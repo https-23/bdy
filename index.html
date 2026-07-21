@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday ✨</title>
+        <!-- WhatsApp & Social Media Link Preview (Open Graph) -->
+    <meta property="og:title" content="A Special Surprise for You ✨">
+    <meta property="og:description" content="I made something unique to bring a big smile to your face today. Tap to open your surprise! 🌸">
+    
+    <!-- Yahan apni website ka exact URL daalna -->
+    <meta property="og:url" content="https://https-23.github.io/bdy/">
+    
+    <!-- Yahan preview me dikhne wali image ka absolute URL daalna hai -->
+    <meta property="og:image" content="https://https-23.github.io/bdy/plane.heart.penguin.gif">
+    
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#ffb6c1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="preloader">
+        <div class="loader-content">
+            <img src="penguin3.gif" alt="Loading" class="bounce-loader">
+            <h2 style="color: #c0392b; margin-top: 15px;">Loading Magic... ✨</h2>
+        </div>
+    </div>
+    
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="app">
+        <section class="screen active" id="screen1">
+            <img class="character corner-penguin" src="penguin3.gif" alt="Penguin 3">
+            <div class="middle-part">
+                <img class="character center-penguin" src="doublejumppengu.gif" alt="double jump pengu">
+                <h1>I made something<br>special for u ✨</h1>
+                <p>do u wanna see it?</p>
+            </div>
+            <div class="bottom-part">
+                <img class="character above-btn-penguin" src="penguin1.gif" alt="Penguin 1">
+                <div class="buttons">
+                    <button id="yesBtn">YES 💖</button>
+                    <button id="noBtn">NO 🙄</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="screen" id="angry">
+            <img class="character shake" src="furious.penguin.gif" alt="furious Penguin">
+            <h1>😤 HMPH ! HOW DARE YOU!?</h1>
+            <button id="tryAgain">TRY AGAIN</button>
+        </section>
+
+        <section class="screen" id="screen2">
+            <button class="backBtn" data-back="screen1">⬅️</button>
+            <h1>A special message for you... 🌸</h1>
+            <img class="character" src="plane.heart.penguin.gif" alt="Penguin Plane heart">
+            <p class="swipe">👇 Tap Anywhere to Continue</p>
+        </section>
+
+        <section class="screen" id="screen3">
+            <button class="backBtn" data-back="screen2">⬅️</button>
+            <h1 class="birthday">HAPPY<br>BIRTHDAY 🎂</h1>
+            <img class="cake" src="birthday.penguin.gif" alt="Cake">
+            <button class="heartNext">❤️</button>
+        </section>
+
+        <section class="screen" id="screen4">
+            <button class="backBtn" data-back="screen3">⬅️</button>
+            <img class="character" src="celeb-penguin.gif" alt="Penguin celebration" style="height: 110px; margin-top: 10px; margin-bottom: 5px;">
+            
+            <h1>Open Me, One Surprise at a Time 💌</h1>
+            
+            <div class="envelope-wrapper" id="envelope-wrapper">
+                <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
+                <div class="envelope">
+                    <div class="letter">
+                        <p>Happy Birthday! 🌸<br>I wanted to make something different that could bring a big smile to your face today. Hope you like this little surprise!</p>
+                    </div>
+                    <div class="envelope-front"></div>
+                </div>
+            </div>
+            
+            <p class="click-hint">Tap on envelope to open 👆</p>
+            <button class="next" id="envelopeNextBtn" style="display: none;">Next →</button>
+        </section>
+
+        <section class="screen" id="screen5">
+            <button class="backBtn" data-back="screen4">⬅️</button>
+            <img class="character" src="penguin8.gif" alt="Penguin 8" style="height: 110px; margin-top: 10px; margin-bottom: 5px;">
+            
+            <h1>Special Messages ✨</h1>
+            <p>Tap a box to open your surprise!</p>
+            
+            <div class="mini-card-grid">
+                <div class="mini-card" data-id="1">🎁 Message 1</div>
+                <div class="mini-card" data-id="2">🎁 Message 2</div>
+                <div class="mini-card" data-id="3">🎁 Message 3</div>
+                <div class="mini-card" data-id="4">🎁 Message 4</div>
+            </div>
+            
+            <button class="heartNext">❤️</button>
+
+            <div id="scratch-modal" class="hidden-modal">
+                <div class="scratch-modal-content">
+                    <button id="close-modal">✖</button>
+                    <div id="modal-message-content"></div>
+                    <canvas id="popup-scratch-pad"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="screen" id="screen6">
+            <button class="backBtn" data-back="screen5">⬅️</button>
+            <h1>Flowers for you 🌸</h1>
+            <img class="flowers" src="flowers-love-you.gif" alt="Flowers">
+            <button class="heartNext">❤️</button>
+        </section>
+
+        <section class="screen" id="screen7">
+            <button class="backBtn" data-back="screen6">⬅️</button>
+            <img class="character" src="sadpenguin.gif" alt="Sad Penguin" style="width: 250px; margin-bottom: 20px;">
+            <h2>Aapki Photos nahi hai is me, sorry! 🥺</h2>
+            <button class="heartNext">❤️</button>
+        </section>
+
+        <section class="screen" id="screen8">
+            <button class="backBtn" data-back="screen7">⬅️</button>
+            <div class="glass">
+                <img class="character" src="love-penguin.gif" alt="Penguin celebration" style="height: 110px; opacity: 0.5; margin-top: 10px; margin-bottom: 5px;">
+            
+                <h1>My Wish For You ✨</h1>
+                <p id="final-message">
+                    Happy Birthday! 🎉<br><br>
+                    I made this little website because I wanted to do something unique and hopefully make you smile today. I hope today brings you calm, lots of smiles, and the warm feeling of knowing how special you are.<br><br>
+                    I sincerely wish this year brings you happiness, peace, good health, success, and beautiful memories. Keep smiling, always.<br><br>Happiest Birthday once again! 🌸
+                </p>
+                <h2>Take Care ✨</h2>
+                
+                <h2 id="secret-name" class="glowing-name">For __s_a_ 💖</h2>
+            </div>
+        </section>
+
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <audio id="pop-sound" src="pop.mp3" preload="auto"></audio>
+    <audio id="scratch-sound" src="scratch.mp3" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
