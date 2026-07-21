@@ -252,5 +252,28 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(renderParallax);
     }
     renderParallax(); 
+            // --- PHOTO GALLERY LIGHTBOX (Screen 7) ---
+    const photoModal = document.getElementById('photo-modal');
+    const modalImage = document.getElementById('modal-image');
+    const closePhotoModalBtn = document.getElementById('close-photo-modal');
+
+    // Har chote photo par click karne ka event
+    document.querySelectorAll('.photo-card').forEach(card => {
+        card.addEventListener('click', () => {
+            playPopSound();
+            const img = card.querySelector('img');
+            if(img) {
+                modalImage.src = img.src; // Chote photo ka source bade modal me daalo
+                photoModal.classList.add('show');
+            }
+        });
+    });
+
+    // Close button ka logic
+    closePhotoModalBtn?.addEventListener('click', () => {
+        playPopSound();
+        photoModal.classList.remove('show');
+    });
+        
 });
                                                              
