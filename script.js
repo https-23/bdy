@@ -257,19 +257,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalImage = document.getElementById('modal-image');
     const closePhotoModalBtn = document.getElementById('close-photo-modal');
 
-    // Har chote photo par click karne ka event
-    document.querySelectorAll('.photo-card').forEach(card => {
+    // Har chote IG post par click karne ka event
+    document.querySelectorAll('.ig-card').forEach(card => {
         card.addEventListener('click', () => {
             playPopSound();
-            const img = card.querySelector('img');
+            const img = card.querySelector('.gallery-img'); // Image dhoondo
             if(img) {
-                modalImage.src = img.src; // Chote photo ka source bade modal me daalo
+                modalImage.src = img.src; // Badi image me set karo
                 photoModal.classList.add('show');
             }
         });
     });
 
-    // Close button ka logic
     closePhotoModalBtn?.addEventListener('click', () => {
         playPopSound();
         photoModal.classList.remove('show');
