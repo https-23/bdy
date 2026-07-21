@@ -116,17 +116,49 @@
 
         <section class="screen" id="screen6">
             <button class="backBtn" data-back="screen5">⬅️</button>
+            <img class="running" src="runpenguin.gif" alt="running penguin" style="width: 150px; height: auto;">
+            
             <h1>Flowers for you 🌸</h1>
             <img class="flowers" src="flowers-love-you.gif" alt="Flowers">
             <button class="heartNext">❤️</button>
         </section>
 
+                <!-- Screen 7: Premium Photo Gallery -->
         <section class="screen" id="screen7">
             <button class="backBtn" data-back="screen6">⬅️</button>
-            <img class="character" src="sadpenguin.gif" alt="Sad Penguin" style="width: 250px; margin-bottom: 20px;">
-            <h2>Aapki Photos nahi hai is me, sorry! 🥺</h2>
+            <h1>Beautiful Memories 📸</h1>
+            <p>Tap a photo to view!</p>
+            
+            <div class="photo-grid">
+                <!-- Photo 1 -->
+                <div class="photo-card" style="transform: rotate(-3deg);">
+                    <img src="photo1.jpg" alt="Memory 1" class="gallery-img">
+                </div>
+                <!-- Photo 2 -->
+                <div class="photo-card" style="transform: rotate(4deg);">
+                    <img src="photo2.jpg" alt="Memory 2" class="gallery-img">
+                </div>
+                <!-- Photo 3 -->
+                <div class="photo-card" style="transform: rotate(2deg);">
+                    <img src="photo3.jpg" alt="Memory 3" class="gallery-img">
+                </div>
+                <!-- Photo 4 -->
+                <div class="photo-card" style="transform: rotate(-4deg);">
+                    <img src="photo4.jpg" alt="Memory 4" class="gallery-img">
+                </div>
+            </div>
+            
             <button class="heartNext">❤️</button>
+
+            <!-- Lightbox Modal (Tap karne par bada photo yahan dikhega) -->
+            <div id="photo-modal" class="hidden-modal">
+                <div class="photo-modal-content">
+                    <button id="close-photo-modal">✖</button>
+                    <img id="modal-image" src="" alt="Full View">
+                </div>
+            </div>
         </section>
+
 
         <section class="screen" id="screen8">
             <button class="backBtn" data-back="screen7">⬅️</button>
