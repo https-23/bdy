@@ -252,20 +252,48 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(renderParallax);
     }
     renderParallax(); 
-            // --- PHOTO GALLERY LIGHTBOX (Screen 7) ---
+                // --- PHOTO GALLERY LIGHTBOX & DOUBLE TAP MAGIC (Screen 7) ---
     const photoModal = document.getElementById('photo-modal');
     const modalImage = document.getElementById('modal-image');
     const closePhotoModalBtn = document.getElementById('close-photo-modal');
 
-    // Har chote IG post par click karne ka event
     document.querySelectorAll('.ig-card').forEach(card => {
-        card.addEventListener('click', () => {
-            playPopSound();
-            const img = card.querySelector('.gallery-img'); // Image dhoondo
-            if(img) {
-                modalImage.src = img.src; // Badi image me set karo
-                photoModal.classList.add('show');
+        let lastTap = 0;
+        let tapTimer;
+
+        card.addEventListener('click', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                // 🔥 DOUBLE TAP DETECTED! 🔥
+                clearTimeout(tapTimer); // Single click ko rok do
+                e.preventDefault();
+                
+                // Heartbeat Haptic Vibration
+                if ("vibrate" in navigator) navigator.vibrate([30, 50, 30]); 
+                
+                // Heart Element Create Karo
+                const heart = document.createElement('div');
+                heart.classList.add('popup-heart');
+                heart.innerText = '❤️';
+                card.appendChild(heart);
+                
+                // 1 second baad heart ko HTML se hata do taaki memory full na ho
+                setTimeout(() => heart.remove(), 1000);
+
+            } else {
+                // 🖱️ SINGLE TAP (Lightbox open karo)
+                tapTimer = setTimeout(() => {
+                    playPopSound();
+                    const img = card.querySelector('.gallery-img');
+                    if(img) {
+                        modalImage.src = img.src;
+                        photoModal.classList.add('show');
+                    }
+                }, 300); // 300ms wait karega check karne ke liye ki double tap to nahi kiya
             }
+            lastTap = currentTime;
         });
     });
 
@@ -273,6 +301,6 @@ document.addEventListener("DOMContentLoaded", () => {
         playPopSound();
         photoModal.classList.remove('show');
     });
-        
+
 });
                                                              
