@@ -122,13 +122,15 @@
             <img class="flowers" src="flowers-love-you.gif" alt="Flowers">
             <button class="heartNext">❤️</button>
         </section>
+                <!-- Screen 7: Premium Photo Gallery (Instagram Style with Floating & Double Tap Magic) -->
         <section class="screen" id="screen7">
             <button class="backBtn" data-back="screen6">⬅️</button>
             <h1>Beautiful Memories 📸</h1>
             <p>Tap a post to view!</p>
             
-                        <div class="photo-grid">
-                <div class="ig-card" style="transform: rotate(-3deg);">
+            <div class="photo-grid">
+                <!-- Post 1 -->
+                <div class="ig-card" style="--rot: -3deg;">
                     <div class="ig-header">
                         <div class="ig-user">
                             <div class="ig-pfp"></div>
@@ -142,7 +144,8 @@
                     </div>
                 </div>
                 
-                <div class="ig-card" style="transform: rotate(4deg);">
+                <!-- Post 2 -->
+                <div class="ig-card" style="--rot: 4deg;">
                     <div class="ig-header">
                         <div class="ig-user">
                             <div class="ig-pfp"></div>
@@ -156,7 +159,8 @@
                     </div>
                 </div>
                 
-                <div class="ig-card" style="transform: rotate(2deg);">
+                <!-- Post 3 -->
+                <div class="ig-card" style="--rot: 2deg;">
                     <div class="ig-header">
                         <div class="ig-user">
                             <div class="ig-pfp"></div>
@@ -170,7 +174,8 @@
                     </div>
                 </div>
                 
-                <div class="ig-card" style="transform: rotate(-4deg);">
+                <!-- Post 4 -->
+                <div class="ig-card" style="--rot: -4deg;">
                     <div class="ig-header">
                         <div class="ig-user">
                             <div class="ig-pfp"></div>
@@ -185,9 +190,9 @@
                 </div>
             </div>
 
-            
             <button class="heartNext">❤️</button>
 
+            <!-- Lightbox Modal (Tap karne par bada photo dikhega) -->
             <div id="photo-modal" class="hidden-modal">
                 <div class="photo-modal-content">
                     <button id="close-photo-modal">✖</button>
