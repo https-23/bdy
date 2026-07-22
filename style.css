@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@400;600&display=swap');
+
 /* --- Premium Preloader --- */
 #preloader {
     position: fixed;
@@ -19,6 +20,7 @@
     from { transform: translateY(0); } 
     to { transform: translateY(-20px); } 
 }
+
 /* --- Architectural Foundation (Variables) --- */
 :root {
     --bg-gradient: linear-gradient(135deg, #ffe6ea 0%, #fdfbfb 100%);
@@ -304,15 +306,8 @@ button.heartNext {
     from { text-shadow: 0 0 5px #ff758c, 0 0 10px #ff758c, 0 0 15px #c0392b; }
     to { text-shadow: 0 0 10px #ff7eb3, 0 0 20px #ff7eb3, 0 0 30px #ff7eb3, 0 0 40px #ff758c; }
 }
-/* --- Premium Photo Gallery (Screen 7) --- */
-.photo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    width: 90%;
-    margin: 10px 0 20px 0;
-}
 
+/* --- Premium Photo Gallery (Screen 7) --- */
 .photo-card {
     background: #fff;
     padding: 8px 8px 25px 8px; /* Polaroid jaisa effect */
@@ -324,14 +319,6 @@ button.heartNext {
 
 .photo-card:active {
     transform: scale(0.95) !important;
-}
-
-.gallery-img {
-    width: 100%;
-    height: 130px; /* Perfect height bina scroll kiye fit aane ke liye */
-    object-fit: cover;
-    border-radius: 3px;
-    pointer-events: none;
 }
 
 /* --- Instagram Style Photo Gallery (Screen 7) --- */
@@ -353,9 +340,22 @@ button.heartNext {
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid #efefef;
+    position: relative; /* Heart animation ke liye zaroori hai */
+    animation: floating 3.5s ease-in-out infinite;
 }
 
 .ig-card:active { transform: scale(0.95) !important; }
+
+/* Sabko alag-alag speed do taaki natural lage */
+.ig-card:nth-child(1) { animation-delay: 0s; }
+.ig-card:nth-child(2) { animation-delay: 0.8s; }
+.ig-card:nth-child(3) { animation-delay: 1.5s; }
+.ig-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+    50% { transform: translateY(-10px) rotate(var(--rot)); } /* Halka sa upar uthega */
+}
 
 /* IG Header */
 .ig-header {
@@ -441,21 +441,6 @@ button.heartNext {
     width: 35px; height: 35px; z-index: 2000; cursor: pointer; font-weight: bold;
     font-size: 1.2rem; display: flex; justify-content: center; align-items: center;
 }
-/* --- ZERO GRAVITY FLOATING EFFECT --- */
-.ig-card {
-    position: relative; /* Heart animation ke liye zaroori hai */
-    animation: floating 3.5s ease-in-out infinite;
-}
-/* Sabko alag-alag speed do taaki natural lage */
-.ig-card:nth-child(1) { animation-delay: 0s; }
-.ig-card:nth-child(2) { animation-delay: 0.8s; }
-.ig-card:nth-child(3) { animation-delay: 1.5s; }
-.ig-card:nth-child(4) { animation-delay: 0.4s; }
-
-@keyframes floating {
-    0%, 100% { transform: translateY(0) rotate(var(--rot)); }
-    50% { transform: translateY(-10px) rotate(var(--rot)); } /* Halka sa upar uthega */
-}
 
 /* --- DOUBLE TAP HEART POP ANIMATION --- */
 .popup-heart {
@@ -476,3 +461,108 @@ button.heartNext {
     40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
     100% { transform: translate(-50%, -100%) scale(1); opacity: 0; } /* Upar udte hue gayab */
 }
+
+/* =========================================
+   3D LOGIN SCREEN & WOW FACTOR STYLES
+   ========================================= */
+#login-screen {
+    perspective: 1000px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-gradient);
+}
+
+.glass-login-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    padding: 40px 30px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(255, 117, 140, 0.2), 
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    width: 85%;
+    max-width: 340px;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.glass-login-card > * {
+    transform: translateZ(30px);
+}
+
+.input-group {
+    position: relative;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255, 117, 140, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    outline: none;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    color: var(--text-color);
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #ff758c;
+    box-shadow: 0 0 10px rgba(255, 117, 140, 0.3);
+}
+
+.input-group label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+    top: -10px;
+    left: 10px;
+    font-size: 0.8rem;
+    color: #ff758c;
+    background: var(--bg-gradient);
+    padding: 0 5px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.magic-btn {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loader.hidden { display: none; }
+.btn-text.hidden { opacity: 0; }
+
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
