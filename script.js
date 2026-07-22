@@ -3,12 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('load', () => {
         const preloader = document.getElementById('preloader');
         if (preloader) {
-            // Thoda delay taaki smooth transition ho
             setTimeout(() => {
                 preloader.style.opacity = '0';
                 setTimeout(() => {
                     preloader.style.visibility = 'hidden';
-                }, 600); // Wait for fade out animation
+                }, 600); 
             }, 800); 
         }
     });
@@ -16,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const screens = document.querySelectorAll(".screen");
     let typeWriterTriggered = false;
 
-    // AUDIO HAPTIC ENGINE
+    // AUDIO ENGINE
     function playPopSound() {
         const pop = document.getElementById("pop-sound");
         if (pop) {
@@ -25,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // CONFETTI CANNON
+    // CONFETTI ENGINE
     function fireConfetti() {
         if (typeof confetti !== "undefined") {
             var duration = 3000;
@@ -62,6 +61,58 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // --- 3D LOGIN SCREEN LOGIC ---
+    const loginScreen = document.getElementById('login-screen');
+    const tiltCard = document.getElementById('tilt-card');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const btnText = unlockBtn?.querySelector('.btn-text');
+    const btnLoader = unlockBtn?.querySelector('.loader');
+
+    if (loginScreen && tiltCard) {
+        loginScreen.addEventListener('mousemove', (e) => {
+            const rect = tiltCard.getBoundingClientRect();
+            const x = e.clientX - (rect.left + rect.width / 2);
+            const y = e.clientY - (rect.top + rect.height / 2);
+            
+            const tiltX = -(y / 15).toFixed(2);
+            const tiltY = (x / 15).toFixed(2);
+
+            tiltCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+        });
+
+        loginScreen.addEventListener('mouseleave', () => {
+            tiltCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            tiltCard.style.transition = "transform 0.5s ease-out"; 
+            setTimeout(() => { tiltCard.style.transition = "transform 0.1s ease-out"; }, 500);
+        });
+    }
+
+    unlockBtn?.addEventListener('click', () => {
+        const user = document.getElementById('dummy-username').value;
+        const pass = document.getElementById('dummy-password').value;
+
+        if(user.trim() === '' || pass.trim() === '') {
+            tiltCard.classList.add('shake');
+            setTimeout(() => tiltCard.classList.remove('shake'), 500);
+            return;
+        }
+
+        // Processing state
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
+        playPopSound(); 
+
+        setTimeout(() => {
+            const bgMusic = document.getElementById("bg-music");
+            if (bgMusic) { 
+                bgMusic.volume = 0.5; 
+                bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
+            }
+            showScreen("screen1");
+        }, 1500);
+    });
+
+    // --- BASIC NAVIGATION ---
     document.getElementById("yesBtn")?.addEventListener("click", () => {
         playPopSound(); 
         const bgMusic = document.getElementById("bg-music");
@@ -91,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // --- ENVELOPE LOGIC ---
     const envelopeWrapper = document.getElementById("envelope-wrapper");
     if (envelopeWrapper) {
         envelopeWrapper.addEventListener("click", () => {
@@ -106,6 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     document.getElementById("envelopeNextBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
 
+    // --- BACKGROUND PARTICLES ---
     const pCanvas = document.getElementById("particle-canvas");
     if (pCanvas) {
         const pCtx = pCanvas.getContext("2d");
@@ -143,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         animateParticles();
     }
 
-    // --- TYPEWRITER & SECRET NAME REVEAL ---
+    // --- TYPEWRITER ---
     function triggerTypewriter() {
         const pElement = document.getElementById("final-message");
         if (!pElement) return;
@@ -157,16 +210,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 i++;
                 setTimeout(typing, 35);
             } else {
-                // Typing khatam hone ke baad Secret Name Glow karega!
                 const secretName = document.getElementById("secret-name");
-                if (secretName) {
-                    secretName.classList.add("show-name");
-                }
+                if (secretName) secretName.classList.add("show-name");
             }
         }
         typing();
     }
 
+    // --- SCRATCH CARDS (Memory Leak Fixed) ---
     const messages = {
         1: `<strong style="font-size: 1.4rem; color: var(--primary-color);">🎂 Happy Birthday!</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">Wishing you a year full of happiness, good health, and countless reasons to smile. Have an amazing birthday!</span>`,
         2: `<strong style="font-size: 1.4rem; color: var(--primary-color);">💛 A Small Apology</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">If I ever made you uncomfortable or hurt you in any way, I'm truly sorry. That was never my intention.</span>`,
@@ -190,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById('close-modal')?.addEventListener('click', () => { playPopSound(); modal.classList.remove('show'); });
 
-    // --- SCRATCH CARD OPTIMIZATION (Memory Leak Fix) ---
     let isDrawing = false; 
     let lastAudioTime = 0; 
     let scratchEventsBound = false; 
@@ -201,7 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
         scratchCanvas.width = rect.width; 
         scratchCanvas.height = rect.height;
 
-        // Reset composite operation BEFORE drawing the new scratch cover
         ctx.globalCompositeOperation = 'source-over'; 
         ctx.fillStyle = '#b3b3b3'; 
         ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
@@ -212,7 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.textBaseline = "middle";
         ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
 
-        // Only bind the event listeners if they haven't been bound yet
         if (!scratchEventsBound) {
             function scratch(e) {
                 if (!isDrawing) return;
@@ -250,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- PARALLAX & SENSOR OPTIMIZATION (Battery/Performance Fix) ---
+    // --- PARALLAX & SENSOR OPTIMIZATION (Throttled) ---
     let targetX = 0, targetY = 0; 
     let currentX = 0, currentY = 0;
 
@@ -300,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     renderParallax(); 
 
-    // --- PHOTO GALLERY LIGHTBOX & DOUBLE TAP MAGIC (Screen 7) ---
+    // --- INSTAGRAM DOUBLE TAP & LIGHTBOX ---
     const photoModal = document.getElementById('photo-modal');
     const modalImage = document.getElementById('modal-image');
     const closePhotoModalBtn = document.getElementById('close-photo-modal');
@@ -314,24 +362,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const tapLength = currentTime - lastTap;
             
             if (tapLength < 300 && tapLength > 0) {
-                // 🔥 DOUBLE TAP DETECTED! 🔥
-                clearTimeout(tapTimer); // Single click ko rok do
+                clearTimeout(tapTimer); 
                 e.preventDefault();
                 
-                // Heartbeat Haptic Vibration
                 if ("vibrate" in navigator) navigator.vibrate([30, 50, 30]); 
                 
-                // Heart Element Create Karo
                 const heart = document.createElement('div');
                 heart.classList.add('popup-heart');
                 heart.innerText = '❤️';
                 card.appendChild(heart);
                 
-                // 1 second baad heart ko HTML se hata do taaki memory full na ho
                 setTimeout(() => heart.remove(), 1000);
 
             } else {
-                // 🖱️ SINGLE TAP (Lightbox open karo)
                 tapTimer = setTimeout(() => {
                     playPopSound();
                     const img = card.querySelector('.gallery-img');
@@ -351,3 +394,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+                    
