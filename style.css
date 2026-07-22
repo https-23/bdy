@@ -467,11 +467,10 @@ button.heartNext {
    ========================================= */
 #login-screen {
     perspective: 1000px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background: var(--bg-gradient);
+    z-index: 50; /* Thoda extra safe rakhne ke liye */
 }
+
 
 .glass-login-card {
     background: rgba(255, 255, 255, 0.4);
