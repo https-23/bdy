@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {    
-        // --- PRELOADER LOGIC ---
+    // --- PRELOADER LOGIC ---
     window.addEventListener('load', () => {
         const preloader = document.getElementById('preloader');
         if (preloader) {
@@ -190,69 +190,117 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById('close-modal')?.addEventListener('click', () => { playPopSound(); modal.classList.remove('show'); });
 
+    // --- SCRATCH CARD OPTIMIZATION (Memory Leak Fix) ---
+    let isDrawing = false; 
+    let lastAudioTime = 0; 
+    let scratchEventsBound = false; 
+
     function initPopupScratchCard() {
         const ctx = scratchCanvas.getContext('2d');
         const rect = scratchCanvas.parentElement.getBoundingClientRect();
-        scratchCanvas.width = rect.width; scratchCanvas.height = rect.height;
+        scratchCanvas.width = rect.width; 
+        scratchCanvas.height = rect.height;
 
-        ctx.fillStyle = '#b3b3b3'; ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-        ctx.font = "bold 24px 'Fredoka', sans-serif"; ctx.fillStyle = "#ffffff";
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        // Reset composite operation BEFORE drawing the new scratch cover
+        ctx.globalCompositeOperation = 'source-over'; 
+        ctx.fillStyle = '#b3b3b3'; 
+        ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        
+        ctx.font = "bold 24px 'Fredoka', sans-serif"; 
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center"; 
+        ctx.textBaseline = "middle";
         ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
 
-        let isDrawing = false; let lastAudioTime = 0; 
+        // Only bind the event listeners if they haven't been bound yet
+        if (!scratchEventsBound) {
+            function scratch(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                
+                const dynamicCtx = scratchCanvas.getContext('2d');
+                const canvasRect = scratchCanvas.getBoundingClientRect();
+                
+                let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
+                let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
 
-        function scratch(e) {
-            if (!isDrawing) return;
-            e.preventDefault();
-            const canvasRect = scratchCanvas.getBoundingClientRect();
-            let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
-            let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
+                dynamicCtx.globalCompositeOperation = 'destination-out';
+                dynamicCtx.beginPath(); 
+                dynamicCtx.arc(x, y, 25, 0, Math.PI * 2); 
+                dynamicCtx.fill();
 
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(x, y, 25, 0, Math.PI * 2); ctx.fill();
-
-            const now = Date.now();
-            if (now - lastAudioTime > 150) { 
-                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(e => {}); }
-                lastAudioTime = now;
+                const now = Date.now();
+                if (now - lastAudioTime > 150) { 
+                    if (scratchSound) { 
+                        scratchSound.currentTime = 0; 
+                        scratchSound.play().catch(e => {}); 
+                    }
+                    lastAudioTime = now;
+                }
             }
-        }
 
-        scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
-        scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
-        scratchCanvas.addEventListener('mousemove', scratch);
-        scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
-        scratchCanvas.addEventListener('touchend', () => isDrawing = false);
-        scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
+            scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
+            scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
+            scratchCanvas.addEventListener('mousemove', scratch);
+            scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
+            scratchCanvas.addEventListener('touchend', () => isDrawing = false);
+            scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
+            
+            scratchEventsBound = true; 
+        }
     }
 
-    let targetX = 0, targetY = 0; let currentX = 0, currentY = 0;
+    // --- PARALLAX & SENSOR OPTIMIZATION (Battery/Performance Fix) ---
+    let targetX = 0, targetY = 0; 
+    let currentX = 0, currentY = 0;
 
-    window.addEventListener("deviceorientation", (e) => {
+    function throttle(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
+    window.addEventListener("deviceorientation", throttle((e) => {
         if (!e.gamma || !e.beta) return;
-        let tiltX = e.gamma; let tiltY = e.beta;  
-        if (tiltX > 25) tiltX = 25; if (tiltX < -25) tiltX = -25;
-        if (tiltY > 55) tiltY = 55; if (tiltY < 25) tiltY = 25; 
-        targetX = (tiltX / 25) * 15; targetY = ((tiltY - 40) / 15) * 15; 
-    });
+        
+        let tiltX = e.gamma; 
+        let tiltY = e.beta;  
+        
+        if (tiltX > 25) tiltX = 25; 
+        if (tiltX < -25) tiltX = -25;
+        if (tiltY > 55) tiltY = 55; 
+        if (tiltY < 25) tiltY = 25; 
+        
+        targetX = (tiltX / 25) * 15; 
+        targetY = ((tiltY - 40) / 15) * 15; 
+    }, 20));
 
-    document.addEventListener("mousemove", (e) => {
+    document.addEventListener("mousemove", throttle((e) => {
         const x = (e.clientX / window.innerWidth - 0.5) * 30; 
         const y = (e.clientY / window.innerHeight - 0.5) * 30;
-        targetX = x; targetY = y;
-    });
+        targetX = x; 
+        targetY = y;
+    }, 20));
 
     function renderParallax() {
-        currentX += (targetX - currentX) * 0.1; currentY += (targetY - currentY) * 0.1;
+        currentX += (targetX - currentX) * 0.1; 
+        currentY += (targetY - currentY) * 0.1;
+        
         document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
             const depth = el.classList.contains('glass') ? 0.4 : 1;
             el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
         });
+        
         requestAnimationFrame(renderParallax);
     }
     renderParallax(); 
-                // --- PHOTO GALLERY LIGHTBOX & DOUBLE TAP MAGIC (Screen 7) ---
+
+    // --- PHOTO GALLERY LIGHTBOX & DOUBLE TAP MAGIC (Screen 7) ---
     const photoModal = document.getElementById('photo-modal');
     const modalImage = document.getElementById('modal-image');
     const closePhotoModalBtn = document.getElementById('close-photo-modal');
@@ -291,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         modalImage.src = img.src;
                         photoModal.classList.add('show');
                     }
-                }, 300); // 300ms wait karega check karne ke liye ki double tap to nahi kiya
+                }, 300); 
             }
             lastTap = currentTime;
         });
@@ -303,4 +351,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
-                                                             
