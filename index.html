@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Happy Birthday ✨</title>
-        <!-- WhatsApp & Social Media Link Preview (Open Graph) -->
+    
+    <!-- WhatsApp & Social Media Link Preview (Open Graph) -->
     <meta property="og:title" content="A Special Surprise for You ✨">
     <meta property="og:description" content="I made something unique to bring a big smile to your face today. Tap to open your surprise! 🌸">
     
@@ -33,7 +34,37 @@
     <canvas id="particle-canvas"></canvas>
 
     <div id="app">
-        <section class="screen active" id="screen1">
+        
+        <!-- =========================================
+             NEW 3D MAGIC LOGIN SCREEN
+             ========================================= -->
+        <section class="screen active" id="login-screen">
+            <div class="glass-login-card" id="tilt-card">
+                <img class="character" src="penguin3.gif" alt="Security Penguin" style="height: 90px; margin-bottom: 10px;">
+                <h2>Secret Portal ✨</h2>
+                <p style="font-size: 0.9rem; margin-bottom: 20px;">Enter any magical credentials</p>
+                
+                <div class="input-group">
+                    <input type="text" id="dummy-username" required placeholder=" ">
+                    <label>Magical Name</label>
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="dummy-password" required placeholder=" ">
+                    <label>Secret Spell</label>
+                </div>
+
+                <button id="unlock-btn" class="magic-btn">
+                    <span class="btn-text">UNLOCK MAGIC 🔓</span>
+                    <span class="loader hidden"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- =========================================
+             ORIGINAL SCREENS (Screen 1 se active hata diya hai)
+             ========================================= -->
+        <section class="screen" id="screen1">
             <img class="character corner-penguin" src="penguin3.gif" alt="Penguin 3">
             <div class="middle-part">
                 <img class="character center-penguin" src="doublejumppengu.gif" alt="double jump pengu">
@@ -122,7 +153,8 @@
             <img class="flowers" src="flowers-love-you.gif" alt="Flowers">
             <button class="heartNext">❤️</button>
         </section>
-                <!-- Screen 7: Premium Photo Gallery (Instagram Style with Floating & Double Tap Magic) -->
+        
+        <!-- Screen 7: Premium Photo Gallery (Instagram Style with Floating & Double Tap Magic) -->
         <section class="screen" id="screen7">
             <button class="backBtn" data-back="screen6">⬅️</button>
             <h1>Beautiful Memories 📸</h1>
