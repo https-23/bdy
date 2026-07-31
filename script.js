@@ -1,17 +1,82 @@
 document.addEventListener("DOMContentLoaded", () => {    
-    // --- PRELOADER LOGIC ---
-    window.addEventListener('load', () => {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.visibility = 'hidden';
-                }, 600); 
-            }, 800); 
-        }
-    });
+    
+    // ==========================================
+    // PHASE 1: FORM TO PREVIEW LOGIC
+    // ==========================================
+    const orderForm = document.getElementById('order-form-container');
+    const previewContainer = document.getElementById('preview-container');
+    const previewBtn = document.getElementById('preview-btn');
+    
+    if(previewBtn) {
+        previewBtn.addEventListener('click', () => {
+            const partnerName = document.getElementById('partner-name-input').value;
+            const customerName = document.getElementById('customer-name-input').value;
+            
+            if(partnerName.trim() === '' || customerName.trim() === '') {
+                alert("Please fill all details to preview the magic! ✨");
+                return;
+            }
 
+            // Inject Data into Preview
+            const secretNameEl = document.getElementById('secret-name');
+            if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+            
+            const dummyUser = document.getElementById('dummy-username');
+            if(dummyUser) dummyUser.value = partnerName; // Autofill portal
+            
+            const dummyPass = document.getElementById('dummy-password');
+            if(dummyPass) dummyPass.value = "magic"; // Autofill password
+            
+            // Hide Form, Show Preview
+            orderForm.style.display = "none";
+            previewContainer.style.display = "block";
+            
+            // Trigger Preloader manually
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.visibility = 'hidden';
+                    }, 600); 
+                }, 800); 
+            }
+        });
+    }
+
+    // ==========================================
+    // PHASE 2: RAZORPAY CHECKOUT LOGIC
+    // ==========================================
+    const payBtn = document.getElementById('pay-now-btn');
+    if(payBtn) {
+        payBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            
+            var options = {
+                "key": "YOUR_RAZORPAY_TEST_KEY_HERE", // Yahan apni test key dalna
+                "amount": "9900", // ₹99 = 9900 paise
+                "currency": "INR",
+                "name": "Magical Surprises",
+                "description": "Custom Birthday Link",
+                "handler": function (response){
+                    alert("Payment Success! ID: " + response.razorpay_payment_id);
+                    // Yahan future me database API call hogi
+                },
+                "prefill": {
+                    "name": document.getElementById('customer-name-input') ? document.getElementById('customer-name-input').value : "Customer",
+                },
+                "theme": {
+                    "color": "#c0392b"
+                }
+            };
+            var rzp = new Razorpay(options);
+            rzp.open();
+        });
+    }
+
+    // ==========================================
+    // PHASE 3: ORIGINAL MAGICAL APP LOGIC
+    // ==========================================
     const screens = document.querySelectorAll(".screen");
     let typeWriterTriggered = false;
 
@@ -87,30 +152,33 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    unlockBtn?.addEventListener('click', () => {
-        const user = document.getElementById('dummy-username').value;
-        const pass = document.getElementById('dummy-password').value;
+    if(unlockBtn) {
+        unlockBtn.addEventListener('click', () => {
+            const user = document.getElementById('dummy-username').value;
+            const pass = document.getElementById('dummy-password').value;
 
-        if(user.trim() === '' || pass.trim() === '') {
-            tiltCard.classList.add('shake');
-            setTimeout(() => tiltCard.classList.remove('shake'), 500);
-            return;
-        }
-
-        // Processing state
-        btnText.classList.add('hidden');
-        btnLoader.classList.remove('hidden');
-        playPopSound(); 
-
-        setTimeout(() => {
-            const bgMusic = document.getElementById("bg-music");
-            if (bgMusic) { 
-                bgMusic.volume = 0.5; 
-                bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
+            if(user.trim() === '' || pass.trim() === '') {
+                tiltCard.classList.add('shake');
+                setTimeout(() => tiltCard.classList.remove('shake'), 500);
+                return;
             }
-            showScreen("screen1");
-        }, 1500);
-    });
+
+            if(btnText && btnLoader) {
+                btnText.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
+            }
+            playPopSound(); 
+
+            setTimeout(() => {
+                const bgMusic = document.getElementById("bg-music");
+                if (bgMusic) { 
+                    bgMusic.volume = 0.5; 
+                    bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
+                }
+                showScreen("screen1");
+            }, 1500);
+        });
+    }
 
     // --- BASIC NAVIGATION ---
     document.getElementById("yesBtn")?.addEventListener("click", () => {
@@ -217,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
         typing();
     }
 
-    // --- SCRATCH CARDS (Memory Leak Fixed) ---
+    // --- SCRATCH CARDS ---
     const messages = {
         1: `<strong style="font-size: 1.4rem; color: var(--primary-color);">🎂 Happy Birthday!</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">Wishing you a year full of happiness, good health, and countless reasons to smile. Have an amazing birthday!</span>`,
         2: `<strong style="font-size: 1.4rem; color: var(--primary-color);">💛 A Small Apology</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">If I ever made you uncomfortable or hurt you in any way, I'm truly sorry. That was never my intention.</span>`,
@@ -233,19 +301,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.mini-card').forEach(card => {
         card.addEventListener('click', () => {
             playPopSound();
-            modalContent.innerHTML = messages[card.getAttribute('data-id')];
-            modal.classList.add('show');
+            if(modalContent) modalContent.innerHTML = messages[card.getAttribute('data-id')];
+            if(modal) modal.classList.add('show');
             setTimeout(initPopupScratchCard, 300);
         });
     });
 
-    document.getElementById('close-modal')?.addEventListener('click', () => { playPopSound(); modal.classList.remove('show'); });
+    document.getElementById('close-modal')?.addEventListener('click', () => { 
+        playPopSound(); 
+        if(modal) modal.classList.remove('show'); 
+    });
 
     let isDrawing = false; 
     let lastAudioTime = 0; 
     let scratchEventsBound = false; 
 
     function initPopupScratchCard() {
+        if(!scratchCanvas) return;
         const ctx = scratchCanvas.getContext('2d');
         const rect = scratchCanvas.parentElement.getBoundingClientRect();
         scratchCanvas.width = rect.width; 
@@ -298,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- PARALLAX & SENSOR OPTIMIZATION (Throttled) ---
+    // --- PARALLAX OPTIMIZATION ---
     let targetX = 0, targetY = 0; 
     let currentX = 0, currentY = 0;
 
@@ -378,7 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 tapTimer = setTimeout(() => {
                     playPopSound();
                     const img = card.querySelector('.gallery-img');
-                    if(img) {
+                    if(img && modalImage && photoModal) {
                         modalImage.src = img.src;
                         photoModal.classList.add('show');
                     }
@@ -388,10 +460,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    closePhotoModalBtn?.addEventListener('click', () => {
-        playPopSound();
-        photoModal.classList.remove('show');
-    });
+    if(closePhotoModalBtn) {
+        closePhotoModalBtn.addEventListener('click', () => {
+            playPopSound();
+            if(photoModal) photoModal.classList.remove('show');
+        });
+    }
 
 });
-                    
