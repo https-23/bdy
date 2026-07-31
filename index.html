@@ -169,21 +169,88 @@
                 <button class="heartNext">❤️</button>
             </section>
             
-            <section class="screen" id="screen7">
-                <!-- Tumhara existing photo grid code yahan aayega -->
-                <button class="backBtn" data-back="screen6">⬅️</button>
-                <h1>Beautiful Memories 📸</h1>
-                <p>Tap a post to view!</p>
-                <div class="photo-grid">
-                    <div class="ig-card" style="--rot: -3deg;"><img src="photo1.jpg" alt="Memory 1" class="gallery-img"></div>
-                    <div class="ig-card" style="--rot: 4deg;"><img src="photo2.jpg" alt="Memory 2" class="gallery-img"></div>
+        <!-- Screen 7: Premium Photo Gallery (Instagram Style with Floating & Double Tap Magic) -->
+        <section class="screen" id="screen7">
+            <button class="backBtn" data-back="screen6">⬅️</button>
+            <h1>Beautiful Memories 📸</h1>
+            <p>Tap a post to view!</p>
+            
+            <div class="photo-grid">
+                <!-- Post 1 -->
+                <div class="ig-card" style="--rot: -3deg;">
+                    <div class="ig-header">
+                        <div class="ig-user">
+                            <div class="ig-pfp"></div>
+                            <span class="ig-username">memories</span>
+                        </div>
+                        <span class="ig-dots">⋮</span>
+                    </div>
+                    <img src="photo1.jpg" alt="Memory 1" class="gallery-img">
+                    <div class="ig-footer">
+                        <span>❤️</span> <span>🗨️</span> <span>⌲</span>
+                    </div>
                 </div>
-                <button class="heartNext">❤️</button>
-            </section>
+                
+                <!-- Post 2 -->
+                <div class="ig-card" style="--rot: 4deg;">
+                    <div class="ig-header">
+                        <div class="ig-user">
+                            <div class="ig-pfp"></div>
+                            <span class="ig-username">special_day</span>
+                        </div>
+                        <span class="ig-dots">⋮</span>
+                    </div>
+                    <img src="photo2.jpg" alt="Memory 2" class="gallery-img">
+                    <div class="ig-footer">
+                        <span>❤️</span> <span>🗨️</span> <span>⌲</span>
+                    </div>
+                </div>
+                
+                <!-- Post 3 -->
+                <div class="ig-card" style="--rot: 2deg;">
+                    <div class="ig-header">
+                        <div class="ig-user">
+                            <div class="ig-pfp"></div>
+                            <span class="ig-username">smiles</span>
+                        </div>
+                        <span class="ig-dots">⋮</span>
+                    </div>
+                    <img src="photo3.jpg" alt="Memory 3" class="gallery-img">
+                    <div class="ig-footer">
+                        <span>❤️</span> <span>🗨️</span> <span>⌲</span>
+                    </div>
+                </div>
+                
+                <!-- Post 4 -->
+                <div class="ig-card" style="--rot: -4deg;">
+                    <div class="ig-header">
+                        <div class="ig-user">
+                            <div class="ig-pfp"></div>
+                            <span class="ig-username">forever</span>
+                        </div>
+                        <span class="ig-dots">⋮</span>
+                    </div>
+                    <img src="photo4.jpg" alt="Memory 4" class="gallery-img">
+                    <div class="ig-footer">
+                        <span>❤️</span> <span>🗨️</span> <span>⌲</span>
+                    </div>
+                </div>
+            </div>
 
-            <section class="screen" id="screen8">
-                <button class="backBtn" data-back="screen7">⬅️</button>
-                <div class="glass">
+            <button class="heartNext">❤️</button>
+
+            <!-- Lightbox Modal (Tap karne par bada photo dikhega) -->
+            <div id="photo-modal" class="hidden-modal">
+                <div class="photo-modal-content">
+                    <button id="close-photo-modal">✖</button>
+                    <img id="modal-image" src="" alt="Full View">
+                </div>
+            </div>
+        </section>
+
+        <section class="screen" id="screen8">
+            <button class="backBtn" data-back="screen7">⬅️</button>
+            <div class="glass">
                     <img class="character" src="love-penguin.gif" alt="Penguin celebration" style="height: 110px; opacity: 0.5; margin-top: 10px; margin-bottom: 5px;">
                     <h1>My Wish For You ✨</h1>
                     <p id="final-message">
