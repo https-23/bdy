@@ -3,6 +3,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // PHASE 1: FORM TO PREVIEW LOGIC
     // ==========================================
+        // 📸 PHOTO UPLOAD PREVIEW LOGIC
+    const photoUploadBoxes = document.querySelectorAll('.photo-upload-box input[type="file"]');
+    
+    photoUploadBoxes.forEach(input => {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const parentLabel = input.parentElement;
+                    
+                    // Photo ko dabbe ke background me fit karna
+                    parentLabel.style.backgroundImage = `url('${event.target.result}')`;
+                    parentLabel.style.backgroundSize = 'cover';
+                    parentLabel.style.backgroundPosition = 'center';
+                    parentLabel.style.border = 'none'; // Photo lagne ke baad border hata dena
+                    
+                    // '+' icon ko chupana
+                    const plusIcon = parentLabel.querySelector('.upload-icon');
+                    if(plusIcon) plusIcon.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+    
     const orderForm = document.getElementById('order-form-container');
     const previewContainer = document.getElementById('preview-container');
     const previewBtn = document.getElementById('preview-btn');
