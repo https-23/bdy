@@ -23,28 +23,40 @@
     <!-- =========================================
          PHASE 1: THE IN-APP FORM (Wrapper)
          ========================================= -->
-    <div id="order-form-container" class="active-container">
-        <div class="glass-login-card" style="margin-top: 20px;">
-            <h2 style="font-size: 2.2rem; margin-bottom: 5px;">Make Her Surprise 🍒</h2>
-            <p style="font-size: 1rem; margin-bottom: 25px;">Three photos, a few words — that's all it takes.</p>
-            
-            <div class="input-group">
-                <input type="text" id="partner-name-input" placeholder="e.g. Sana" required>
-                <label>Her Name</label>
-            </div>
-            
-            <div class="input-group">
-                <input type="text" id="customer-name-input" placeholder=" " required>
-                <label>Your Name</label>
-            </div>
+    <div id="order-form-container" class="form-card">
+    <h2 class="form-title">Make Her Surprise</h2>
+    <p class="form-subtitle">Four photos, a few words — that's all it takes.</p>
 
-            <!-- Note: Photo upload UI can be added here later -->
+    <!-- Names -->
+    <input type="text" id="partner-name-input" class="premium-input" placeholder="Her Name (e.g., Sana)">
+    <input type="text" id="user-name-input" class="premium-input" placeholder="Your Name">
 
-            <button id="preview-btn" class="magic-btn" style="margin-top: 15px;">
-                <span class="btn-text">PREVIEW THE SURPRISE ➔</span>
-            </button>
-        </div>
+    <!-- 4 Photo Grid -->
+    <p class="section-label">FOUR PHOTOS, FOR THE BOARD</p>
+    <div class="photo-grid-4">
+        <label class="photo-upload-box"><input type="file" accept="image/*"><span>+</span></label>
+        <label class="photo-upload-box"><input type="file" accept="image/*"><span>+</span></label>
+        <label class="photo-upload-box"><input type="file" accept="image/*"><span>+</span></label>
+        <label class="photo-upload-box"><input type="file" accept="image/*"><span>+</span></label>
     </div>
+
+    <!-- Envelope Message -->
+    <p class="section-label">ENVELOPE MESSAGE</p>
+    <div class="envelope-box">
+        <span class="rose-icon">🌹</span>
+        <input type="text" id="envelope-msg" placeholder="Short cute message for the cover...">
+        <span class="rose-icon">🌹</span>
+    </div>
+
+    <!-- Main Wish Message -->
+    <p class="section-label">HEARTFELT WISH</p>
+    <textarea id="main-wish-msg" class="premium-textarea" placeholder="I know I don't say it enough, so let me say it properly today..."></textarea>
+    
+    <!-- AI Generator Button -->
+    <button type="button" id="ai-generate-btn" class="ai-btn">✨ Auto-Generate Wish ✨</button>
+
+    <button id="pay-now-btn" class="submit-btn">PREVIEW THE SURPRISE →</button>
+</div>
 
     <!-- =========================================
          PHASE 2: THE LIVE PREVIEW (Hidden initially)
