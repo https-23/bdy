@@ -7,6 +7,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewContainer = document.getElementById('preview-container');
     const previewBtn = document.getElementById('preview-btn');
     
+    // 🌟 AI WISH GENERATOR LOGIC (Isko bahar nikal diya hai)
+    const aiGenerateBtn = document.getElementById('ai-generate-btn');
+    if(aiGenerateBtn) {
+        aiGenerateBtn.addEventListener('click', function() {
+            const mainWish = document.getElementById('main-wish-msg');
+            const aiMessage = "You turn the most ordinary days into something worth remembering - a random Tuesday.";
+            
+            // Sweet typewriter effect
+            mainWish.value = "";
+            let i = 0;
+            let typeWriter; 
+            
+            typeWriter = setInterval(() => {
+                mainWish.value += aiMessage.charAt(i);
+                i++;
+                if (i >= aiMessage.length) {
+                    clearInterval(typeWriter);
+                }
+            }, 20); // Speed of typing
+        });
+    }
+
+    // 🚀 PREVIEW BUTTON LOGIC
     if(previewBtn) {
         previewBtn.addEventListener('click', () => {
             const partnerName = document.getElementById('partner-name-input').value;
@@ -43,6 +66,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // ==========================================
+    // PHASE 2: RAZORPAY CHECKOUT LOGIC 
+    // ==========================================
+    // (Tumhara Phase 2 ka baaki Razorpay code yahan niche waise hi rahega jaise screenshot 215228.jpg me hai)
+    
+});
+
+
     // ==========================================
     // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
     // ==========================================
