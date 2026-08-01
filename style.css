@@ -1,27 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@400;600&display=swap');
 
-/* --- Form Wrapper Styles --- */
-#order-form-container {
-    /* Isko hum screen ke ekdum center me popup ki tarah float karwayenge */
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10000;
-    width: 90%; /* Phone par perfectly fit hone ke liye */
+/* --- Form Wrapper Styles (100% Mobile Safe) --- */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Ye screen ke beecho beech layega */
+    background: var(--bg-gradient);
 }
 
-/* Form Container */
-.form-card {
-    background: #ffffff;
-    padding: 30px 25px;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+#order-form-container {
+    width: 90%;
     max-width: 400px;
-    margin: 0 auto;
+    margin: 20px auto;
+    z-index: 10000;
+}
+
+/* Form Container (Competitor Jaisa Premium Border) */
+.form-card {
+    background: #fffcfc; /* Halka sa warm white */
+    padding: 30px 20px;
+    border-radius: 20px;
+    border: 6px solid #900c3f; /* Dark red/burgundy premium border */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    box-sizing: border-box; /* Screen ke bahar jaane se rokne ke liye */
     font-family: 'Georgia', serif;
-    /* DHYAN DEIN: Yahan se 'display: flex' aur 'height: 100vh' hata diya hai */
-    display: block; 
+    display: block;
 }
 
 /* Typography & Inputs */
@@ -34,25 +42,58 @@
 }
 .premium-textarea { height: 100px; resize: none; }
 
-/* 4-Photo Grid */
-.photo-grid-4 {
+/* --- Insta-Style Zig-Zag Photo Grid --- */
+.zig-zag-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 10px;
+    gap: 15px;
+    padding: 10px 5px;
 }
-.photo-upload-box {
-    background: #fdf5f7;
-    border: 2px dashed #f0d5db;
-    border-radius: 12px;
-    height: 100px;
+
+.ig-style {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    height: 110px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #c08594;
-    font-size: 24px;
+    position: relative;
+    transition: transform 0.3s ease;
 }
+
+/* Fake Instagram Top Bar */
+.ig-style::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+    border-radius: 8px 8px 0 0;
+}
+
+.upload-icon {
+    font-size: 30px;
+    color: #c0392b;
+    margin-top: 15px; /* Top bar se thoda niche */
+}
+
+/* The Magic Zig-Zag Tilt Effect 🪄 */
+.ig-style:nth-child(1) { transform: rotate(-5deg) translateY(5px); }
+.ig-style:nth-child(2) { transform: rotate(4deg) translateY(-5px); }
+.ig-style:nth-child(3) { transform: rotate(3deg) translateY(5px); }
+.ig-style:nth-child(4) { transform: rotate(-4deg) translateY(-5px); }
+
+/* Jab customer click karne ke liye touch karega */
+.ig-style:active {
+    transform: scale(0.95) rotate(0deg);
+}
+
 .photo-upload-box input { display: none; }
 
 /* Envelope Setup */
