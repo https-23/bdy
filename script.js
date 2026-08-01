@@ -43,36 +43,65 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
     // ==========================================
-    // PHASE 2: RAZORPAY CHECKOUT LOGIC
+    // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
-        payBtn.addEventListener('click', function(e){
+        payBtn.addEventListener('click', async function(e){
             e.preventDefault();
             
-            var options = {
-                "key": "YOUR_RAZORPAY_TEST_KEY_HERE", // Yahan apni test key dalna
-                "amount": "9900", // ₹99 = 9900 paise
-                "currency": "INR",
-                "name": "Magical Surprises",
-                "description": "Custom Birthday Link",
-                "handler": function (response){
-                    alert("Payment Success! ID: " + response.razorpay_payment_id);
-                    // Yahan future me database API call hogi
-                },
-                "prefill": {
-                    "name": document.getElementById('customer-name-input') ? document.getElementById('customer-name-input').value : "Customer",
-                },
-                "theme": {
-                    "color": "#c0392b"
-                }
-            };
-            var rzp = new Razorpay(options);
-            rzp.open();
+            payBtn.innerText = "Processing...";
+            payBtn.disabled = true;
+
+            try {
+                // 1. Apne Vercel API se order ID mangwana (No external URLs needed!)
+                const response = await fetch('/api/create-order', { method: 'POST' });
+                const order = await response.json();
+
+                if(order.error) throw new Error(order.error);
+
+                var options = {
+                    "key": "rzp_test_TKTfMVdW3E31VL", // Yahan apni Test Key Id daalna
+                    "amount": "9900",
+                    "currency": "INR",
+                    "name": "Magical Surprises",
+                    "order_id": order.id, 
+                    "handler": async function (payment_response){
+                        // 2. Payment verify karke link generate karna
+                        const verifyRes = await fetch('/api/verify-and-generate-link', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                order_id: payment_response.razorpay_order_id,
+                                payment_id: payment_response.razorpay_payment_id,
+                                signature: payment_response.razorpay_signature,
+                                partner_name: document.getElementById('partner-name-input').value
+                            })
+                        });
+                        
+                        const result = await verifyRes.json();
+                        if(result.status === "success") {
+                            prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                            payBtn.innerText = "Pay Now (₹99)";
+                            payBtn.disabled = false;
+                        } else {
+                            alert("Payment verification failed! Please contact support.");
+                        }
+                    },
+                    "theme": { "color": "#c0392b" }
+                };
+                var rzp = new Razorpay(options);
+                rzp.open();
+                
+            } catch (error) {
+                alert("Error connecting to server. Please try again.");
+                payBtn.innerText = "Pay Now (₹99)";
+                payBtn.disabled = false;
+            }
         });
     }
+
 
     // ==========================================
     // PHASE 3: ORIGINAL MAGICAL APP LOGIC
