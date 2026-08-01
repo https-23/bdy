@@ -1,23 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@400;600&display=swap');
 
 /* --- 1. Form Wrapper Styles (Keyboard & Scroll Safe) --- */
-body {
+html, body {
     margin: 0;
-    padding: 20px 0; /* Upar-niche thodi jagah di hai taaki scroll achhe se ho */
-    width: 100vw;
+    padding: 0;
+    width: 100%;
+    height: auto !important; /* Purana height lock todne ke liye */
     min-height: 100vh;
-    display: block; /* Flex centering hata di hai taaki scroll kaam kare */
+    overflow-x: hidden;
+    overflow-y: auto !important; /* Ye scroll ko force chalu karega */
     background: var(--bg-gradient);
-    overflow-x: hidden; /* Screen ko left-right hilne se rokega */
 }
 
 #order-form-container {
-    position: relative; /* Fixed hata diya! Ab form easily upar-niche scroll hoga */
+    position: relative !important; 
     width: 92%;
     max-width: 400px;
-    margin: 20px auto 60px auto; /* Niche space diya hai taaki button clear dikhe */
+    /* Upar 30px, aur niche 120px ki margin di hai keyboard scroll ke liye */
+    margin: 30px auto 120px auto !important; 
     z-index: 10000;
 }
+
 
 /* Form Container */
 .form-card {
