@@ -33,7 +33,7 @@ async def verify_payment(request: Request):
         
         # Link generate karna
         partner = data.get('partner_name', 'magic').replace(" ", "").lower()
-        unique_url = f"https://bdy-two-inky.vercel.app/?id={partner}"
+        unique_url = f"https://10petalx.vercel.app/?id={partner}"
         
         return JSONResponse({"status": "success", "link": unique_url})
     except Exception as e:
