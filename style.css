@@ -2,26 +2,26 @@
 
 /* --- Form Wrapper Styles --- */
 #order-form-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
+    /* Isko hum screen ke ekdum center me popup ki tarah float karwayenge */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10000;
+    width: 90%; /* Phone par perfectly fit hone ke liye */
 }
 
 /* Form Container */
 .form-card {
-    background: #fff;
-    padding: 25px;
+    background: #ffffff;
+    padding: 30px 25px;
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(192, 57, 43, 0.1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     max-width: 400px;
     margin: 0 auto;
     font-family: 'Georgia', serif;
+    /* DHYAN DEIN: Yahan se 'display: flex' aur 'height: 100vh' hata diya hai */
+    display: block; 
 }
 
 /* Typography & Inputs */
