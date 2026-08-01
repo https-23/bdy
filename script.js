@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewContainer = document.getElementById('preview-container');
     const previewBtn = document.getElementById('preview-btn');
     
-    // 🌟 AI WISH GENERATOR LOGIC (Isko bahar nikal diya hai)
+    // 🌟 AI WISH GENERATOR LOGIC
     const aiGenerateBtn = document.getElementById('ai-generate-btn');
     if(aiGenerateBtn) {
         aiGenerateBtn.addEventListener('click', function() {
@@ -66,15 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
-    // ==========================================
-    // PHASE 2: RAZORPAY CHECKOUT LOGIC 
-    // ==========================================
-    // (Tumhara Phase 2 ka baaki Razorpay code yahan niche waise hi rahega jaise screenshot 215228.jpg me hai)
     
-});
-
-
     // ==========================================
     // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
     // ==========================================
