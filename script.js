@@ -71,29 +71,35 @@ document.addEventListener("DOMContentLoaded", () => {
             if(dummyUser) dummyUser.value = partnerName; 
 
                         // Form chupao, Preview dikhao
+                        // Form chupao, Preview dikhao
             const orderForm = document.getElementById('order-form-container');
             const previewContainer = document.getElementById('preview-container');
             
             if(orderForm) orderForm.style.display = "none";
+            if(previewContainer) previewContainer.style.display = "block"; 
             
-            if(previewContainer) {
-                previewContainer.style.display = "block"; 
-                // 👇 YAHAN THI GALTI: Pehli screen ko manually active karna padega!
-                const loginScreen = document.getElementById('login-screen');
-                if(loginScreen) {
-                    loginScreen.classList.add('active'); 
-                    loginScreen.style.display = 'flex'; // Ekdum force visible
-                }
+            // 👇👇 YEH 4 LINES KA JADU DAALNA HAI 👇👇
+            const loginScreen = document.getElementById('login-screen');
+            if(loginScreen) {
+                loginScreen.classList.add('active'); // Is class ke bina andar ka content nahi dikhega!
             }
+            // 👆👆 YAHAN TAK 👆👆
             
             window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
 
-            // Preloader ko permanently chupao
-            const preloader = document.getElementById('preloader');
-            if (preloader) preloader.style.display = 'none';
-            
-        });
-    }
+            window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
+
+// Preloader ko theek se hide karo
+const preloader = document.getElementById('preloader');
+if (preloader) {
+    setTimeout(() => {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+            preloader.style.visibility = 'hidden';
+        }, 600);
+    }, 800);
+} // यहाँ यह ब्रैकेट सही से बंद होना चाहिए
+à
 
     // ==========================================
     // 💳 PHASE 2: RAZORPAY CHECKOUT LOGIC 
