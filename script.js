@@ -27,20 +27,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // ✨ 2. AUTO-GENERATE WISH LOGIC (Fixed)
+    // ✨ 2. AUTO-GENERATE WISH LOGIC (100% Fixed)
     // ==========================================
-    // (Agar tumhara textarea ya button ka ID alag hai to usse match kar lena)
-    const autoWishBtn = document.querySelector('button:contains("Auto-Generate Wish"), .auto-wish-btn, #auto-wish-btn');
+    const allButtons = document.querySelectorAll('button');
     const wishTextarea = document.querySelector('textarea'); 
     
-    // Fallback: Agar auto-wish button directly mil jaye to ye click event usme message daal dega
-    if (autoWishBtn && wishTextarea) {
-        autoWishBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const aiMessage = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
-            wishTextarea.value = aiMessage;
-        });
-    }
+    allButtons.forEach(btn => {
+        // Safe JavaScript tarika button dhundne ka
+        if(btn.innerText.includes("Auto-Generate Wish")) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if(wishTextarea) {
+                    wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+                }
+            });
+        }
+    });
 
     // ==========================================
     // 🚀 3. PREVIEW BUTTON LOGIC (Transition)
@@ -79,16 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-// 🔥 Sabse zaroori closing bracket jo pichli baar miss ho gaya tha
-}); 
-
-// ==========================================
-// PHASE 2: RAZORPAY CHECKOUT LOGIC 
-// ==========================================
-// (Razorpay ka const payBtn = document.getElementById('pay-now-btn'); wala code yahan se shuru rehne dena)
-
     // ==========================================
-    // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
+    // 💳 PHASE 2: RAZORPAY CHECKOUT LOGIC 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
@@ -99,20 +93,18 @@ document.addEventListener("DOMContentLoaded", () => {
             payBtn.disabled = true;
 
             try {
-                // 1. Apne Vercel API se order ID mangwana (No external URLs needed!)
                 const response = await fetch('/api/create-order', { method: 'POST' });
                 const order = await response.json();
 
                 if(order.error) throw new Error(order.error);
 
                 var options = {
-                    "key": "rzp_test_TKTfMVdW3E31VL", // Yahan apni Test Key Id daalna
+                    "key": "rzp_test_TKTfMVdW3E31VL", 
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": async function (payment_response){
-                        // 2. Payment verify karke link generate karna
                         const verifyRes = await fetch('/api/verify-and-generate-link', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -120,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 order_id: payment_response.razorpay_order_id,
                                 payment_id: payment_response.razorpay_payment_id,
                                 signature: payment_response.razorpay_signature,
-                                partner_name: document.getElementById('partner-name-input').value
+                                partner_name: document.getElementById('partner-name-input') ? document.getElementById('partner-name-input').value : "Someone Special"
                             })
                         });
                         
@@ -146,9 +138,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
     // ==========================================
-    // PHASE 3: ORIGINAL MAGICAL APP LOGIC
+    // 🎩 PHASE 3: ORIGINAL MAGICAL APP LOGIC
     // ==========================================
     const screens = document.querySelectorAll(".screen");
     let typeWriterTriggered = false;
@@ -442,8 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
             scratchEventsBound = true; 
         }
     }
-
-    // --- PARALLAX OPTIMIZATION ---
+// --- PARALLAX OPTIMIZATION ---
     let targetX = 0, targetY = 0; 
     let currentX = 0, currentY = 0;
 
