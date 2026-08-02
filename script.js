@@ -1,105 +1,106 @@
 document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC
+    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC (Bulletproof)
     // ==========================================
-    const photoUploadBoxes = document.querySelectorAll('.photo-upload-box input[type="file"]');
-    
-    photoUploadBoxes.forEach(input => {
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const parentLabel = input.parentElement;
-                    // Photo ko background me fit karna
-                    parentLabel.style.backgroundImage = `url('${event.target.result}')`;
-                    parentLabel.style.backgroundSize = 'cover';
-                    parentLabel.style.backgroundPosition = 'center';
-                    parentLabel.style.border = 'none'; 
-                    // '+' icon ko chupana
-                    const plusIcon = parentLabel.querySelector('.upload-icon');
-                    if(plusIcon) plusIcon.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
+    try {
+        const photoInputs = document.querySelectorAll('input[type="file"]');
+        photoInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const parentLabel = input.parentElement;
+                        if(parentLabel) {
+                            parentLabel.style.backgroundImage = `url('${event.target.result}')`;
+                            parentLabel.style.backgroundSize = 'cover';
+                            parentLabel.style.backgroundPosition = 'center';
+                            parentLabel.style.border = 'none'; 
+                            
+                            const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
+                            if(plusIcon) plusIcon.style.display = 'none';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
         });
-    });
+    } catch (err) {
+        console.log("Photo upload error:", err);
+    }
 
     // ==========================================
-    // ✨ 2. AUTO-GENERATE WISH LOGIC (100% Fixed)
+    // ✨ 2. AUTO-GENERATE WISH LOGIC
     // ==========================================
-    const allButtons = document.querySelectorAll('button');
-    const wishTextarea = document.querySelector('textarea'); 
-    
-    allButtons.forEach(btn => {
-        // Safe JavaScript tarika button dhundne ka
-        if(btn.innerText.includes("Auto-Generate Wish")) {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if(wishTextarea) {
-                    wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+    try {
+        const allButtons = document.querySelectorAll('button');
+        const wishTextarea = document.querySelector('textarea'); 
+        allButtons.forEach(btn => {
+            if(btn.innerText && btn.innerText.includes("Auto-Generate")) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if(wishTextarea) {
+                        wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+                    }
+                });
+            }
+        });
+    } catch (err) {
+        console.log("Auto-wish error:", err);
+    }
+
+    // ==========================================
+    // 🚀 3. PREVIEW BUTTON & SCREEN TRANSITION LOGIC
+    // ==========================================
+    try {
+        const previewBtn = document.getElementById('preview-btn');
+        if(previewBtn) {
+            previewBtn.addEventListener('click', () => {
+                const partnerNameInput = document.getElementById('partner-name-input');
+                const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
+
+                if(partnerName === '') {
+                    alert("Please enter the name first! ✨");
+                    return;
+                }
+
+                // Data transfer to preview
+                const secretNameEl = document.getElementById('secret-name');
+                if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+                
+                const dummyUser = document.getElementById('dummy-username');
+                if(dummyUser) dummyUser.value = partnerName; 
+
+                // Form chupao aur actual Magical App / Login screen dikhao
+                const orderForm = document.getElementById('order-form-container');
+                if(orderForm) orderForm.style.display = "none";
+
+                // Preview container ya Login screen ko active karo
+                const previewContainer = document.getElementById('preview-container');
+                if(previewContainer) previewContainer.style.display = "block"; 
+
+                const loginScreen = document.getElementById('login-screen');
+                if(loginScreen) {
+                    loginScreen.style.display = 'flex';
+                    loginScreen.classList.add('active');
+                }
+
+                window.scrollTo(0, 0);
+
+                // Preloader hatao
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600);
                 }
             });
         }
-    });
-
-    // ==========================================
-    // 🚀 3. PREVIEW BUTTON LOGIC (Transition)
-    // ==========================================
-    const previewBtn = document.getElementById('preview-btn');
-    
-    if(previewBtn) {
-        previewBtn.addEventListener('click', () => {
-            const partnerNameInput = document.getElementById('partner-name-input');
-            const customerNameInput = document.getElementById('user-name-input');
-            
-            const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
-            const customerName = customerNameInput ? customerNameInput.value.trim() : '';
-
-            // Agar form khali hai to aage mat badho
-            if(partnerName === '' || customerName === '') {
-                alert("Please fill the names to preview the magic! ✨");
-                return;
-            }
-
-            // Preview screen par data daalna
-            const secretNameEl = document.getElementById('secret-name');
-            if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
-
-            const dummyUser = document.getElementById('dummy-username');
-            if(dummyUser) dummyUser.value = partnerName; 
-
-                        // Form chupao, Preview dikhao
-                        // Form chupao, Preview dikhao
-            const orderForm = document.getElementById('order-form-container');
-            const previewContainer = document.getElementById('preview-container');
-            
-            if(orderForm) orderForm.style.display = "none";
-            if(previewContainer) previewContainer.style.display = "block"; 
-            
-            // 👇👇 YEH 4 LINES KA JADU DAALNA HAI 👇👇
-            const loginScreen = document.getElementById('login-screen');
-            if(loginScreen) {
-                loginScreen.classList.add('active'); // Is class ke bina andar ka content nahi dikhega!
-            }
-            // 👆👆 YAHAN TAK 👆👆
-            
-            window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
-
-            window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
-
-// Preloader ko theek se hide karo
-const preloader = document.getElementById('preloader');
-if (preloader) {
-    setTimeout(() => {
-        preloader.style.opacity = '0';
-        setTimeout(() => {
-            preloader.style.visibility = 'hidden';
-        }, 600);
-    }, 800);
-} // यहाँ यह ब्रैकेट सही से बंद होना चाहिए
-
+    } catch (err) {
+        console.log("Preview button error:", err);
+    }
+        
     // ==========================================
     // 💳 PHASE 2: RAZORPAY CHECKOUT LOGIC 
     // ==========================================
@@ -155,7 +156,7 @@ if (preloader) {
                 payBtn.disabled = false;
             }
         });
-    }
+    
 
     // ==========================================
     // 🎩 PHASE 3: ORIGINAL MAGICAL APP LOGIC
