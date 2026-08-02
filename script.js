@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // 📸 1. PHOTO UPLOAD PREVIEW LOGIC
+    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC
     // ==========================================
     const photoUploadBoxes = document.querySelectorAll('.photo-upload-box input[type="file"]');
     
@@ -12,13 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const parentLabel = input.parentElement;
-                    
-                    // Photo ko dabbe ke background me fit karna
+                    // Photo ko background me fit karna
                     parentLabel.style.backgroundImage = `url('${event.target.result}')`;
                     parentLabel.style.backgroundSize = 'cover';
                     parentLabel.style.backgroundPosition = 'center';
                     parentLabel.style.border = 'none'; 
-                    
                     // '+' icon ko chupana
                     const plusIcon = parentLabel.querySelector('.upload-icon');
                     if(plusIcon) plusIcon.style.display = 'none';
@@ -29,57 +27,66 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 🚀 2. PREVIEW BUTTON LOGIC
+    // ✨ 2. AUTO-GENERATE WISH LOGIC (Fixed)
+    // ==========================================
+    // (Agar tumhara textarea ya button ka ID alag hai to usse match kar lena)
+    const autoWishBtn = document.querySelector('button:contains("Auto-Generate Wish"), .auto-wish-btn, #auto-wish-btn');
+    const wishTextarea = document.querySelector('textarea'); 
+    
+    // Fallback: Agar auto-wish button directly mil jaye to ye click event usme message daal dega
+    if (autoWishBtn && wishTextarea) {
+        autoWishBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const aiMessage = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+            wishTextarea.value = aiMessage;
+        });
+    }
+
+    // ==========================================
+    // 🚀 3. PREVIEW BUTTON LOGIC (Transition)
     // ==========================================
     const previewBtn = document.getElementById('preview-btn');
     
     if(previewBtn) {
         previewBtn.addEventListener('click', () => {
-            const partnerName = document.getElementById('partner-name-input').value;
-            const customerName = document.getElementById('user-name-input').value; 
+            const partnerNameInput = document.getElementById('partner-name-input');
+            const customerNameInput = document.getElementById('user-name-input');
+            
+            const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
+            const customerName = customerNameInput ? customerNameInput.value.trim() : '';
 
             // Agar form khali hai to aage mat badho
-            if(partnerName.trim() === '' || customerName.trim() === '') {
-                alert("Please fill all details to preview the magic! ✨");
+            if(partnerName === '' || customerName === '') {
+                alert("Please fill the names to preview the magic! ✨");
                 return;
             }
 
-            // Inject Data into Preview (e.g., Sana)
+            // Preview screen par data daalna
             const secretNameEl = document.getElementById('secret-name');
             if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
 
             const dummyUser = document.getElementById('dummy-username');
             if(dummyUser) dummyUser.value = partnerName; 
 
-            const dummyPass = document.getElementById('dummy-password');
-            if(dummyPass) dummyPass.value = "magic"; 
-
-            // Hide Form, Show Preview
-            document.getElementById('order-form-container').style.display = "none";
-            document.getElementById('preview-container').style.display = "block"; 
-
-            // Trigger Preloader manually
-            const preloader = document.getElementById('preloader');
-            if (preloader) {
-                setTimeout(() => {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.visibility = 'hidden';
-                    }, 600);
-                }, 800);
-            }
+            // Form chupao, Preview dikhao
+            const orderForm = document.getElementById('order-form-container');
+            const previewContainer = document.getElementById('preview-container');
+            
+            if(orderForm) orderForm.style.display = "none";
+            if(previewContainer) previewContainer.style.display = "block"; 
+            
+            window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
         });
     }
-    
-// 🔥 Yahan document.addEventListener ka bracket close hota hai (Shayad yahi miss hua tha!)
+
+// 🔥 Sabse zaroori closing bracket jo pichli baar miss ho gaya tha
 }); 
 
 // ==========================================
-// PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
+// PHASE 2: RAZORPAY CHECKOUT LOGIC 
 // ==========================================
-// (Iske niche tumhara pehle wala 'payBtn' ka code aise hi rahega, usko bilkul mat chhedna)
+// (Razorpay ka const payBtn = document.getElementById('pay-now-btn'); wala code yahan se shuru rehne dena)
 
-    
     // ==========================================
     // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
     // ==========================================
