@@ -1,9 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {    
+document.addEventListener("DOMContentLoaded", () => {
     
     // ==========================================
-    // PHASE 1: FORM TO PREVIEW LOGIC
+    // 📸 1. PHOTO UPLOAD PREVIEW LOGIC
     // ==========================================
-        // 📸 PHOTO UPLOAD PREVIEW LOGIC
     const photoUploadBoxes = document.querySelectorAll('.photo-upload-box input[type="file"]');
     
     photoUploadBoxes.forEach(input => {
@@ -18,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     parentLabel.style.backgroundImage = `url('${event.target.result}')`;
                     parentLabel.style.backgroundSize = 'cover';
                     parentLabel.style.backgroundPosition = 'center';
-                    parentLabel.style.border = 'none'; // Photo lagne ke baad border hata dena
+                    parentLabel.style.border = 'none'; 
                     
                     // '+' icon ko chupana
                     const plusIcon = parentLabel.querySelector('.upload-icon');
@@ -28,75 +27,37 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-    
-    const orderForm = document.getElementById('order-form-container');
-    const previewContainer = document.getElementById('preview-container');
+
+    // ==========================================
+    // 🚀 2. PREVIEW BUTTON LOGIC
+    // ==========================================
     const previewBtn = document.getElementById('preview-btn');
     
-    // 🌟 AI WISH GENERATOR LOGIC
-    const aiGenerateBtn = document.getElementById('ai-generate-btn');
-    if(aiGenerateBtn) {
-        aiGenerateBtn.addEventListener('click', function() {
-            const mainWish = document.getElementById('main-wish-msg');
-            const aiMessage = "You turn the most ordinary days into something worth remembering - a random Tuesday.";
-            
-            // Sweet typewriter effect
-            mainWish.value = "";
-            let i = 0;
-            let typeWriter; 
-            
-            typeWriter = setInterval(() => {
-                mainWish.value += aiMessage.charAt(i);
-                i++;
-                if (i >= aiMessage.length) {
-                    clearInterval(typeWriter);
-                }
-            }, 20); // Speed of typing
-        });
-    }
-    
-// 🚀 PREVIEW BUTTON LOGIC
-const previewBtn = document.getElementById('preview-btn');
+    if(previewBtn) {
+        previewBtn.addEventListener('click', () => {
+            const partnerName = document.getElementById('partner-name-input').value;
+            const customerName = document.getElementById('user-name-input').value; 
 
-if(previewBtn) {
-    previewBtn.addEventListener('click', () => {
-        const partnerName = document.getElementById('partner-name-input').value;
-        // BUG FIX: HTML me 'user-name-input' id thi, usko yahan fix kar diya hai
-        const customerName = document.getElementById('user-name-input').value; 
+            // Agar form khali hai to aage mat badho
+            if(partnerName.trim() === '' || customerName.trim() === '') {
+                alert("Please fill all details to preview the magic! ✨");
+                return;
+            }
 
-        if(partnerName.trim() === '' || customerName.trim() === '') {
-            alert("Please fill all details to preview the magic! ✨");
-            return;
-        }
+            // Inject Data into Preview (e.g., Sana)
+            const secretNameEl = document.getElementById('secret-name');
+            if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
 
-        // Inject Data into Preview
-        const secretNameEl = document.getElementById('secret-name');
-        if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+            const dummyUser = document.getElementById('dummy-username');
+            if(dummyUser) dummyUser.value = partnerName; 
 
-        const dummyUser = document.getElementById('dummy-username');
-        if(dummyUser) dummyUser.value = partnerName; // Autofill portal
+            const dummyPass = document.getElementById('dummy-password');
+            if(dummyPass) dummyPass.value = "magic"; 
 
-        const dummyPass = document.getElementById('dummy-password');
-        if(dummyPass) dummyPass.value = "magic"; // Autofill password
+            // Hide Form, Show Preview
+            document.getElementById('order-form-container').style.display = "none";
+            document.getElementById('preview-container').style.display = "block"; 
 
-        // Hide Form, Show Preview
-        document.getElementById('order-form-container').style.display = "none";
-        // Agar previewContainer variable pehle se top par defined nahi tha, to main id se direct block kar raha hu
-        document.getElementById('preview-container').style.display = "block"; 
-
-        // Trigger Preloader manually
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            setTimeout(() => {
-                preloader.style.opacity = '0';
-                setTimeout(() => {
-                    preloader.style.visibility = 'hidden';
-                }, 600);
-            }, 800);
-        }
-    });
-}
-            
             // Trigger Preloader manually
             const preloader = document.getElementById('preloader');
             if (preloader) {
@@ -104,11 +65,20 @@ if(previewBtn) {
                     preloader.style.opacity = '0';
                     setTimeout(() => {
                         preloader.style.visibility = 'hidden';
-                    }, 600); 
-                }, 800); 
+                    }, 600);
+                }, 800);
             }
         });
     }
+    
+// 🔥 Yahan document.addEventListener ka bracket close hota hai (Shayad yahi miss hua tha!)
+}); 
+
+// ==========================================
+// PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
+// ==========================================
+// (Iske niche tumhara pehle wala 'payBtn' ka code aise hi rahega, usko bilkul mat chhedna)
+
     
     // ==========================================
     // PHASE 2: RAZORPAY CHECKOUT LOGIC (FINAL VERCEL)
