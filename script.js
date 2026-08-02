@@ -70,24 +70,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const dummyUser = document.getElementById('dummy-username');
             if(dummyUser) dummyUser.value = partnerName; 
 
-            // Form chupao, Preview dikhao
+                        // Form chupao, Preview dikhao
             const orderForm = document.getElementById('order-form-container');
             const previewContainer = document.getElementById('preview-container');
             
             if(orderForm) orderForm.style.display = "none";
-            if(previewContainer) previewContainer.style.display = "block"; 
+            
+            if(previewContainer) {
+                previewContainer.style.display = "block"; 
+                // 👇 YAHAN THI GALTI: Pehli screen ko manually active karna padega!
+                const loginScreen = document.getElementById('login-screen');
+                if(loginScreen) {
+                    loginScreen.classList.add('active'); 
+                    loginScreen.style.display = 'flex'; // Ekdum force visible
+                }
+            }
             
             window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
-                        // Trigger Preloader manually taaki blank overlay hat jaye
+
+            // Preloader ko permanently chupao
             const preloader = document.getElementById('preloader');
-            if (preloader) {
-                setTimeout(() => {
-                    preloader.style.opacity = '0';
-                    setTimeout(() => {
-                        preloader.style.visibility = 'hidden';
-                    }, 600);
-                }, 800);
-            }
+            if (preloader) preloader.style.display = 'none';
             
         });
     }
