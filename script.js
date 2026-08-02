@@ -54,31 +54,48 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 20); // Speed of typing
         });
     }
+    
+// 🚀 PREVIEW BUTTON LOGIC
+const previewBtn = document.getElementById('preview-btn');
 
-    // 🚀 PREVIEW BUTTON LOGIC
-    if(previewBtn) {
-        previewBtn.addEventListener('click', () => {
-            const partnerName = document.getElementById('partner-name-input').value;
-            const customerName = document.getElementById('customer-name-input').value;
-            
-            if(partnerName.trim() === '' || customerName.trim() === '') {
-                alert("Please fill all details to preview the magic! ✨");
-                return;
-            }
+if(previewBtn) {
+    previewBtn.addEventListener('click', () => {
+        const partnerName = document.getElementById('partner-name-input').value;
+        // BUG FIX: HTML me 'user-name-input' id thi, usko yahan fix kar diya hai
+        const customerName = document.getElementById('user-name-input').value; 
 
-            // Inject Data into Preview
-            const secretNameEl = document.getElementById('secret-name');
-            if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
-            
-            const dummyUser = document.getElementById('dummy-username');
-            if(dummyUser) dummyUser.value = partnerName; // Autofill portal
-            
-            const dummyPass = document.getElementById('dummy-password');
-            if(dummyPass) dummyPass.value = "magic"; // Autofill password
-            
-            // Hide Form, Show Preview
-            orderForm.style.display = "none";
-            previewContainer.style.display = "block";
+        if(partnerName.trim() === '' || customerName.trim() === '') {
+            alert("Please fill all details to preview the magic! ✨");
+            return;
+        }
+
+        // Inject Data into Preview
+        const secretNameEl = document.getElementById('secret-name');
+        if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+
+        const dummyUser = document.getElementById('dummy-username');
+        if(dummyUser) dummyUser.value = partnerName; // Autofill portal
+
+        const dummyPass = document.getElementById('dummy-password');
+        if(dummyPass) dummyPass.value = "magic"; // Autofill password
+
+        // Hide Form, Show Preview
+        document.getElementById('order-form-container').style.display = "none";
+        // Agar previewContainer variable pehle se top par defined nahi tha, to main id se direct block kar raha hu
+        document.getElementById('preview-container').style.display = "block"; 
+
+        // Trigger Preloader manually
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.visibility = 'hidden';
+                }, 600);
+            }, 800);
+        }
+    });
+}
             
             // Trigger Preloader manually
             const preloader = document.getElementById('preloader');
