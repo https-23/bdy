@@ -78,6 +78,17 @@ document.addEventListener("DOMContentLoaded", () => {
             if(previewContainer) previewContainer.style.display = "block"; 
             
             window.scrollTo(0, 0); // Preview aate hi screen upar chali jayegi
+                        // Trigger Preloader manually taaki blank overlay hat jaye
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.visibility = 'hidden';
+                    }, 600);
+                }, 800);
+            }
+            
         });
     }
 
