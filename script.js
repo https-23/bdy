@@ -1,17 +1,73 @@
-// ==========================================
-    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC (Bulletproof)
+    // ==========================================
+    // 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
+    // ==========================================
+    window.magicalState = {
+        partnerName: "",
+        userName: "",
+        envelopeMsg: "",
+        mainWish: "",
+        audioLink: "",
+        images: { 0: null, 1: null, 2: null, 3: null } // Holds Base64 strings
+    };
+
+    // Compresses 20MB images down to ~150KB WebP Base64 strings
+    async function compressImage(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1080;
+                    const MAX_HEIGHT = 1350;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 0.7 quality WebP is the sweet spot for mobile loading speed
+                    resolve(canvas.toDataURL('image/webp', 0.7)); 
+                };
+                img.onerror = (err) => reject(err);
+            };
+            reader.onerror = (err) => reject(err);
+        });
+    }
+
+    // ==========================================
+    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC (Upgraded)
     // ==========================================
     try {
-        const photoInputs = document.querySelectorAll('input[type="file"]');
-        photoInputs.forEach(input => {
-            input.addEventListener('change', function(e) {
+        const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
+        photoInputs.forEach((input, index) => {
+            input.addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if(file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
+                    try {
+                        // Compress and store in global state instantly
+                        const base64Data = await compressImage(file);
+                        window.magicalState.images[index] = base64Data;
+
+                        // UI Update
                         const parentLabel = input.parentElement;
                         if(parentLabel) {
-                            parentLabel.style.backgroundImage = `url('${event.target.result}')`;
+                            parentLabel.style.backgroundImage = `url('${base64Data}')`;
                             parentLabel.style.backgroundSize = 'cover';
                             parentLabel.style.backgroundPosition = 'center';
                             parentLabel.style.border = 'none'; 
@@ -19,8 +75,10 @@
                             const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
                             if(plusIcon) plusIcon.style.display = 'none';
                         }
-                    };
-                    reader.readAsDataURL(file);
+                    } catch (error) {
+                        console.error("Compression failed:", error);
+                        alert("Could not process this image. Please try a different one.");
+                    }
                 }
             });
         });
