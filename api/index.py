@@ -22,12 +22,14 @@ client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 if not firebase_admin._apps:
     firebase_creds_json = os.environ.get('FIREBASE_CREDENTIALS')
     if firebase_creds_json:
-        creds_dict = json.loads(firebase_creds_json)
-        cred = credentials.Certificate(creds_dict)
-        # Required for image uploads. E.g., 'my-project-id.appspot.com'
-        firebase_admin.initialize_app(cred, {
-            'storageBucket': os.environ.get('FIREBASE_STORAGE_BUCKET') 
-        })
+        try:
+            creds_dict = json.loads(firebase_creds_json)
+            cred = credentials.Certificate(creds_dict)
+            firebase_admin.initialize_app(cred, {
+                'storageBucket': os.environ.get('FIREBASE_STORAGE_BUCKET') 
+            })
+        except Exception as e:
+            print(f"Firebase Init Error: {str(e)}")
 
 db = firestore.client() if firebase_admin._apps else None
 bucket = storage.bucket() if firebase_admin._apps else None
@@ -71,16 +73,15 @@ def verify_payment():
         if bucket:
             images_b64 = data.get('images', {})
             for index, b64_str in images_b64.items():
-                if b64_str: # If user uploaded an image for this slot
+                if b64_str:
                     try:
-                        # Split standard dataURI: 'data:image/webp;base64,...'
                         header, encoded = b64_str.split(",", 1)
                         file_data = base64.b64decode(encoded)
                         
                         file_path = f"gifts/{unique_gift_id}/photo_{index}.webp"
                         blob = bucket.blob(file_path)
                         blob.upload_from_string(file_data, content_type='image/webp')
-                        blob.make_public() # Ensure bucket permissions allow public read
+                        blob.make_public() 
                         
                         uploaded_image_urls[index] = blob.public_url
                     except Exception as img_err:
@@ -113,3 +114,4 @@ def verify_payment():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
