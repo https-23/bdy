@@ -10,48 +10,56 @@
         images: { 0: null, 1: null, 2: null, 3: null } // Holds Base64 strings
     };
 
-    // Compresses 20MB images down to ~150KB WebP Base64 strings
+    // Compresses images down to ~150KB WebP Base64 strings
     async function compressImage(file) {
         return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1080;
-                    const MAX_HEIGHT = 1350;
-                    let width = img.width;
-                    let height = img.height;
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const MAX_WIDTH = 1080;
+                            const MAX_HEIGHT = 1350;
+                            let width = img.width;
+                            let height = img.height;
 
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height *= MAX_WIDTH / width;
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width *= MAX_HEIGHT / height;
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // 0.7 quality WebP is optimal for mobile loading speeds
+                            resolve(canvas.toDataURL('image/webp', 0.7)); 
+                        } catch (err) {
+                            reject(err);
                         }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // 0.7 quality WebP is the sweet spot for mobile loading speed
-                    resolve(canvas.toDataURL('image/webp', 0.7)); 
+                    };
+                    img.onerror = (err) => reject(err);
                 };
-                img.onerror = (err) => reject(err);
-            };
-            reader.onerror = (err) => reject(err);
+                reader.onerror = (err) => reject(err);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 
     // ==========================================
-    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC (Upgraded)
+    // 📸 1. PHOTO UPLOAD & PREVIEW LOGIC
     // ==========================================
     try {
         const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
@@ -60,11 +68,9 @@
                 const file = e.target.files[0];
                 if(file) {
                     try {
-                        // Compress and store in global state instantly
                         const base64Data = await compressImage(file);
                         window.magicalState.images[index] = base64Data;
 
-                        // UI Update
                         const parentLabel = input.parentElement;
                         if(parentLabel) {
                             parentLabel.style.backgroundImage = `url('${base64Data}')`;
@@ -83,7 +89,7 @@
             });
         });
     } catch (err) {
-        console.log("Photo upload error:", err);
+        console.error("Photo upload error:", err);
     }
 
     // ==========================================
@@ -103,10 +109,10 @@
             }
         });
     } catch (err) {
-        console.log("Auto-wish error:", err);
+        console.error("Auto-wish error:", err);
     }
 
-        // ==========================================
+    // ==========================================
     // 🚀 3. PREVIEW BUTTON & STATE CAPTURE
     // ==========================================
     try {
@@ -117,25 +123,23 @@
                 const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
                 if(partnerName === '') {
-                    alert("Please enter her name first! ✨");
+                    alert("Please enter the name first! ✨");
                     return;
                 }
 
-                // 1. Lock all form data into our Global State
+                // Lock form data into Global State
                 window.magicalState.partnerName = partnerName;
                 window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
                 window.magicalState.envelopeMsg = document.getElementById('envelope-msg')?.value.trim() || "";
                 window.magicalState.mainWish = document.getElementById('main-wish-msg')?.value.trim() || "";
                 window.magicalState.audioLink = document.getElementById('audio-link-input')?.value.trim() || "";
 
-                // 2. Data transfer to UI elements
                 const secretNameEl = document.getElementById('secret-name');
                 if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
                 
                 const dummyUser = document.getElementById('dummy-username');
                 if(dummyUser) dummyUser.value = partnerName; 
 
-                // 3. UI Transitions
                 const orderForm = document.getElementById('order-form-container');
                 if(orderForm) orderForm.style.display = "none";
 
@@ -158,11 +162,11 @@
             });
         }
     } catch (err) {
-        console.log("Preview button error:", err);
+        console.error("Preview button error:", err);
     }
         
     // ==========================================
-    // 💳 PHASE 2: RAZORPAY ATOMIC TRANSACTION 
+    // 💳 4. RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
@@ -185,7 +189,7 @@
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": async function (payment_response){
-                        payBtn.innerText = "Generating Link..."; // Keep UI locked during backend upload
+                        payBtn.innerText = "Generating Link..."; 
 
                         try {
                             const verifyRes = await fetch('/api/verify-and-generate-link', {
@@ -195,7 +199,6 @@
                                     order_id: payment_response.razorpay_order_id,
                                     payment_id: payment_response.razorpay_payment_id,
                                     signature: payment_response.razorpay_signature,
-                                    // Injecting the complete State Payload
                                     partner_name: window.magicalState.partnerName,
                                     user_name: window.magicalState.userName,
                                     envelope_msg: window.magicalState.envelopeMsg,
@@ -229,13 +232,13 @@
                 rzp.open();
                 
             } catch (error) {
+                console.error(error);
                 alert("Error connecting to server. Please try again.");
                 payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
         });
     }
-
 
     // ==========================================
     // 🎩 PHASE 3: ORIGINAL MAGICAL APP LOGIC
