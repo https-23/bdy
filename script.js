@@ -106,8 +106,8 @@
         console.log("Auto-wish error:", err);
     }
 
-    // ==========================================
-    // 🚀 3. PREVIEW BUTTON & SCREEN TRANSITION LOGIC
+        // ==========================================
+    // 🚀 3. PREVIEW BUTTON & STATE CAPTURE
     // ==========================================
     try {
         const previewBtn = document.getElementById('preview-btn');
@@ -117,22 +117,28 @@
                 const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
                 if(partnerName === '') {
-                    alert("Please enter the name first! ✨");
+                    alert("Please enter her name first! ✨");
                     return;
                 }
 
-                // Data transfer to preview
+                // 1. Lock all form data into our Global State
+                window.magicalState.partnerName = partnerName;
+                window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
+                window.magicalState.envelopeMsg = document.getElementById('envelope-msg')?.value.trim() || "";
+                window.magicalState.mainWish = document.getElementById('main-wish-msg')?.value.trim() || "";
+                window.magicalState.audioLink = document.getElementById('audio-link-input')?.value.trim() || "";
+
+                // 2. Data transfer to UI elements
                 const secretNameEl = document.getElementById('secret-name');
                 if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
                 
                 const dummyUser = document.getElementById('dummy-username');
                 if(dummyUser) dummyUser.value = partnerName; 
 
-                // Form chupao aur actual Magical App / Login screen dikhao
+                // 3. UI Transitions
                 const orderForm = document.getElementById('order-form-container');
                 if(orderForm) orderForm.style.display = "none";
 
-                // Preview container ya Login screen ko active karo
                 const previewContainer = document.getElementById('preview-container');
                 if(previewContainer) previewContainer.style.display = "block"; 
 
@@ -144,7 +150,6 @@
 
                 window.scrollTo(0, 0);
 
-                // Preloader hatao
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
                     preloader.style.opacity = '0';
@@ -157,14 +162,14 @@
     }
         
     // ==========================================
-    // 💳 PHASE 2: RAZORPAY CHECKOUT LOGIC 
+    // 💳 PHASE 2: RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
         payBtn.addEventListener('click', async function(e){
             e.preventDefault();
             
-            payBtn.innerText = "Processing...";
+            payBtn.innerText = "Securing Magic...";
             payBtn.disabled = true;
 
             try {
@@ -180,29 +185,47 @@
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": async function (payment_response){
-                        const verifyRes = await fetch('/api/verify-and-generate-link', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                order_id: payment_response.razorpay_order_id,
-                                payment_id: payment_response.razorpay_payment_id,
-                                signature: payment_response.razorpay_signature,
-                                partner_name: document.getElementById('partner-name-input') ? document.getElementById('partner-name-input').value : "Someone Special"
-                            })
-                        });
-                        
-                        const result = await verifyRes.json();
-                        if(result.status === "success") {
-                            prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-                            payBtn.innerText = "Pay Now (₹99)";
-                            payBtn.disabled = false;
-                        } else {
-                            alert("Payment verification failed! Please contact support.");
+                        payBtn.innerText = "Generating Link..."; // Keep UI locked during backend upload
+
+                        try {
+                            const verifyRes = await fetch('/api/verify-and-generate-link', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    order_id: payment_response.razorpay_order_id,
+                                    payment_id: payment_response.razorpay_payment_id,
+                                    signature: payment_response.razorpay_signature,
+                                    // Injecting the complete State Payload
+                                    partner_name: window.magicalState.partnerName,
+                                    user_name: window.magicalState.userName,
+                                    envelope_msg: window.magicalState.envelopeMsg,
+                                    main_wish: window.magicalState.mainWish,
+                                    audio_link: window.magicalState.audioLink,
+                                    images: window.magicalState.images
+                                })
+                            });
+                            
+                            const result = await verifyRes.json();
+                            if(result.status === "success") {
+                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                                payBtn.innerText = "Link Generated ✔";
+                            } else {
+                                throw new Error(result.error);
+                            }
+                        } catch (verificationError) {
+                            console.error("Backend Error:", verificationError);
+                            alert("Payment successful, but link generation failed. Contact support with your payment ID.");
+                            payBtn.innerText = "Error (See Console)";
                         }
                     },
                     "theme": { "color": "#c0392b" }
                 };
+                
                 var rzp = new Razorpay(options);
+                rzp.on('payment.failed', function (response){
+                    payBtn.innerText = "Pay Now (₹99)";
+                    payBtn.disabled = false;
+                });
                 rzp.open();
                 
             } catch (error) {
@@ -211,7 +234,8 @@
                 payBtn.disabled = false;
             }
         });
-    
+    }
+
 
     // ==========================================
     // 🎩 PHASE 3: ORIGINAL MAGICAL APP LOGIC
