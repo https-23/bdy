@@ -111,7 +111,26 @@ def verify_payment():
         return jsonify({'status': 'failed', 'error': 'Fake payment detected!'}), 400
     except Exception as e:
         return jsonify({'status': 'failed', 'error': str(e)}), 500
-
+# ==========================================
+# ROUTE 3: FETCH GIFT DATA (Phase 3)
+# ==========================================
+@app.route('/api/get-gift/<gift_id>', methods=['GET'])
+def get_gift(gift_id):
+    try:
+        if not db:
+            return jsonify({'error': 'Database not initialized'}), 500
+            
+        doc_ref = db.collection('magical_gifts').document(gift_id)
+        doc = doc_ref.get()
+        
+        if doc.exists:
+            return jsonify({'status': 'success', 'data': doc.to_dict()}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Gift not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+        
 if __name__ == '__main__':
     app.run(debug=True)
     
