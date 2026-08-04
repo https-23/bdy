@@ -242,9 +242,10 @@
                 });
                 rzp.open();
                 
-            } catch (error) {
-                console.error(error);
-                alert("Error connecting to server. Please try again.");
+                        } catch (error) {
+                console.error("Payment System Error:", error);
+                // This will now show the EXACT error the server is complaining about!
+                alert("Backend Error: " + error.message); 
                 payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
