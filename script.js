@@ -135,7 +135,19 @@
 
                 const secretNameEl = document.getElementById('secret-name');
                 if(secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+                                // Inject Envelope Message
+                const envelopeText = document.querySelector('.letter p');
+                if (envelopeText && window.magicalState.envelopeMsg) {
+                    envelopeText.innerHTML = `${window.magicalState.envelopeMsg}<br><br>Hope you like this little surprise!`;
+                }
                 
+                // Inject Main Wish
+                const finalMsg = document.getElementById('final-message');
+                if (finalMsg && window.magicalState.mainWish) {
+                    finalMsg.innerHTML = window.magicalState.mainWish.replace(/\n/g, '<br>');
+                }
+
+            
                 const dummyUser = document.getElementById('dummy-username');
                 if(dummyUser) dummyUser.value = partnerName; 
 
