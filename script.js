@@ -291,8 +291,7 @@
             typeWriterTriggered = true;
         }
     }
-
-    // --- 3D LOGIN SCREEN LOGIC ---
+    // --- 3D LOGIN SCREEN LOGIC & CUSTOM AUDIO ROUTER ---
     const loginScreen = document.getElementById('login-screen');
     const tiltCard = document.getElementById('tilt-card');
     const unlockBtn = document.getElementById('unlock-btn');
@@ -336,16 +335,44 @@
             playPopSound(); 
 
             setTimeout(() => {
-                const bgMusic = document.getElementById("bg-music");
-                if (bgMusic) { 
-                    bgMusic.volume = 0.5; 
-                    bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
+                // --- CUSTOM AUDIO ROUTER ---
+                const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+                
+                if (customAudioLink && (customAudioLink.includes('youtube.com') || customAudioLink.includes('youtu.be'))) {
+                    // Extract Video ID robustly
+                    let videoId = '';
+                    try {
+                        if (customAudioLink.includes('youtu.be/')) {
+                            videoId = customAudioLink.split('youtu.be/')[1].split('?')[0];
+                        } else if (customAudioLink.includes('v=')) {
+                            videoId = customAudioLink.split('v=')[1].split('&')[0];
+                        }
+                        
+                        if (videoId) {
+                            // Inject invisible iframe to bypass audio DRM
+                            const iframe = document.createElement('iframe');
+                            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0`;
+                            iframe.style.display = 'none';
+                            iframe.allow = 'autoplay';
+                            document.body.appendChild(iframe);
+                        }
+                    } catch(err) {
+                        console.error("YouTube parsing failed", err);
+                    }
+                } else {
+                    // Fallback to default music if no custom link or not YouTube
+                    const bgMusic = document.getElementById("bg-music");
+                    if (bgMusic) { 
+                        bgMusic.volume = 0.5; 
+                        bgMusic.play().catch(e => console.log("Audio play blocked by browser", e)); 
+                    }
                 }
+                
                 showScreen("screen1");
             }, 1500);
         });
     }
-
+    
     // --- BASIC NAVIGATION ---
     document.getElementById("yesBtn")?.addEventListener("click", () => {
         playPopSound(); 
