@@ -146,8 +146,13 @@
                 if (finalMsg && window.magicalState.mainWish) {
                     finalMsg.innerHTML = window.magicalState.mainWish.replace(/\n/g, '<br>');
                 }
-
-            
+// 📸 NEW: Inject uploaded photos into the preview gallery
+                const galleryImgs = document.querySelectorAll('.gallery-img');
+                galleryImgs.forEach((img, index) => {
+                    if (window.magicalState.images[index]) {
+                        img.src = window.magicalState.images[index];
+                    }
+                });
                 const dummyUser = document.getElementById('dummy-username');
                 if(dummyUser) dummyUser.value = partnerName; 
 
