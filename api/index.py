@@ -1,10 +1,9 @@
 import os
 import json
 import uuid
-import base64
 import razorpay
 import firebase_admin
-from firebase_admin import credentials, firestore, storage
+from firebase_admin import credentials, firestore
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -17,7 +16,7 @@ RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET')
 client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # ==========================================
-# 2. FIREBASE SECURE VAULT & STORAGE SETUP
+# 2. FIREBASE SETUP (100% FREE TIER - NO STORAGE NEEDED)
 # ==========================================
 if not firebase_admin._apps:
     firebase_creds_json = os.environ.get('FIREBASE_CREDENTIALS')
@@ -25,14 +24,11 @@ if not firebase_admin._apps:
         try:
             creds_dict = json.loads(firebase_creds_json)
             cred = credentials.Certificate(creds_dict)
-            firebase_admin.initialize_app(cred, {
-                'storageBucket': os.environ.get('FIREBASE_STORAGE_BUCKET') 
-            })
+            firebase_admin.initialize_app(cred)
         except Exception as e:
             print(f"Firebase Init Error: {str(e)}")
 
 db = firestore.client() if firebase_admin._apps else None
-bucket = storage.bucket() if firebase_admin._apps else None
 
 # ==========================================
 # ROUTE 1: CREATE ORDER
@@ -51,7 +47,7 @@ def create_order():
         return jsonify({'error': str(e)}), 500
 
 # ==========================================
-# ROUTE 2: ATOMIC VERIFY, UPLOAD & GENERATE
+# ROUTE 2: VERIFY AND SAVE (DIRECT TO DB)
 # ==========================================
 @app.route('/api/verify-and-generate-link', methods=['POST'])
 def verify_payment():
@@ -68,26 +64,7 @@ def verify_payment():
         # 2. Generate UUID
         unique_gift_id = str(uuid.uuid4())
         
-        # 3. Decode Base64 and Upload to Firebase Storage
-        uploaded_image_urls = {}
-        if bucket:
-            images_b64 = data.get('images', {})
-            for index, b64_str in images_b64.items():
-                if b64_str:
-                    try:
-                        header, encoded = b64_str.split(",", 1)
-                        file_data = base64.b64decode(encoded)
-                        
-                        file_path = f"gifts/{unique_gift_id}/photo_{index}.webp"
-                        blob = bucket.blob(file_path)
-                        blob.upload_from_string(file_data, content_type='image/webp')
-                        blob.make_public() 
-                        
-                        uploaded_image_urls[index] = blob.public_url
-                    except Exception as img_err:
-                        print(f"Failed to process image {index}: {str(img_err)}")
-
-        # 4. Save Master Record to Firestore
+        # 3. Save Master Record to Firestore (Images saved directly as text!)
         if db:
             db.collection('magical_gifts').document(unique_gift_id).set({
                 'order_id': data['order_id'],
@@ -97,11 +74,11 @@ def verify_payment():
                 'envelope_msg': data.get('envelope_msg', ''),
                 'main_wish': data.get('main_wish', ''),
                 'audio_link': data.get('audio_link', ''),
-                'images': uploaded_image_urls,
+                'images': data.get('images', {}),  # Bypassing storage bucket
                 'status': 'paid_and_secured'
             })
         
-        # 5. Generate Dynamic Frontend Link
+        # 4. Generate Dynamic Frontend Link
         frontend_url = os.environ.get('FRONTEND_URL', 'https://10petalx.vercel.app').rstrip('/')
         gift_link = f"{frontend_url}/?gift={unique_gift_id}"
         
@@ -111,8 +88,9 @@ def verify_payment():
         return jsonify({'status': 'failed', 'error': 'Fake payment detected!'}), 400
     except Exception as e:
         return jsonify({'status': 'failed', 'error': str(e)}), 500
+
 # ==========================================
-# ROUTE 3: FETCH GIFT DATA (Phase 3)
+# ROUTE 3: FETCH GIFT DATA
 # ==========================================
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
@@ -130,7 +108,7 @@ def get_gift(gift_id):
             
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-        
+
 if __name__ == '__main__':
     app.run(debug=True)
     
