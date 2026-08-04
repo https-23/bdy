@@ -268,8 +268,17 @@
         }
     }
     
-    function showScreen(screenId) {
-        screens.forEach(screen => screen.classList.remove("active"));
+        function showScreen(screenId) {
+        // 1. Grab all screens fresh
+        const allScreens = document.querySelectorAll(".screen");
+        
+        // 2. Remove the active class AND clear the stuck inline styles
+        allScreens.forEach(screen => {
+            screen.classList.remove("active");
+            screen.style.display = ''; // 🧹 This line forces the login screen to disappear!
+        });
+
+        // 3. Show the new target screen
         const targetScreen = document.getElementById(screenId);
         if (targetScreen) targetScreen.classList.add("active");
 
