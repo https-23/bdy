@@ -660,3 +660,103 @@
     }
 
 });
+    // ==========================================
+    // 🔮 PHASE 3 & 4: RECEIVER'S EXPERIENCE & PRELOADER
+    // ==========================================
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const giftId = urlParams.get('gift');
+        
+        const preloader = document.getElementById('preloader');
+        const orderForm = document.getElementById('order-form-container');
+        const previewContainer = document.getElementById('preview-container');
+        const loginScreen = document.getElementById('login-screen');
+        
+        if (giftId) {
+            // Receiver Mode: Lock UI, keep preloader active
+            if (preloader) {
+                preloader.style.opacity = '1';
+                preloader.style.visibility = 'visible';
+            }
+            if (orderForm) orderForm.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/get-gift/${giftId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    
+                    // 1. Hydrate Texts
+                    const secretNameEl = document.getElementById('secret-name');
+                    if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} 💖`;
+                    
+                    const dummyUser = document.getElementById('dummy-username');
+                    if (dummyUser) dummyUser.value = data.partner_name;
+                    
+                    const envelopeText = document.querySelector('.letter p');
+                    if (envelopeText && data.envelope_msg) {
+                        envelopeText.innerHTML = `${data.envelope_msg}<br><br>Hope you like this little surprise!`;
+                    }
+                    
+                    const finalMsg = document.getElementById('final-message');
+                    if (finalMsg && data.main_wish) {
+                        finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
+                    }
+                    
+                    // Remove the payment button for the receiver
+                    const payBtn = document.getElementById('pay-now-btn');
+                    if (payBtn) payBtn.style.display = 'none';
+                    
+                    // 2. Hydrate Images (Screen 7 Gallery)
+                    if (data.images) {
+                        const galleryImgs = document.querySelectorAll('.gallery-img');
+                        galleryImgs.forEach((img, index) => {
+                            // Check for both integer and stringified keys from Firestore
+                            const imgUrl = data.images[index] || data.images[index.toString()];
+                            if (imgUrl) {
+                                img.src = imgUrl;
+                            }
+                        });
+                    }
+                    
+                    // 3. Store custom audio for the Unlock Button to use
+                    if (data.audio_link) {
+                        window.magicalState = window.magicalState || {};
+                        window.magicalState.receiverAudio = data.audio_link;
+                    }
+                    
+                    // Launch the experience
+                    if (previewContainer) previewContainer.style.display = 'block';
+                    if (loginScreen) {
+                        loginScreen.style.display = 'flex';
+                        loginScreen.classList.add('active');
+                    }
+                } else {
+                    alert("Oops! This magical link seems broken or has expired.");
+                    if (orderForm) orderForm.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Failed to load gift data:", error);
+                alert("Error loading the surprise. Please refresh the page.");
+                if (orderForm) orderForm.style.display = 'block';
+            } finally {
+                // Drop Preloader Smoothly
+                if (preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600);
+                }
+            }
+        } else {
+            // Creator Mode: Drop preloader instantly, show the builder form
+            if (preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600);
+            }
+        }
+    });
