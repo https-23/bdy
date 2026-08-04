@@ -99,7 +99,7 @@
         const allButtons = document.querySelectorAll('button');
         const wishTextarea = document.querySelector('textarea'); 
         allButtons.forEach(btn => {
-            if(btn.innerText && btn.innerText.includes("Auto-Generate")) {
+            if(btn.innerText && btn.innerText.includes("AI-Generate-btn")) {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     if(wishTextarea) {
@@ -109,7 +109,7 @@
             }
         });
     } catch (err) {
-        console.error("Auto-wish error:", err);
+        console.error("AI-wish error:", err);
     }
 
     // ==========================================
