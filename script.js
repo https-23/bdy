@@ -92,24 +92,23 @@
         console.error("Photo upload error:", err);
     }
 
-    // ==========================================
+        // ==========================================
     // ✨ 2. AUTO-GENERATE WISH LOGIC
     // ==========================================
     try {
-        const allButtons = document.querySelectorAll('button');
-        const wishTextarea = document.querySelector('textarea'); 
-        allButtons.forEach(btn => {
-            if(btn.innerText && btn.innerText.includes("AI-Generate-btn")) {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if(wishTextarea) {
-                        wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
-                    }
-                });
-            }
-        });
+        const aiBtn = document.getElementById('ai-generate-btn'); 
+        const wishTextarea = document.getElementById('main-wish-msg'); 
+        
+        if (aiBtn) {
+            aiBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (wishTextarea) {
+                    wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+                }
+            });
+        }
     } catch (err) {
-        console.error("AI-wish error:", err);
+        console.error("Auto-wish error:", err);
     }
 
     // ==========================================
