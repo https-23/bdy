@@ -183,7 +183,7 @@
                 if(order.error) throw new Error(order.error);
 
                 var options = {
-                    "key": "rzp_test_TKTfMVdW3E31VL", 
+                    "key": "Rzp_test_TLeNXeVeDyigeU", 
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
