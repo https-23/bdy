@@ -741,6 +741,76 @@ button.heartNext {
     background-position: center;
     background-repeat: no-repeat;
 }
+/* =========================================
+   ARCHERY & PENGUIN ANIMATION STYLES
+   ========================================= */
+.archery-stage {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin: 20px 0;
+    border-bottom: 2px dashed rgba(255, 117, 140, 0.3); /* Gives them ground to stand on */
+}
+
+.bow-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 4.5rem;
+    transition: left 0.35s cubic-bezier(0.55, 0.085, 0.68, 0.53); /* Realistic arrow flight speed */
+    z-index: 10;
+}
+
+.bow-icon.fly {
+    left: calc(100% - 90px); /* Flies across the screen */
+}
+
+.bow-icon.hidden {
+    opacity: 0;
+    display: none;
+}
+
+.heart-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) scale(1);
+    font-size: 5.5rem;
+    animation: pulseHeart 1s infinite alternate ease-in-out;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+}
+
+.heart-icon.burst {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+}
+
+.new-penguins {
+    position: absolute;
+    bottom: -30px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0;
+    transition: opacity 1s ease, transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateY(60px); /* Start hidden below */
+    pointer-events: none;
+}
+
+.new-penguins.show {
+    opacity: 1;
+    transform: translateY(0); /* Pop up to the stage */
+}
+
+.peng-h1, .peng-h2 {
+    height: 110px;
+}
+
+@keyframes pulseHeart {
+    from { transform: translateY(-50%) scale(1); filter: drop-shadow(0 0 10px rgba(255,117,140,0.4)); }
+    to { transform: translateY(-50%) scale(1.15); filter: drop-shadow(0 0 25px rgba(255,117,140,0.9)); }
+}
 /* --- OVERFLOW AND Z-INDEX LAYER FIXES --- */
 #order-form-container {
     box-sizing: border-box;
