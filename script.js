@@ -7,7 +7,8 @@ window.magicalState = {
     envelopeMsg: "",
     mainWish: "",
     audioLink: "",
-    images: { 0: null, 1: null, 2: null, 3: null }
+    images: { 0: null, 1: null, 2: null, 3: null },
+    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } // NEW: Stores custom scratch texts
 };
 
 async function compressImage(file) {
@@ -100,11 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Capture all form inputs
             window.magicalState.partnerName = partnerName;
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
             window.magicalState.envelopeMsg = document.getElementById('envelope-msg')?.value.trim() || "";
             window.magicalState.mainWish = document.getElementById('main-wish-msg')?.value.trim() || "";
             window.magicalState.audioLink = document.getElementById('audio-link-input')?.value.trim() || "";
+            
+            // Capture custom Scratch Messages
+            window.magicalState.scratchMsgs[1] = document.getElementById('scratch-1')?.value || "Message 1";
+            window.magicalState.scratchMsgs[2] = document.getElementById('scratch-2')?.value || "Message 2";
+            window.magicalState.scratchMsgs[3] = document.getElementById('scratch-3')?.value || "Message 3";
+            window.magicalState.scratchMsgs[4] = document.getElementById('scratch-4')?.value || "Message 4";
 
             const secretNameEl = document.getElementById('secret-name');
             if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
@@ -121,7 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const galleryImgs = document.querySelectorAll('.gallery-img');
             galleryImgs.forEach((img, index) => {
-                if (window.magicalState.images[index]) img.src = window.magicalState.images[index];
+                if (window.magicalState.images[index]) {
+                    img.src = window.magicalState.images[index];
+                }
+                // If empty, the CSS camera placeholder takes over automatically
             });
 
             const dummyUser = document.getElementById('dummy-username');
@@ -161,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(order.error) throw new Error(order.error);
 
                 var options = {
-                    "key": "rzp_test_TLeNXeVeDyigeU", 
+                    "key": "rzp_test_TLeNXeVeDyigeU", // Make sure this matches your Vercel Env Var
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
@@ -181,7 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     envelope_msg: window.magicalState.envelopeMsg,
                                     main_wish: window.magicalState.mainWish,
                                     audio_link: window.magicalState.audioLink,
-                                    images: window.magicalState.images
+                                    images: window.magicalState.images,
+                                    scratch_msgs: window.magicalState.scratchMsgs // Send custom messages to DB
                                 })
                             });
                             
@@ -243,7 +255,7 @@ function showScreen(screenId) {
     const allScreens = document.querySelectorAll(".screen");
     allScreens.forEach(screen => {
         screen.classList.remove("active");
-        screen.style.display = 'none'; // Forces clean screen switching
+        screen.style.display = 'none'; 
     });
 
     const targetScreen = document.getElementById(screenId);
@@ -269,7 +281,6 @@ function showScreen(screenId) {
     }
 }
 
-// --- 3D LOGIN SCREEN LOGIC & CUSTOM AUDIO ROUTER ---
 const loginScreen = document.getElementById('login-screen');
 const tiltCard = document.getElementById('tilt-card');
 const unlockBtn = document.getElementById('unlock-btn');
@@ -431,14 +442,7 @@ function triggerTypewriter() {
     typing();
 }
 
-// --- SCRATCH CARDS ---
-const messages = {
-    1: `<strong style="font-size: 1.4rem; color: var(--primary-color);">🎂 Happy Birthday!</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">Wishing you a year full of happiness, good health, and countless reasons to smile. Have an amazing birthday!</span>`,
-    2: `<strong style="font-size: 1.4rem; color: var(--primary-color);">💛 A Small Apology</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">If I ever made you uncomfortable or hurt you in any way, I'm truly sorry. That was never my intention.</span>`,
-    3: `<strong style="font-size: 1.4rem; color: var(--primary-color);">💌 Just One Thing</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">You don't have to reply. I just hope you read this. That's enough for me.</span>`,
-    4: `<strong style="font-size: 1.4rem; color: var(--primary-color);">🌸 Take Care</strong><br><br><span style="font-size: 1.1rem; color: var(--text-color);">No matter what, I genuinely wish the best for you. Stay happy, stay safe, and enjoy your special day.</span>`
-};
-
+// --- CUSTOM SCRATCH CARDS ---
 const modal = document.getElementById('scratch-modal');
 const modalContent = document.getElementById('modal-message-content');
 const scratchCanvas = document.getElementById('popup-scratch-pad');
@@ -447,7 +451,14 @@ const scratchSound = document.getElementById('scratch-sound');
 document.querySelectorAll('.mini-card').forEach(card => {
     card.addEventListener('click', () => {
         playPopSound();
-        if(modalContent) modalContent.innerHTML = messages[card.getAttribute('data-id')];
+        const cardId = card.getAttribute('data-id');
+        const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
+        
+        // Dynamically style the user's custom text
+        if(modalContent) {
+            modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
+        }
+
         if(modal) modal.classList.add('show');
         setTimeout(initPopupScratchCard, 300);
     });
@@ -635,12 +646,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const payBtn = document.getElementById('pay-now-btn');
                 if (payBtn) payBtn.style.display = 'none';
                 
+                // Hydrate Images
                 if (data.images) {
                     const galleryImgs = document.querySelectorAll('.gallery-img');
                     galleryImgs.forEach((img, index) => {
                         const imgUrl = data.images[index] || data.images[index.toString()];
                         if (imgUrl) img.src = imgUrl;
                     });
+                }
+                
+                // Hydrate Custom Scratch Messages
+                if (data.scratch_msgs) {
+                    window.magicalState.scratchMsgs = data.scratch_msgs;
                 }
                 
                 if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
