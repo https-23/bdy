@@ -811,6 +811,11 @@ button.heartNext {
     from { transform: translateY(-50%) scale(1); filter: drop-shadow(0 0 10px rgba(255,117,140,0.4)); }
     to { transform: translateY(-50%) scale(1.15); filter: drop-shadow(0 0 25px rgba(255,117,140,0.9)); }
 }
+/* --- Giant Penguin Shadow Effect --- */
+#giant-penguin-img.hide-shadow {
+    transform: scale(1.6); /* Zooms in slightly */
+    opacity: 0; /* Fades out */
+}
 /* --- OVERFLOW AND Z-INDEX LAYER FIXES --- */
 #order-form-container {
     box-sizing: border-box;
