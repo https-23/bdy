@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(order.error) throw new Error(order.error);
 
                 var options = {
-                    "key": "Rzp_test_TLeNXeVeDyigeU", // Use your live key for production
+                    "key": "rzp_test_TLeNXeVeDyigeU", 
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
