@@ -338,7 +338,20 @@ if(unlockBtn) {
                     bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
                 }
             }
-            showScreen("archery-screen");
+            showScreen("big-penguin-screen");
+
+            setTimeout(() => {
+                // Apply shadow fade effect after 1 second
+                const giantPeng = document.getElementById('giant-penguin-img');
+                if(giantPeng) giantPeng.classList.add('hide-shadow');
+                
+                // Wait 500ms for animation to finish, then show archery
+                setTimeout(() => {
+                    showScreen("archery-screen");
+                }, 500);
+                
+            }, 1500); // 1500ms = 1.5 second exactly
+            
         }, 1500);
     });
 }
@@ -607,18 +620,22 @@ if(closePhotoModalBtn) {
         if(photoModal) photoModal.classList.remove('show');
     });
 }
-// --- ARCHERY CINEMATIC ANIMATION ---
-const shootBtn = document.getElementById('shoot-btn');
+// --- NEW ARCHERY "TAP ANYWHERE" LOGIC ---
+const archeryScreen = document.getElementById('archery-screen');
 const theBow = document.getElementById('the-bow');
 const theHeart = document.getElementById('the-heart');
-const archeryTitle = document.getElementById('archery-title');
-const thePenguins = document.getElementById('the-penguins');
-const archeryNextBtn = document.getElementById('archery-next-btn');
+let hasShot = false;
 
-if (shootBtn) {
-    shootBtn.addEventListener('click', () => {
-        // Hide button, play sound, fly arrow
-        shootBtn.style.display = 'none';
+if (archeryScreen) {
+    archeryScreen.addEventListener('click', () => {
+        if (hasShot) return; // Prevent double-shooting
+        hasShot = true;
+
+        // Hide the "Tap anywhere" text immediately
+        const tapText = archeryScreen.querySelector('.swipe');
+        if(tapText) tapText.style.opacity = '0';
+
+        // Fly arrow
         theBow.classList.add('fly');
 
         setTimeout(() => {
@@ -628,20 +645,12 @@ if (shootBtn) {
             fireConfetti();
             playPopSound();
 
-            // Fade out old text
-            archeryTitle.style.opacity = '0';
-
+            // Wait 1.2 seconds to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
-                // Change text, glow it up, bring in penguins!
-                archeryTitle.innerHTML = "Happy Birthday! 🎉";
-                archeryTitle.classList.add('glowing-name', 'show-name');
-                archeryTitle.style.opacity = '1';
-                
-                thePenguins.classList.add('show');
-                archeryNextBtn.style.display = 'inline-block';
-            }, 400);
+                showScreen('screen1');
+            }, 1700);
 
-        }, 350); // Matches the exact CSS flight time
+        }, 350); // Matches the flight time
     });
 }
 
