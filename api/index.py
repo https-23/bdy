@@ -132,6 +132,7 @@ def verify_payment():
             'envelope_msg': data.get('envelope_msg', ''),
             'main_wish': data.get('main_wish', ''),
             'audio_link': data.get('audio_link', ''),
+            'scratch_msgs': data.get('scratch_msgs', {}),
             'images': final_images,
             'created_at': datetime.datetime.utcnow(),
             'status': 'paid_and_secured'
