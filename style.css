@@ -381,7 +381,14 @@ button.heartNext {
     z-index: 2; 
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
 }
-.letter p { font-family: var(--font-heading); font-size: 1.1rem; margin: 0; line-height: 1.3; }
+.letter p { 
+    font-family: var(--font-heading); 
+    font-size: 1.1rem; 
+    margin: 0; 
+    line-height: 1.3; 
+    word-wrap: break-word; 
+    overflow-wrap: break-word; 
+}
 .envelope-wrapper.open .letter { transform: translateY(-130px); z-index: 4; }
 .click-hint { font-size: 1rem; color: var(--primary-color); font-weight: bold; margin-top: 5px; }
 .side-penguin { position: absolute; bottom: -15px; right: -30px; width: 80px; z-index: 10; pointer-events: none; }
