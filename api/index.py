@@ -2,24 +2,36 @@ import os
 import json
 import uuid
 import base64
-import sys  # 1. ADD THIS IMPORT
+import sys
+import types  # <--- NEW: Needed to create a proper mock module
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# --- 2. ADD THIS VERCEL RAZORPAY PATCH ---
-# Vercel strips pkg_resources from serverless functions. 
-# This safely mocks it so Razorpay can initialize without crashing.
+# --- 🚀 THE ULTIMATE VERCEL RAZORPAY PATCH ---
+# Vercel strips pkg_resources. Razorpay tries to import 'DistributionNotFound' 
+# from it. This builds a perfect fake module so Razorpay initializes smoothly.
 if 'pkg_resources' not in sys.modules:
-    class MockPkg:
-        @staticmethod
-        def get_distribution(name):
-            class MockDist:
-                version = "1.4.1"
-            return MockDist()
-    sys.modules['pkg_resources'] = MockPkg
-# -----------------------------------------
-
+    # 1. Create a fake module
+    mock_pkg_resources = types.ModuleType('pkg_resources')
+    
+    # 2. Create the missing exception class Razorpay is looking for
+    class DistributionNotFound(Exception):
+        pass
+        
+    # 3. Create the version checker
+    def get_distribution(name):
+        class MockDist:
+            version = "1.4.1"
+        return MockDist()
+        
+    # 4. Attach them to the fake module
+    mock_pkg_resources.DistributionNotFound = DistributionNotFound
+    mock_pkg_resources.get_distribution = get_distribution
+    
+    # 5. Trick the system into thinking it's installed
+    sys.modules['pkg_resources'] = mock_pkg_resources
+# ---------------------------------------------
 # --- 1. RAZORPAY INITIALIZATION ---
 def get_razorpay_client():
     import razorpay
