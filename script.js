@@ -338,7 +338,7 @@ if(unlockBtn) {
                     bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
                 }
             }
-            showScreen("screen1");
+            showScreen("archery-screen");
         }, 1500);
     });
 }
