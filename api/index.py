@@ -2,9 +2,23 @@ import os
 import json
 import uuid
 import base64
+import sys  # 1. ADD THIS IMPORT
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+
+# --- 2. ADD THIS VERCEL RAZORPAY PATCH ---
+# Vercel strips pkg_resources from serverless functions. 
+# This safely mocks it so Razorpay can initialize without crashing.
+if 'pkg_resources' not in sys.modules:
+    class MockPkg:
+        @staticmethod
+        def get_distribution(name):
+            class MockDist:
+                version = "1.4.1"
+            return MockDist()
+    sys.modules['pkg_resources'] = MockPkg
+# -----------------------------------------
 
 # --- 1. RAZORPAY INITIALIZATION ---
 def get_razorpay_client():
