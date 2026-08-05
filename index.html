@@ -132,33 +132,38 @@
                 </div>
             </section>
 
-                        <!-- =========================================
-                 NEW ARCHERY ANIMATION SCREEN 
+                                    <!-- =========================================
+                 SCENE 1: THE GIANT PENGUIN REVEAL
+                 ========================================= -->
+            <section class="screen" id="big-penguin-screen">
+                <img id="giant-penguin-img" src="penguineH1.gif" alt="Giant Penguin" style="height: 250px; filter: drop-shadow(0 20px 30px rgba(255, 117, 140, 0.6)); transition: transform 0.5s ease-in, opacity 0.5s ease-in;">
+            </section>
+
+            <!-- =========================================
+                 SCENE 2: THE NEW ARCHERY SCREEN
                  ========================================= -->
             <section class="screen" id="archery-screen">
-                <h1 id="archery-title" style="transition: opacity 0.4s ease; margin-bottom: 40px;">Aim for the heart 🎯</h1>
+                <!-- Penguin 1 above the title -->
+                <img src="penguineH1.gif" alt="Penguin 1" style="height: 90px; margin-bottom: 5px;">
+                
+                <h1 id="archery-title" style="margin-bottom: 5px;">Aim for the heart 🎯</h1>
+                
+                <!-- Minimal Tap Text -->
+                <p class="swipe" style="font-size: 0.95rem; margin-top: 0; margin-bottom: 40px; color: #ff758c;">
+                    👇 Tap anywhere to shoot 🏹
+                </p>
                 
                 <div class="archery-stage">
                     <div class="bow-icon" id="the-bow">🏹</div>
                     <div class="heart-icon" id="the-heart">💖</div>
                 </div>
 
-                <!-- Your Two New Penguins -->
-                <div class="new-penguins" id="the-penguins">
-                    <img class="character peng-h1" src="penguineH1.gif" alt="Penguin 1">
-                    <img class="character peng-h2" src="penguineH2.gif" alt="Penguin 2">
-                </div>
-
-                <button class="magic-btn" id="shoot-btn" style="margin-top: 50px; width: 80%; max-width: 250px;">
-                    <span class="btn-text">SHOOT 💘</span>
-                </button>
-                
-                <button class="next" id="archery-next-btn" style="display: none; margin-top: 50px; width: 80%; max-width: 250px;">
-                    See Your Surprise ✨
-                </button>
+                <!-- Penguin 2 in place of the old button -->
+                <img src="penguineH2.gif" alt="Penguin 2" style="height: 120px; margin-top: 50px;">
             </section>
-            <!-- (Your existing #screen1 starts here...) -->
-            
+
+            <!-- (Your existing <section class="screen" id="screen1"> stays right below this!) -->
+
             <!-- Screens 1 to 7 remain exactly same, pasting a few for structure -->
             <section class="screen" id="screen1">
                 <img class="character corner-penguin" src="penguin3.gif" alt="Penguin 3">
