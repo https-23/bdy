@@ -1,12 +1,24 @@
 import os
 import json
 import uuid
+import sys
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# 1. LAZY LOAD RAZORPAY
+# 1. LAZY LOAD RAZORPAY (WITH VERCEL HACK)
 def get_razorpay_client():
+    # --- 🚀 THE TRICK: Fake the missing package so Razorpay stops crashing ---
+    if 'pkg_resources' not in sys.modules:
+        class MockPkg:
+            @staticmethod
+            def get_distribution(name):
+                class MockDist:
+                    version = "1.4.1"
+                return MockDist()
+        sys.modules['pkg_resources'] = MockPkg
+    # ------------------------------------------------------------------------
+    
     import razorpay
     key_id = os.environ.get('RAZORPAY_KEY_ID')
     key_secret = os.environ.get('RAZORPAY_KEY_SECRET')
