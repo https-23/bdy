@@ -732,3 +732,28 @@ button.heartNext {
 .btn-text.hidden { opacity: 0; }
 
 @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+/* --- OVERFLOW AND Z-INDEX LAYER FIXES --- */
+#order-form-container {
+    box-sizing: border-box;
+    margin-bottom: 80px !important;
+}
+
+.screen {
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Ensure Lightbox Modals sit above parallax elements */
+#scratch-modal, #photo-modal {
+    z-index: 999999 !important;
+}
+
+/* Ensure Pay Button stays visible and clickable on small mobile screens */
+#pay-now-btn {
+    position: relative;
+    z-index: 1000;
+    padding: 16px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
