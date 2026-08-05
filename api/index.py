@@ -3,40 +3,33 @@ import json
 import uuid
 import base64
 import sys
-from unittest.mock import MagicMock  # <--- THE BULLETPROOF FIX
+import datetime
+import traceback
+from unittest.mock import MagicMock
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 # --- 🚀 THE BULLETPROOF VERCEL RAZORPAY PATCH ---
-# Instead of guessing which pieces of pkg_resources Razorpay wants, 
-# we use Python's built-in MagicMock to fake the ENTIRE module dynamically.
 if 'pkg_resources' not in sys.modules:
     mock_pkg_resources = MagicMock()
-    
-    # 1. Give it the exact version it expects
     class MockDist:
         version = "1.4.1"
     mock_pkg_resources.get_distribution.return_value = MockDist()
-    
-    # 2. Give it the exception class it looks for
     class DistributionNotFound(Exception):
         pass
     mock_pkg_resources.DistributionNotFound = DistributionNotFound
-    
-    # MagicMock will automatically handle .require() or anything else it asks for without crashing!
     sys.modules['pkg_resources'] = mock_pkg_resources
 # ---------------------------------------------
-# --- 1. RAZORPAY INITIALIZATION ---
+
 def get_razorpay_client():
     import razorpay
     key_id = os.environ.get('RAZORPAY_KEY_ID')
     key_secret = os.environ.get('RAZORPAY_KEY_SECRET')
     if not key_id or not key_secret:
-        raise ValueError("Razorpay API keys are missing in environment variables.")
+        raise ValueError("Razorpay API keys are missing in Vercel Environment Variables.")
     return razorpay.Client(auth=(key_id, key_secret))
 
-# --- 2. FIREBASE INITIALIZATION ---
 def get_db_and_bucket():
     import firebase_admin
     from firebase_admin import credentials, firestore, storage
@@ -44,19 +37,31 @@ def get_db_and_bucket():
     if not firebase_admin._apps:
         firebase_creds = os.environ.get('FIREBASE_CREDENTIALS')
         if not firebase_creds:
-            raise ValueError("Firebase credentials missing in environment variables.")
+            raise ValueError("FIREBASE_CREDENTIALS missing in Vercel Environment Variables.")
         
-        creds_dict = json.loads(firebase_creds)
+        try:
+            # Fix Vercel's JSON string escaping issues dynamically
+            if firebase_creds.startswith("'") and firebase_creds.endswith("'"):
+                firebase_creds = firebase_creds[1:-1]
+            
+            creds_dict = json.loads(firebase_creds, strict=False)
+            
+            # Heal the broken newline characters in the private key
+            if 'private_key' in creds_dict:
+                creds_dict['private_key'] = creds_dict['private_key'].replace('\\n', '\n')
+                
+        except Exception as e:
+            raise ValueError(f"Failed to parse Firebase JSON. Ensure it is a valid JSON string: {str(e)}")
+            
         bucket_name = os.environ.get('FIREBASE_STORAGE_BUCKET', '')
-        
         cred = credentials.Certificate(creds_dict)
+        
         if bucket_name:
             firebase_admin.initialize_app(cred, {'storageBucket': bucket_name})
         else:
             firebase_admin.initialize_app(cred)
             
     db = firestore.client()
-    bucket = None
     try:
         bucket = storage.bucket() if os.environ.get('FIREBASE_STORAGE_BUCKET') else None
     except Exception:
@@ -65,14 +70,10 @@ def get_db_and_bucket():
     return db, bucket
 
 def process_and_upload_images(images_dict, gift_id, bucket):
-    """Processes images: saves to Firebase Storage if bucket exists, otherwise validates payload size."""
     processed_images = {}
-    
     for key, base64_str in images_dict.items():
         if not base64_str or not isinstance(base64_str, str):
             continue
-            
-        # If Storage Bucket is available, upload to Firebase Storage
         if bucket and base64_str.startswith('data:image'):
             try:
                 header, encoded = base64_str.split(',', 1)
@@ -84,22 +85,16 @@ def process_and_upload_images(images_dict, gift_id, bucket):
                 processed_images[str(key)] = blob.public_url
                 continue
             except Exception as e:
-                print(f"Storage upload failed for image {key}, falling back to inline: {e}")
-        
-        # Fallback to inline WebP Base64 (validated for size)
+                print(f"Storage upload failed: {e}")
         processed_images[str(key)] = base64_str
-
     return processed_images
-
-# --- ROUTES ---
 
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
     try:
         client = get_razorpay_client()
-        order_amount = 9900  # ₹99 in paise
         razorpay_order = client.order.create({
-            "amount": order_amount,
+            "amount": 9900,
             "currency": "INR",
             "payment_capture": 1
         })
@@ -110,40 +105,35 @@ def create_order():
 @app.route('/api/verify-and-generate-link', methods=['POST'])
 def verify_payment():
     data = request.json or {}
-    required_fields = ['order_id', 'payment_id', 'signature']
-    
-    if not all(field in data for field in required_fields):
-        return jsonify({'status': 'failed', 'error': 'Missing transaction parameters.'}), 400
-
     try:
+        # 1. Verify Payment Signature
         client = get_razorpay_client()
-        params_dict = {
-            'razorpay_order_id': data['order_id'],
-            'razorpay_payment_id': data['payment_id'],
-            'razorpay_signature': data['signature']
-        }
-        
-        # Verify Payment Signature
-        client.utility.verify_payment_signature(params_dict)
+        client.utility.verify_payment_signature({
+            'razorpay_order_id': data.get('order_id', ''),
+            'razorpay_payment_id': data.get('payment_id', ''),
+            'razorpay_signature': data.get('signature', '')
+        })
 
         unique_gift_id = str(uuid.uuid4())
+        
+        # 2. Connect to Database
         db, bucket = get_db_and_bucket()
         
-        # Process and optimize image storage payload
+        # 3. Process Images
         raw_images = data.get('images', {})
         final_images = process_and_upload_images(raw_images, unique_gift_id, bucket)
         
-        # Save payload to Firestore
+        # 4. Save to Firestore
         doc_data = {
-            'order_id': data['order_id'],
-            'payment_id': data['payment_id'],
+            'order_id': data.get('order_id'),
+            'payment_id': data.get('payment_id'),
             'partner_name': data.get('partner_name', 'Someone Special'),
             'user_name': data.get('user_name', ''),
             'envelope_msg': data.get('envelope_msg', ''),
             'main_wish': data.get('main_wish', ''),
             'audio_link': data.get('audio_link', ''),
             'images': final_images,
-            'created_at': firestore.SERVER_TIMESTAMP,
+            'created_at': datetime.datetime.utcnow(),
             'status': 'paid_and_secured'
         }
         
@@ -153,8 +143,13 @@ def verify_payment():
         gift_link = f"{frontend_url}/?gift={unique_gift_id}"
         
         return jsonify({'status': 'success', 'link': gift_link}), 200
+        
     except Exception as e:
-        return jsonify({'status': 'failed', 'error': f"Verification Failed: {str(e)}"}), 500
+        # If it fails, log the exact detailed traceback to the Vercel console
+        error_trace = traceback.format_exc()
+        print("CRITICAL BACKEND ERROR:")
+        print(error_trace) 
+        return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
 
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
@@ -162,11 +157,10 @@ def get_gift(gift_id):
         db, _ = get_db_and_bucket()
         doc_ref = db.collection('magical_gifts').document(gift_id)
         doc = doc_ref.get()
-        
         if doc.exists:
             return jsonify({'status': 'success', 'data': doc.to_dict()}), 200
         else:
-            return jsonify({'status': 'error', 'message': 'Surprise link not found or expired.'}), 404
+            return jsonify({'status': 'error', 'message': 'Surprise link not found.'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
