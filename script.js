@@ -607,7 +607,50 @@ if(closePhotoModalBtn) {
         if(photoModal) photoModal.classList.remove('show');
     });
 }
+// --- ARCHERY CINEMATIC ANIMATION ---
+const shootBtn = document.getElementById('shoot-btn');
+const theBow = document.getElementById('the-bow');
+const theHeart = document.getElementById('the-heart');
+const archeryTitle = document.getElementById('archery-title');
+const thePenguins = document.getElementById('the-penguins');
+const archeryNextBtn = document.getElementById('archery-next-btn');
 
+if (shootBtn) {
+    shootBtn.addEventListener('click', () => {
+        // Hide button, play sound, fly arrow
+        shootBtn.style.display = 'none';
+        theBow.classList.add('fly');
+
+        setTimeout(() => {
+            // IMPACT! Hide arrow, burst heart, blast confetti
+            theBow.classList.add('hidden');
+            theHeart.classList.add('burst');
+            fireConfetti();
+            playPopSound();
+
+            // Fade out old text
+            archeryTitle.style.opacity = '0';
+
+            setTimeout(() => {
+                // Change text, glow it up, bring in penguins!
+                archeryTitle.innerHTML = "Happy Birthday! 🎉";
+                archeryTitle.classList.add('glowing-name', 'show-name');
+                archeryTitle.style.opacity = '1';
+                
+                thePenguins.classList.add('show');
+                archeryNextBtn.style.display = 'inline-block';
+            }, 400);
+
+        }, 350); // Matches the exact CSS flight time
+    });
+}
+
+if (archeryNextBtn) {
+    archeryNextBtn.addEventListener('click', () => {
+        playPopSound();
+        showScreen('screen1'); // Move to the YES/NO screen
+    });
+}
 // ==========================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION
 // ==========================================
