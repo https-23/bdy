@@ -3,33 +3,28 @@ import json
 import uuid
 import base64
 import sys
-import types  # <--- NEW: Needed to create a proper mock module
+from unittest.mock import MagicMock  # <--- THE BULLETPROOF FIX
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# --- 🚀 THE ULTIMATE VERCEL RAZORPAY PATCH ---
-# Vercel strips pkg_resources. Razorpay tries to import 'DistributionNotFound' 
-# from it. This builds a perfect fake module so Razorpay initializes smoothly.
+# --- 🚀 THE BULLETPROOF VERCEL RAZORPAY PATCH ---
+# Instead of guessing which pieces of pkg_resources Razorpay wants, 
+# we use Python's built-in MagicMock to fake the ENTIRE module dynamically.
 if 'pkg_resources' not in sys.modules:
-    # 1. Create a fake module
-    mock_pkg_resources = types.ModuleType('pkg_resources')
+    mock_pkg_resources = MagicMock()
     
-    # 2. Create the missing exception class Razorpay is looking for
+    # 1. Give it the exact version it expects
+    class MockDist:
+        version = "1.4.1"
+    mock_pkg_resources.get_distribution.return_value = MockDist()
+    
+    # 2. Give it the exception class it looks for
     class DistributionNotFound(Exception):
         pass
-        
-    # 3. Create the version checker
-    def get_distribution(name):
-        class MockDist:
-            version = "1.4.1"
-        return MockDist()
-        
-    # 4. Attach them to the fake module
     mock_pkg_resources.DistributionNotFound = DistributionNotFound
-    mock_pkg_resources.get_distribution = get_distribution
     
-    # 5. Trick the system into thinking it's installed
+    # MagicMock will automatically handle .require() or anything else it asks for without crashing!
     sys.modules['pkg_resources'] = mock_pkg_resources
 # ---------------------------------------------
 # --- 1. RAZORPAY INITIALIZATION ---
