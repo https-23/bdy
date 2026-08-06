@@ -708,6 +708,62 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 
                 if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
+                                // ==========================================
+                // ✨ VIRAL SHARE ENGINE INITIALIZATION ✨
+                // ==========================================
+                
+                // 1. Reveal the Share Button ONLY for the receiver
+                const shareContainer = document.getElementById('share-magic-container');
+                if (shareContainer) {
+                    // Show button after a 7-second delay so they have time to cry first
+                    setTimeout(() => { shareContainer.style.display = 'block'; }, 7000);
+                }
+
+                // 2. Hydrate Export Templates
+                const expMain = document.getElementById('export-img-main');
+                const exp1 = document.getElementById('export-img-1');
+                const exp2 = document.getElementById('export-img-2');
+                const exp3 = document.getElementById('export-img-3');
+                const expName = document.getElementById('export-sender-name');
+                const expWish = document.getElementById('export-main-wish');
+
+                if (data.images) {
+                    if (expMain) expMain.src = data.images[0] || data.images['0'];
+                    if (exp1) exp1.src = data.images[0] || data.images['0'];
+                    if (exp2) exp2.src = data.images[1] || data.images['1'];
+                    if (exp3) exp3.src = data.images[2] || data.images['2'];
+                }
+                if (expName) expName.innerText = `Made for ${data.partner_name} ❤️`;
+                if (expWish) expWish.innerHTML = data.main_wish ? data.main_wish.replace(/\n/g, '<br>') : 'A beautiful surprise...';
+
+                // 3. Dynamic Color Matching Engine
+                function getAverageColor(imgElement) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 50; canvas.height = 50;
+                    try {
+                        ctx.drawImage(imgElement, 0, 0, 50, 50);
+                        const imgData = ctx.getImageData(0, 0, 50, 50).data;
+                        let r = 0, g = 0, b = 0, count = 0;
+                        for (let i = 0; i < imgData.length; i += 4) {
+                            r += imgData[i]; g += imgData[i+1]; b += imgData[i+2]; count++;
+                        }
+                        return `rgb(${Math.floor(r/count)}, ${Math.floor(g/count)}, ${Math.floor(b/count)})`;
+                    } catch (e) {
+                        return '#ffe6ea'; // Fallback pink if cross-origin blocks it
+                    }
+                }
+
+                // Wait for the first image to load, then steal its color for the background!
+                if (expMain && expMain.src) {
+                    const tempImg = new Image();
+                    tempImg.crossOrigin = "Anonymous";
+                    tempImg.onload = function() {
+                        const dominantColor = getAverageColor(tempImg);
+                        document.getElementById('export-stage').style.background = `linear-gradient(135deg, ${dominantColor} 0%, #222 100%)`;
+                    };
+                    tempImg.src = expMain.src;
+                }
                 
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
@@ -723,4 +779,76 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
     }
+});
+// ==========================================
+// 📱 NATIVE SHARE & HTML2CANVAS LOGIC
+// ==========================================
+const openShareBtn = document.getElementById('open-share-modal-btn');
+const closeShareBtn = document.getElementById('close-export-modal');
+const exportModal = document.getElementById('export-modal');
+const loadingText = document.getElementById('export-loading-text');
+
+if (openShareBtn) {
+    openShareBtn.addEventListener('click', () => {
+        playPopSound();
+        exportModal.classList.add('show');
+    });
+}
+
+if (closeShareBtn) {
+    closeShareBtn.addEventListener('click', () => {
+        exportModal.classList.remove('show');
+    });
+}
+
+document.querySelectorAll('.style-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+        playPopSound();
+        const style = e.target.getAttribute('data-style');
+        loadingText.style.display = 'block';
+        
+        // Hide all templates, show only the selected one
+        document.querySelectorAll('.export-template').forEach(t => t.style.display = 'none');
+        document.getElementById(`template-${style}`).style.display = 'flex';
+
+        // Wait a tiny bit for the DOM to update, then take the 4K screenshot
+        setTimeout(async () => {
+            try {
+                const stage = document.getElementById('export-stage');
+                const canvas = await html2canvas(stage, { 
+                    scale: 1, // 1080x1920 is already huge
+                    useCORS: true, 
+                    allowTaint: true 
+                });
+
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'magical-surprise.png', { type: 'image/png' });
+                    
+                    // NATIVE SHARE API (Opens Instagram/WhatsApp directly on mobile!)
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: 'My Magical Surprise',
+                                text: 'Someone made this beautiful surprise for me! 😭❤️ Made on MagicalSurprise.com'
+                            });
+                        } catch (err) { console.log('Share canceled', err); }
+                    } else {
+                        // Fallback if browser doesn't support Native Share (like Desktop)
+                        const link = document.createElement('a');
+                        link.download = 'magical-surprise.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        alert("Image saved to your phone! You can now post it to your Story.");
+                    }
+                    loadingText.style.display = 'none';
+                    exportModal.classList.remove('show');
+                }, 'image/png');
+            } catch (error) {
+                console.error("Export failed:", error);
+                alert("Oops! Couldn't generate the image. Try again.");
+                loadingText.style.display = 'none';
+            }
+        }, 500);
+    });
 });
