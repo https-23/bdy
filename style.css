@@ -225,6 +225,7 @@ body {
     position: relative;
     background-color: transparent;
     z-index: 1;
+    overflow-x: hidden;
 }
 
 /* --- Screens State Machine --- */
@@ -388,6 +389,9 @@ button.heartNext {
     line-height: 1.3; 
     word-wrap: break-word; 
     overflow-wrap: break-word; 
+    word-break: break-word; 
+    width: 100%;
+    box-sizing: border-box;
 }
 .envelope-wrapper.open .letter { transform: translateY(-130px); z-index: 4; }
 .click-hint { font-size: 1rem; color: var(--primary-color); font-weight: bold; margin-top: 5px; }
@@ -815,6 +819,14 @@ button.heartNext {
 #giant-penguin-img.hide-shadow {
     transform: scale(1.6); /* Zooms in slightly */
     opacity: 0; /* Fades out */
+}
+/* 2. Dynamically shrink titles on smaller phones so they never get cut off */
+h1, h2 {
+    font-size: clamp(1.8rem, 8vw, 2.5rem) !important; 
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    padding: 0 10px;
 }
 /* --- OVERFLOW AND Z-INDEX LAYER FIXES --- */
 #order-form-container {
