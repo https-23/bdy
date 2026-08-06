@@ -359,6 +359,64 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <audio id="pop-sound" src="pop.mp3" preload="auto"></audio>
     <audio id="scratch-sound" src="scratch.mp3" preload="auto"></audio>
+    <!-- =========================================
+         VIRAL SHARE ENGINE (RECEIVER ONLY)
+         ========================================= -->
+    
+    <!-- The Trigger Button (Hidden by default) -->
+    <div id="share-magic-container" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 350px;">
+        <button id="open-share-modal-btn" style="width: 100%; box-shadow: 0 10px 25px rgba(255, 117, 140, 0.6); animation: bounce 2s infinite;">
+            ✨ Share the Magic
+        </button>
+    </div>
+
+    <!-- The Export Choice Modal -->
+    <div id="export-modal" class="modal-overlay">
+        <div class="export-modal-content">
+            <button id="close-export-modal" class="close-btn">×</button>
+            <h2 style="font-size: 1.8rem; margin-top: 0;">Choose a Style</h2>
+            <p style="font-size: 0.9rem; color: #666;">Pick a template to share on Instagram or WhatsApp!</p>
+            
+            <div class="export-options">
+                <button class="style-btn" data-style="polaroid">📸 Polaroid</button>
+                <button class="style-btn" data-style="film">🎞️ Film Strip</button>
+                <button class="style-btn" data-style="poem">💌 The Message</button>
+            </div>
+            <p id="export-loading-text" style="display: none; color: #c0392b; font-weight: bold; margin-top: 15px;">Generating your masterpiece... 🎨</p>
+        </div>
+    </div>
+
+    <!-- HIDDEN TEMPLATES FOR HTML2CANVAS (Not visible to user) -->
+    <div id="export-stage" style="position: absolute; top: -9999px; left: -9999px; width: 1080px; height: 1920px; background: #ffe6ea;">
+        
+        <!-- Template 1: Polaroid -->
+        <div id="template-polaroid" class="export-template" style="display: none;">
+            <div class="polaroid-frame">
+                <img id="export-img-main" src="" alt="Main">
+                <p id="export-sender-name" class="polaroid-text">For You</p>
+            </div>
+            <p class="watermark">Made with love on MagicalSurprise.com</p>
+        </div>
+
+        <!-- Template 2: Film Strip -->
+        <div id="template-film" class="export-template" style="display: none;">
+            <div class="film-strip">
+                <img id="export-img-1" src="" class="film-img">
+                <img id="export-img-2" src="" class="film-img">
+                <img id="export-img-3" src="" class="film-img">
+            </div>
+            <p class="watermark">Made with love on MagicalSurprise.com</p>
+        </div>
+
+        <!-- Template 3: The Message -->
+        <div id="template-poem" class="export-template" style="display: none;">
+            <div class="poem-card">
+                <p id="export-main-wish">Your beautiful message here...</p>
+                <span class="heart-icon">❤️</span>
+            </div>
+            <p class="watermark">Made with love on MagicalSurprise.com</p>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
