@@ -338,7 +338,20 @@ if(unlockBtn) {
                     bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
                 }
             }
-            showScreen("screen1");
+            showScreen("big-penguin-screen");
+
+            setTimeout(() => {
+                // Apply shadow fade effect after 1 second
+                const giantPeng = document.getElementById('giant-penguin-img');
+                if(giantPeng) giantPeng.classList.add('hide-shadow');
+                
+                // Wait 500ms for animation to finish, then show archery
+                setTimeout(() => {
+                    showScreen("archery-screen");
+                }, 500);
+                
+            }, 5400); // 1500ms = 5.4 second exactly
+            
         }, 1500);
     });
 }
