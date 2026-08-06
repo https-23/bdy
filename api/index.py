@@ -159,7 +159,13 @@ def get_gift(gift_id):
         doc_ref = db.collection('magical_gifts').document(gift_id)
         doc = doc_ref.get()
         if doc.exists:
-            return jsonify({'status': 'success', 'data': doc.to_dict()}), 200
+            data = doc.to_dict()
+            
+            # 👇 FIX: Convert the Firestore datetime to a string so JSON doesn't crash!
+            if 'created_at' in data:
+                data['created_at'] = str(data['created_at'])
+                
+            return jsonify({'status': 'success', 'data': data}), 200
         else:
             return jsonify({'status': 'error', 'message': 'Surprise link not found.'}), 404
     except Exception as e:
