@@ -645,7 +645,7 @@ if (archeryScreen) {
             fireConfetti();
             playPopSound();
 
-            // Wait 1.2 seconds to enjoy the confetti, then automatically go to YES/NO screen
+            // Wait to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
                 showScreen('screen1');
             }, 5600);
@@ -654,12 +654,6 @@ if (archeryScreen) {
     });
 }
 
-if (archeryNextBtn) {
-    archeryNextBtn.addEventListener('click', () => {
-        playPopSound();
-        showScreen('screen1'); // Move to the YES/NO screen
-    });
-}
 // ==========================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
 // ==========================================
@@ -723,7 +717,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error("Failed to load gift data:", error);
             alert("Error loading the surprise. Please refresh the page.");
-            // We no longer bring the form back here! The receiver stays safe.
         } finally {
             if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
         }
