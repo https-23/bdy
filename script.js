@@ -1,5 +1,5 @@
 // ==========================================
-// ðŸ§  0. GLOBAL STATE & COMPRESSION ENGINE
+// 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
 // ==========================================
 window.magicalState = {
     partnerName: "",
@@ -50,7 +50,7 @@ function extractYouTubeId(url) {
 }
 
 // ==========================================
-// ðŸ“¸ 1. PHOTO UPLOAD & AUTO-WISH
+// 📸 1. PHOTO UPLOAD & AUTO-WISH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
@@ -83,12 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aiBtn && wishTextarea) {
         aiBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            wishTextarea.value = "You turn the most ordinary days into something worth remembering â€” a random Tuesday feels a little more magical just because you're in it. ðŸ’–";
+            wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
         });
     }
 
     // ==========================================
-    // ðŸš€ 2. PREVIEW BUTTON & STATE CAPTURE
+    // 🚀 2. PREVIEW BUTTON & STATE CAPTURE
     // ==========================================
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
             if (!partnerName) {
-                alert("Please enter the name first! âœ¨");
+                alert("Please enter the name first! ✨");
                 return;
             }
 
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.magicalState.scratchMsgs[4] = document.getElementById('scratch-4')?.value || "Message 4";
 
             const secretNameEl = document.getElementById('secret-name');
-            if (secretNameEl) secretNameEl.innerText = `For ${partnerName} ðŸ’–`;
+            if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
             
             const envelopeText = document.querySelector('.letter p');
             if (envelopeText && window.magicalState.envelopeMsg) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // ðŸ’³ 3. RAZORPAY ATOMIC TRANSACTION 
+    // 💳 3. RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             const result = await verifyRes.json();
                             if(result.status === "success") {
-                                prompt("ðŸŽ‰ Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-                                payBtn.innerText = "Link Generated âœ”";
+                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                                payBtn.innerText = "Link Generated ✔";
                             } else {
                                 throw new Error(result.error);
                             }
@@ -215,14 +215,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
-                    payBtn.innerText = "Pay Now (â‚¹99)";
+                    payBtn.innerText = "Pay Now (₹99)";
                     payBtn.disabled = false;
                 });
                 rzp.open();
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Backend Error: " + error.message); 
-                payBtn.innerText = "Pay Now (â‚¹99)";
+                payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
         });
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// ðŸŽ© 4. ORIGINAL MAGICAL APP LOGIC
+// 🎩 4. ORIGINAL MAGICAL APP LOGIC
 // ==========================================
 let typeWriterTriggered = false;
 
@@ -338,20 +338,7 @@ if(unlockBtn) {
                     bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
                 }
             }
-            showScreen("big-penguin-screen");
-
-            setTimeout(() => {
-                // Apply shadow fade effect after 1 second
-                const giantPeng = document.getElementById('giant-penguin-img');
-                if(giantPeng) giantPeng.classList.add('hide-shadow');
-                
-                // Wait 500ms for animation to finish, then show archery
-                setTimeout(() => {
-                    showScreen("archery-screen");
-                }, 500);
-                
-            }, 5400); // 1500ms = 5.4 second exactly
-            
+            showScreen("screen1");
         }, 1500);
     });
 }
@@ -401,7 +388,7 @@ const pCanvas = document.getElementById("particle-canvas");
 if (pCanvas) {
     const pCtx = pCanvas.getContext("2d");
     let particles = [];
-    const emojis = ["ðŸŒ¸", "ðŸ’–", "âœ¨", "ðŸŒ¸", "ðŸ¤"];
+    const emojis = ["🌸", "💖", "✨", "🌸", "🤍"];
 
     function resizeCanvas() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
@@ -467,388 +454,4 @@ document.querySelectorAll('.mini-card').forEach(card => {
         const cardId = card.getAttribute('data-id');
         const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
         
-        // Dynamically style the user's custom text
-        if(modalContent) {
-            modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
-        }
-
-        if(modal) modal.classList.add('show');
-        setTimeout(initPopupScratchCard, 300);
-    });
-});
-
-document.getElementById('close-modal')?.addEventListener('click', () => { 
-    playPopSound(); 
-    if(modal) modal.classList.remove('show'); 
-});
-
-let isDrawing = false; 
-let lastAudioTime = 0; 
-let scratchEventsBound = false; 
-
-function initPopupScratchCard() {
-    if(!scratchCanvas) return;
-    const ctx = scratchCanvas.getContext('2d');
-    const rect = scratchCanvas.parentElement.getBoundingClientRect();
-    scratchCanvas.width = rect.width; 
-    scratchCanvas.height = rect.height;
-
-    ctx.globalCompositeOperation = 'source-over'; 
-    ctx.fillStyle = '#b3b3b3'; 
-    ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
-    
-    ctx.font = "bold 24px 'Fredoka', sans-serif"; 
-    ctx.fillStyle = "#ffffff";
-    ctx.textAlign = "center"; 
-    ctx.textBaseline = "middle";
-    ctx.fillText("Scratch Me! âœ¨", scratchCanvas.width / 2, scratchCanvas.height / 2);
-
-    if (!scratchEventsBound) {
-        function scratch(e) {
-            if (!isDrawing) return;
-            e.preventDefault();
-            const dynamicCtx = scratchCanvas.getContext('2d');
-            const canvasRect = scratchCanvas.getBoundingClientRect();
-            let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
-            let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
-
-            dynamicCtx.globalCompositeOperation = 'destination-out';
-            dynamicCtx.beginPath(); 
-            dynamicCtx.arc(x, y, 25, 0, Math.PI * 2); 
-            dynamicCtx.fill();
-
-            const now = Date.now();
-            if (now - lastAudioTime > 150) { 
-                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(e => {}); }
-                lastAudioTime = now;
-            }
-        }
-
-        scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
-        scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
-        scratchCanvas.addEventListener('mousemove', scratch);
-        scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
-        scratchCanvas.addEventListener('touchend', () => isDrawing = false);
-        scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
-        scratchEventsBound = true; 
-    }
-}
-
-// --- PARALLAX OPTIMIZATION ---
-let targetX = 0, targetY = 0; 
-let currentX = 0, currentY = 0;
-
-function throttle(func, limit) {
-    let inThrottle;
-    return function(...args) {
-        if (!inThrottle) {
-            func.apply(this, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    };
-}
-
-window.addEventListener("deviceorientation", throttle((e) => {
-    if (!e.gamma || !e.beta) return;
-    let tiltX = e.gamma; 
-    let tiltY = e.beta;  
-    if (tiltX > 25) tiltX = 25; 
-    if (tiltX < -25) tiltX = -25;
-    if (tiltY > 55) tiltY = 55; 
-    if (tiltY < 25) tiltY = 25; 
-    targetX = (tiltX / 25) * 15; 
-    targetY = ((tiltY - 40) / 15) * 15; 
-}, 20));
-
-document.addEventListener("mousemove", throttle((e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 30; 
-    const y = (e.clientY / window.innerHeight - 0.5) * 30;
-    targetX = x; targetY = y;
-}, 20));
-
-function renderParallax() {
-    currentX += (targetX - currentX) * 0.1; 
-    currentY += (targetY - currentY) * 0.1;
-    document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
-        const depth = el.classList.contains('glass') ? 0.4 : 1;
-        el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
-    });
-    requestAnimationFrame(renderParallax);
-}
-renderParallax(); 
-
-// --- INSTAGRAM DOUBLE TAP & LIGHTBOX ---
-const photoModal = document.getElementById('photo-modal');
-const modalImage = document.getElementById('modal-image');
-const closePhotoModalBtn = document.getElementById('close-photo-modal');
-
-document.querySelectorAll('.ig-card').forEach(card => {
-    let lastTap = 0;
-    let tapTimer;
-
-    card.addEventListener('click', (e) => {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTap;
-        
-        if (tapLength < 300 && tapLength > 0) {
-            clearTimeout(tapTimer); 
-            e.preventDefault();
-            if ("vibrate" in navigator) navigator.vibrate([30, 50, 30]); 
-            const heart = document.createElement('div');
-            heart.classList.add('popup-heart');
-            heart.innerText = 'â¤ï¸';
-            card.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
-        } else {
-            tapTimer = setTimeout(() => {
-                playPopSound();
-                const img = card.querySelector('.gallery-img');
-                if(img && modalImage && photoModal) {
-                    modalImage.src = img.src;
-                    photoModal.classList.add('show');
-                }
-            }, 300); 
-        }
-        lastTap = currentTime;
-    });
-});
-
-if(closePhotoModalBtn) {
-    closePhotoModalBtn.addEventListener('click', () => {
-        playPopSound();
-        if(photoModal) photoModal.classList.remove('show');
-    });
-}
-// --- NEW ARCHERY "TAP ANYWHERE" LOGIC ---
-const archeryScreen = document.getElementById('archery-screen');
-const theBow = document.getElementById('the-bow');
-const theHeart = document.getElementById('the-heart');
-let hasShot = false;
-
-if (archeryScreen) {
-    archeryScreen.addEventListener('click', () => {
-        if (hasShot) return; // Prevent double-shooting
-        hasShot = true;
-
-        // Hide the "Tap anywhere" text immediately
-        const tapText = archeryScreen.querySelector('.swipe');
-        if(tapText) tapText.style.opacity = '0';
-
-        // Fly arrow
-        theBow.classList.add('fly');
-
-        setTimeout(() => {
-            // IMPACT! Hide arrow, burst heart, blast confetti
-            theBow.classList.add('hidden');
-            theHeart.classList.add('burst');
-            fireConfetti();
-            playPopSound();
-
-            // Wait to enjoy the confetti, then automatically go to YES/NO screen
-            setTimeout(() => {
-                showScreen('screen1');
-            }, 5600);
-
-        }, 350); // Matches the flight time
-    });
-}
-
-// ==========================================
-// ðŸ”® 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
-// ==========================================
-document.addEventListener("DOMContentLoaded", async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const giftId = urlParams.get('gift');
-    
-    const preloader = document.getElementById('preloader');
-    const orderForm = document.getElementById('order-form-container');
-    const previewContainer = document.getElementById('preview-container');
-    const loginScreen = document.getElementById('login-screen');
-    const payBtn = document.getElementById('pay-now-btn');
-    
-    if (giftId) {
-        // STRICT LOCKDOWN: If it's a receiver link, permanently destroy the creator form & pay button
-        if (orderForm) orderForm.remove(); 
-        if (payBtn) payBtn.remove();
-        
-        if (preloader) { preloader.style.opacity = '1'; preloader.style.visibility = 'visible'; }
-        
-        try {
-            const response = await fetch(`/api/get-gift/${giftId}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            
-            if (result.status === 'success') {
-                const data = result.data;
-                const secretNameEl = document.getElementById('secret-name');
-                if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} ðŸ’–`;
-                
-                const dummyUser = document.getElementById('dummy-username');
-                if (dummyUser) dummyUser.value = data.partner_name;
-                
-                const envelopeText = document.querySelector('.letter p');
-                if (envelopeText && data.envelope_msg) envelopeText.innerHTML = `${data.envelope_msg}<br><br>Hope you like this little surprise!`;
-                
-                const finalMsg = document.getElementById('final-message');
-                if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
-                
-                // Hydrate Images
-                if (data.images) {
-                    const galleryImgs = document.querySelectorAll('.gallery-img');
-                    galleryImgs.forEach((img, index) => {
-                        const imgUrl = data.images[index] || data.images[index.toString()];
-                        if (imgUrl) img.src = imgUrl;
-                    });
-                }
-                
-                // Hydrate Custom Scratch Messages
-                if (data.scratch_msgs) {
-                    window.magicalState.scratchMsgs = data.scratch_msgs;
-                }
-                
-                if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
-                                // ==========================================
-                // âœ¨ VIRAL SHARE ENGINE INITIALIZATION âœ¨
-                // ==========================================
-                
-                // 1. Reveal the Share Button ONLY for the receiver
-                const shareContainer = document.getElementById('share-magic-container');
-                if (shareContainer) {
-                    // Show button after a 7-second delay so they have time to cry first
-                    setTimeout(() => { shareContainer.style.display = 'block'; }, 7000);
-                }
-
-                // 2. Hydrate Export Templates
-                const expMain = document.getElementById('export-img-main');
-                const exp1 = document.getElementById('export-img-1');
-                const exp2 = document.getElementById('export-img-2');
-                const exp3 = document.getElementById('export-img-3');
-                const expName = document.getElementById('export-sender-name');
-                const expWish = document.getElementById('export-main-wish');
-
-                if (data.images) {
-                    if (expMain) expMain.src = data.images[0] || data.images['0'];
-                    if (exp1) exp1.src = data.images[0] || data.images['0'];
-                    if (exp2) exp2.src = data.images[1] || data.images['1'];
-                    if (exp3) exp3.src = data.images[2] || data.images['2'];
-                }
-                if (expName) expName.innerText = `Made for ${data.partner_name} â¤ï¸`;
-                if (expWish) expWish.innerHTML = data.main_wish ? data.main_wish.replace(/\n/g, '<br>') : 'A beautiful surprise...';
-
-                // 3. Dynamic Color Matching Engine
-                function getAverageColor(imgElement) {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 50; canvas.height = 50;
-                    try {
-                        ctx.drawImage(imgElement, 0, 0, 50, 50);
-                        const imgData = ctx.getImageData(0, 0, 50, 50).data;
-                        let r = 0, g = 0, b = 0, count = 0;
-                        for (let i = 0; i < imgData.length; i += 4) {
-                            r += imgData[i]; g += imgData[i+1]; b += imgData[i+2]; count++;
-                        }
-                        return `rgb(${Math.floor(r/count)}, ${Math.floor(g/count)}, ${Math.floor(b/count)})`;
-                    } catch (e) {
-                        return '#ffe6ea'; // Fallback pink if cross-origin blocks it
-                    }
-                }
-
-                // Wait for the first image to load, then steal its color for the background!
-                if (expMain && expMain.src) {
-                    const tempImg = new Image();
-                    tempImg.crossOrigin = "Anonymous";
-                    tempImg.onload = function() {
-                        const dominantColor = getAverageColor(tempImg);
-                        document.getElementById('export-stage').style.background = `linear-gradient(135deg, ${dominantColor} 0%, #222 100%)`;
-                    };
-                    tempImg.src = expMain.src;
-                }
-                
-                if (previewContainer) previewContainer.style.display = 'block';
-                if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
-            } else {
-                alert("Oops! This magical link seems broken or has expired.");
-            }
-        } catch (error) {
-            console.error("Failed to load gift data:", error);
-            alert("Error loading the surprise. Please refresh the page.");
-        } finally {
-            if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
-        }
-    } else {
-        if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
-    }
-});
-// ==========================================
-// ðŸ“± NATIVE SHARE & HTML2CANVAS LOGIC
-// ==========================================
-const openShareBtn = document.getElementById('open-share-modal-btn');
-const closeShareBtn = document.getElementById('close-export-modal');
-const exportModal = document.getElementById('export-modal');
-const loadingText = document.getElementById('export-loading-text');
-
-if (openShareBtn) {
-    openShareBtn.addEventListener('click', () => {
-        playPopSound();
-        exportModal.classList.add('show');
-    });
-}
-
-if (closeShareBtn) {
-    closeShareBtn.addEventListener('click', () => {
-        exportModal.classList.remove('show');
-    });
-}
-
-document.querySelectorAll('.style-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-        playPopSound();
-        const style = e.target.getAttribute('data-style');
-        loadingText.style.display = 'block';
-        
-        // Hide all templates, show only the selected one
-        document.querySelectorAll('.export-template').forEach(t => t.style.display = 'none');
-        document.getElementById(`template-${style}`).style.display = 'flex';
-
-        // Wait a tiny bit for the DOM to update, then take the 4K screenshot
-        setTimeout(async () => {
-            try {
-                const stage = document.getElementById('export-stage');
-                const canvas = await html2canvas(stage, { 
-                    scale: 1, // 1080x1920 is already huge
-                    useCORS: true, 
-                    allowTaint: true 
-                });
-
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'magical-surprise.png', { type: 'image/png' });
-                    
-                    // NATIVE SHARE API (Opens Instagram/WhatsApp directly on mobile!)
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: 'My Magical Surprise',
-                                text: 'Someone made this beautiful surprise for me! ðŸ˜­â¤ï¸ Made on MagicalSurprise.com'
-                            });
-                        } catch (err) { console.log('Share canceled', err); }
-                    } else {
-                        // Fallback if browser doesn't support Native Share (like Desktop)
-                        const link = document.createElement('a');
-                        link.download = 'magical-surprise.png';
-                        link.href = URL.createObjectURL(blob);
-                        link.click();
-                        alert("Image saved to your phone! You can now post it to your Story.");
-                    }
-                    loadingText.style.display = 'none';
-                    exportModal.classList.remove('show');
-                }, 'image/png');
-            } catch (error) {
-                console.error("Export failed:", error);
-                alert("Oops! Couldn't generate the image. Try again.");
-                loadingText.style.display = 'none';
-            }
-        }, 500);
-    });
-});
+        // Dynamically style the user's custom te
