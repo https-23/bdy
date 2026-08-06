@@ -1,5 +1,5 @@
 // ==========================================
-// 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
+// ðŸ§  0. GLOBAL STATE & COMPRESSION ENGINE
 // ==========================================
 window.magicalState = {
     partnerName: "",
@@ -50,7 +50,7 @@ function extractYouTubeId(url) {
 }
 
 // ==========================================
-// 📸 1. PHOTO UPLOAD & AUTO-WISH
+// ðŸ“¸ 1. PHOTO UPLOAD & AUTO-WISH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
@@ -83,12 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aiBtn && wishTextarea) {
         aiBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
+            wishTextarea.value = "You turn the most ordinary days into something worth remembering â€” a random Tuesday feels a little more magical just because you're in it. ðŸ’–";
         });
     }
 
     // ==========================================
-    // 🚀 2. PREVIEW BUTTON & STATE CAPTURE
+    // ðŸš€ 2. PREVIEW BUTTON & STATE CAPTURE
     // ==========================================
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
             if (!partnerName) {
-                alert("Please enter the name first! ✨");
+                alert("Please enter the name first! âœ¨");
                 return;
             }
 
@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.magicalState.scratchMsgs[4] = document.getElementById('scratch-4')?.value || "Message 4";
 
             const secretNameEl = document.getElementById('secret-name');
-            if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
+            if (secretNameEl) secretNameEl.innerText = `For ${partnerName} ðŸ’–`;
             
             const envelopeText = document.querySelector('.letter p');
             if (envelopeText && window.magicalState.envelopeMsg) {
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 💳 3. RAZORPAY ATOMIC TRANSACTION 
+    // ðŸ’³ 3. RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
@@ -199,8 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             const result = await verifyRes.json();
                             if(result.status === "success") {
-                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-                                payBtn.innerText = "Link Generated ✔";
+                                prompt("ðŸŽ‰ Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                                payBtn.innerText = "Link Generated âœ”";
                             } else {
                                 throw new Error(result.error);
                             }
@@ -215,14 +215,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
-                    payBtn.innerText = "Pay Now (₹99)";
+                    payBtn.innerText = "Pay Now (â‚¹99)";
                     payBtn.disabled = false;
                 });
                 rzp.open();
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Backend Error: " + error.message); 
-                payBtn.innerText = "Pay Now (₹99)";
+                payBtn.innerText = "Pay Now (â‚¹99)";
                 payBtn.disabled = false;
             }
         });
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// 🎩 4. ORIGINAL MAGICAL APP LOGIC
+// ðŸŽ© 4. ORIGINAL MAGICAL APP LOGIC
 // ==========================================
 let typeWriterTriggered = false;
 
@@ -401,7 +401,7 @@ const pCanvas = document.getElementById("particle-canvas");
 if (pCanvas) {
     const pCtx = pCanvas.getContext("2d");
     let particles = [];
-    const emojis = ["🌸", "💖", "✨", "🌸", "🤍"];
+    const emojis = ["ðŸŒ¸", "ðŸ’–", "âœ¨", "ðŸŒ¸", "ðŸ¤"];
 
     function resizeCanvas() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
@@ -501,7 +501,7 @@ function initPopupScratchCard() {
     ctx.fillStyle = "#ffffff";
     ctx.textAlign = "center"; 
     ctx.textBaseline = "middle";
-    ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
+    ctx.fillText("Scratch Me! âœ¨", scratchCanvas.width / 2, scratchCanvas.height / 2);
 
     if (!scratchEventsBound) {
         function scratch(e) {
@@ -597,7 +597,7 @@ document.querySelectorAll('.ig-card').forEach(card => {
             if ("vibrate" in navigator) navigator.vibrate([30, 50, 30]); 
             const heart = document.createElement('div');
             heart.classList.add('popup-heart');
-            heart.innerText = '❤️';
+            heart.innerText = 'â¤ï¸';
             card.appendChild(heart);
             setTimeout(() => heart.remove(), 1000);
         } else {
@@ -645,7 +645,7 @@ if (archeryScreen) {
             fireConfetti();
             playPopSound();
 
-            // Wait to enjoy the confetti, then automatically go to YES/NO screen
+            // Wait 1.2 seconds to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
                 showScreen('screen1');
             }, 5600);
@@ -654,8 +654,14 @@ if (archeryScreen) {
     });
 }
 
+if (archeryNextBtn) {
+    archeryNextBtn.addEventListener('click', () => {
+        playPopSound();
+        showScreen('screen1'); // Move to the YES/NO screen
+    });
+}
 // ==========================================
-// 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
+// ðŸ”® 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -682,7 +688,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (result.status === 'success') {
                 const data = result.data;
                 const secretNameEl = document.getElementById('secret-name');
-                if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} 💖`;
+                if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} ðŸ’–`;
                 
                 const dummyUser = document.getElementById('dummy-username');
                 if (dummyUser) dummyUser.value = data.partner_name;
@@ -708,62 +714,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 
                 if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
-                                // ==========================================
-                // ✨ VIRAL SHARE ENGINE INITIALIZATION ✨
-                // ==========================================
-                
-                // 1. Reveal the Share Button ONLY for the receiver
-                const shareContainer = document.getElementById('share-magic-container');
-                if (shareContainer) {
-                    // Show button after a 7-second delay so they have time to cry first
-                    setTimeout(() => { shareContainer.style.display = 'block'; }, 7000);
-                }
-
-                // 2. Hydrate Export Templates
-                const expMain = document.getElementById('export-img-main');
-                const exp1 = document.getElementById('export-img-1');
-                const exp2 = document.getElementById('export-img-2');
-                const exp3 = document.getElementById('export-img-3');
-                const expName = document.getElementById('export-sender-name');
-                const expWish = document.getElementById('export-main-wish');
-
-                if (data.images) {
-                    if (expMain) expMain.src = data.images[0] || data.images['0'];
-                    if (exp1) exp1.src = data.images[0] || data.images['0'];
-                    if (exp2) exp2.src = data.images[1] || data.images['1'];
-                    if (exp3) exp3.src = data.images[2] || data.images['2'];
-                }
-                if (expName) expName.innerText = `Made for ${data.partner_name} ❤️`;
-                if (expWish) expWish.innerHTML = data.main_wish ? data.main_wish.replace(/\n/g, '<br>') : 'A beautiful surprise...';
-
-                // 3. Dynamic Color Matching Engine
-                function getAverageColor(imgElement) {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 50; canvas.height = 50;
-                    try {
-                        ctx.drawImage(imgElement, 0, 0, 50, 50);
-                        const imgData = ctx.getImageData(0, 0, 50, 50).data;
-                        let r = 0, g = 0, b = 0, count = 0;
-                        for (let i = 0; i < imgData.length; i += 4) {
-                            r += imgData[i]; g += imgData[i+1]; b += imgData[i+2]; count++;
-                        }
-                        return `rgb(${Math.floor(r/count)}, ${Math.floor(g/count)}, ${Math.floor(b/count)})`;
-                    } catch (e) {
-                        return '#ffe6ea'; // Fallback pink if cross-origin blocks it
-                    }
-                }
-
-                // Wait for the first image to load, then steal its color for the background!
-                if (expMain && expMain.src) {
-                    const tempImg = new Image();
-                    tempImg.crossOrigin = "Anonymous";
-                    tempImg.onload = function() {
-                        const dominantColor = getAverageColor(tempImg);
-                        document.getElementById('export-stage').style.background = `linear-gradient(135deg, ${dominantColor} 0%, #222 100%)`;
-                    };
-                    tempImg.src = expMain.src;
-                }
                 
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
@@ -773,82 +723,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (error) {
             console.error("Failed to load gift data:", error);
             alert("Error loading the surprise. Please refresh the page.");
+            // We no longer bring the form back here! The receiver stays safe.
         } finally {
             if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
         }
     } else {
         if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
     }
-});
-// ==========================================
-// 📱 NATIVE SHARE & HTML2CANVAS LOGIC
-// ==========================================
-const openShareBtn = document.getElementById('open-share-modal-btn');
-const closeShareBtn = document.getElementById('close-export-modal');
-const exportModal = document.getElementById('export-modal');
-const loadingText = document.getElementById('export-loading-text');
-
-if (openShareBtn) {
-    openShareBtn.addEventListener('click', () => {
-        playPopSound();
-        exportModal.classList.add('show');
-    });
-}
-
-if (closeShareBtn) {
-    closeShareBtn.addEventListener('click', () => {
-        exportModal.classList.remove('show');
-    });
-}
-
-document.querySelectorAll('.style-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-        playPopSound();
-        const style = e.target.getAttribute('data-style');
-        loadingText.style.display = 'block';
-        
-        // Hide all templates, show only the selected one
-        document.querySelectorAll('.export-template').forEach(t => t.style.display = 'none');
-        document.getElementById(`template-${style}`).style.display = 'flex';
-
-        // Wait a tiny bit for the DOM to update, then take the 4K screenshot
-        setTimeout(async () => {
-            try {
-                const stage = document.getElementById('export-stage');
-                const canvas = await html2canvas(stage, { 
-                    scale: 1, // 1080x1920 is already huge
-                    useCORS: true, 
-                    allowTaint: true 
-                });
-
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], 'magical-surprise.png', { type: 'image/png' });
-                    
-                    // NATIVE SHARE API (Opens Instagram/WhatsApp directly on mobile!)
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: 'My Magical Surprise',
-                                text: 'Someone made this beautiful surprise for me! 😭❤️ Made on MagicalSurprise.com'
-                            });
-                        } catch (err) { console.log('Share canceled', err); }
-                    } else {
-                        // Fallback if browser doesn't support Native Share (like Desktop)
-                        const link = document.createElement('a');
-                        link.download = 'magical-surprise.png';
-                        link.href = URL.createObjectURL(blob);
-                        link.click();
-                        alert("Image saved to your phone! You can now post it to your Story.");
-                    }
-                    loadingText.style.display = 'none';
-                    exportModal.classList.remove('show');
-                }, 'image/png');
-            } catch (error) {
-                console.error("Export failed:", error);
-                alert("Oops! Couldn't generate the image. Try again.");
-                loadingText.style.display = 'none';
-            }
-        }, 500);
-    });
-});
