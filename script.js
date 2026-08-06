@@ -661,7 +661,7 @@ if (archeryNextBtn) {
     });
 }
 // ==========================================
-// 🔮 5. RECEIVER PAYLOAD HYDRATION
+// 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -671,10 +671,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const orderForm = document.getElementById('order-form-container');
     const previewContainer = document.getElementById('preview-container');
     const loginScreen = document.getElementById('login-screen');
+    const payBtn = document.getElementById('pay-now-btn');
     
     if (giftId) {
+        // STRICT LOCKDOWN: If it's a receiver link, permanently destroy the creator form & pay button
+        if (orderForm) orderForm.remove(); 
+        if (payBtn) payBtn.remove();
+        
         if (preloader) { preloader.style.opacity = '1'; preloader.style.visibility = 'visible'; }
-        if (orderForm) orderForm.style.display = 'none';
         
         try {
             const response = await fetch(`/api/get-gift/${giftId}`);
@@ -694,9 +698,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 
                 const finalMsg = document.getElementById('final-message');
                 if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
-                
-                const payBtn = document.getElementById('pay-now-btn');
-                if (payBtn) payBtn.style.display = 'none';
                 
                 // Hydrate Images
                 if (data.images) {
@@ -718,12 +719,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
             } else {
                 alert("Oops! This magical link seems broken or has expired.");
-                if (orderForm) orderForm.style.display = 'block';
             }
         } catch (error) {
             console.error("Failed to load gift data:", error);
             alert("Error loading the surprise. Please refresh the page.");
-            if (orderForm) orderForm.style.display = 'block';
+            // We no longer bring the form back here! The receiver stays safe.
         } finally {
             if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
         }
