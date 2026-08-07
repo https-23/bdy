@@ -350,7 +350,7 @@ if(unlockBtn) {
                     showScreen("archery-screen");
                 }, 500);
                 
-            }, 5400); // 1500ms = 5.4 second exactly
+            }, 3800); // 1500ms = 5.4 second exactly
             
         }, 1500);
     });
@@ -648,7 +648,7 @@ if (archeryScreen) {
             // Wait to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
                 showScreen('screen1');
-            }, 5600);
+            }, 4200);
 
         }, 350); // Matches the flight time
     });
