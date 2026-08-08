@@ -489,16 +489,10 @@ function triggerTypewriter() {
     }
     typing();
 }
-//CUSTOME SCRATCH CARD 
-let isDrawing = false; 
-let lastAudioTime = 0; 
-let scratchEventsBound = false; 
-
+// --- THE ULTIMATE BULLETPROOF SCRATCH CARD ---
 function initPopupScratchCard() {
     if(!scratchCanvas) return;
-    
-    // willReadFrequently stops mobile browser hanging when rapidly editing canvas pixels
-    const ctx = scratchCanvas.getContext('2d', { willReadFrequently: true });
+    const ctx = scratchCanvas.getContext('2d'); 
     const rect = scratchCanvas.parentElement.getBoundingClientRect();
     scratchCanvas.width = rect.width; 
     scratchCanvas.height = rect.height;
@@ -513,57 +507,43 @@ function initPopupScratchCard() {
     ctx.textBaseline = "middle";
     ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
 
-    if (!scratchEventsBound) {
-        // BUG FIX: Aggressive tracking for Android/iOS touches
-        const scratch = (e) => {
-            if (!isDrawing) return;
-            e.preventDefault();
+    let isDrawing = false;
+    let lastAudioTime = 0;
 
-            const canvasRect = scratchCanvas.getBoundingClientRect();
-            let clientX, clientY;
-            
-            // Safely extract coordinates whether it's a touch or a mouse click
-            if (e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-
-            if (!clientX || !clientY) return;
-
-            let x = clientX - canvasRect.left;
-            let y = clientY - canvasRect.top;
-
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); 
-            ctx.arc(x, y, 45, 0, Math.PI * 2); // Brush size
-            ctx.fill();
-
-            const now = Date.now();
-            if (now - lastAudioTime > 150) { 
-                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(err => {}); }
-                lastAudioTime = now;
-            }
-        };
-
-        // Pointer Events (Modern standard for flawless touch/click tracking)
-        scratchCanvas.addEventListener('pointerdown', (e) => { isDrawing = true; scratch(e); });
-        scratchCanvas.addEventListener('pointerup', () => { isDrawing = false; });
-        scratchCanvas.addEventListener('pointermove', scratch);
-        scratchCanvas.addEventListener('pointercancel', () => { isDrawing = false; });
-        
-        // Fallback for older mobile browsers
-        scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
-        scratchCanvas.addEventListener('touchend', () => { isDrawing = false; });
-        scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
-        
-        scratchEventsBound = true; 
+    // Get exact coordinates safely
+    function getTouchPos(e) {
+        const r = scratchCanvas.getBoundingClientRect();
+        return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
     }
+    function getMousePos(e) {
+        const r = scratchCanvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    // The Erase Function
+    function scratchDraw(x, y) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 45, 0, Math.PI * 2);
+        ctx.fill();
+
+        const now = Date.now();
+        if (now - lastAudioTime > 150) { 
+            if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(()=>{}); }
+            lastAudioTime = now;
+        }
+    }
+
+    // Mouse Events (For Desktop testing)
+    scratchCanvas.onmousedown = (e) => { isDrawing = true; const pos = getMousePos(e); scratchDraw(pos.x, pos.y); };
+    scratchCanvas.onmouseup = () => { isDrawing = false; };
+    scratchCanvas.onmousemove = (e) => { if(isDrawing) { const pos = getMousePos(e); scratchDraw(pos.x, pos.y); } };
+
+    // Touch Events (CRITICAL: preventDefault stops the screen from scrolling!)
+    scratchCanvas.ontouchstart = (e) => { e.preventDefault(); isDrawing = true; const pos = getTouchPos(e); scratchDraw(pos.x, pos.y); };
+    scratchCanvas.ontouchend = () => { isDrawing = false; };
+    scratchCanvas.ontouchmove = (e) => { e.preventDefault(); if(isDrawing) { const pos = getTouchPos(e); scratchDraw(pos.x, pos.y); } };
 }
-
-
 // --- PARALLAX OPTIMIZATION ---
 let targetX = 0, targetY = 0; 
 let currentX = 0, currentY = 0;
