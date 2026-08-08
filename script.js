@@ -55,6 +55,9 @@ function extractYouTubeId(url) {
 document.addEventListener('DOMContentLoaded', () => {
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
+        input.addEventListener('click', function(e) {
+            e.target.value = null; 
+        });
         input.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
