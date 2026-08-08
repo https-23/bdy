@@ -53,24 +53,40 @@ function extractYouTubeId(url) {
 // 📸 1. PHOTO UPLOAD & AUTO-WISH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // 🚀 1. THE NEW BULLETPROOF CLICK TRIGGER
+    const photoBoxes = document.querySelectorAll('.photo-upload-box');
+    photoBoxes.forEach((box) => {
+        box.addEventListener('click', (e) => {
+            // Stop if they somehow managed to click the input directly
+            if (e.target.tagName.toLowerCase() === 'input') return;
+            
+            const fileInput = box.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.value = null; // Clear the cache so it works every time
+                fileInput.click();      // FORCES the phone gallery to open!
+            }
+        });
+    });
+
+    // 📸 2. YOUR EXISTING FILE PROCESSOR
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
-        input.addEventListener('click', function(e) {
-            e.target.value = null; 
-        });
         input.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
                 try {
                     const base64Data = await compressImage(file);
                     window.magicalState.images[index] = base64Data;
-                    const parentLabel = input.parentElement;
-                    if (parentLabel) {
-                        parentLabel.style.backgroundImage = `url('${base64Data}')`;
-                        parentLabel.style.backgroundSize = 'cover';
-                        parentLabel.style.backgroundPosition = 'center';
-                        parentLabel.style.border = 'none';
-                        const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
+                    
+                    // Use closest() since we switched to <div> tags earlier
+                    const parentBox = input.closest('.photo-upload-box');
+                    if (parentBox) {
+                        parentBox.style.backgroundImage = `url('${base64Data}')`;
+                        parentBox.style.backgroundSize = 'cover';
+                        parentBox.style.backgroundPosition = 'center';
+                        parentBox.style.border = 'none';
+                        const plusIcon = parentBox.querySelector('.upload-icon');
                         if (plusIcon) plusIcon.style.display = 'none';
                     }
                 } catch (error) {
@@ -80,6 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // ... The rest of your code (aiBtn logic, etc.) stays exactly the same below here!
+
 
     const aiBtn = document.getElementById('ai-generate-btn'); 
     const wishTextarea = document.getElementById('main-wish-msg'); 
