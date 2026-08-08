@@ -422,7 +422,8 @@
 
 <!-- 2. The Hidden Export Stage (Strictly 1080x1920) -->
 <!-- Pushed -9999px off-screen to completely isolate it from the viewport render tree -->
-<div id="export-wrapper" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; z-index: -999;">
+<div id="export-wrapper" style="position: absolute; top: -9999px; left: -9999px; width: 1080px; height: 1920px; overflow: hidden; z-index: -999; transform: scale(0.001); transform-origin: top left;">
+
     
     <div id="export-stage" style="width: 1080px; height: 1920px; position: relative; background-color: #ffe6ea;">
         
