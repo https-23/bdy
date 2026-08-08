@@ -1008,6 +1008,7 @@ h1, h2 {
     pointer-events: none !important; 
 }
 /* 3. BULLETPROOF FILE INPUT: Make the invisible input cover the entire box */
+/* 3. BULLETPROOF FILE INPUT */
 .photo-upload-box input[type="file"] {
     position: absolute !important;
     top: 0 !important;
@@ -1016,6 +1017,7 @@ h1, h2 {
     height: 100% !important;
     opacity: 0 !important;
     cursor: pointer !important;
-    z-index: 20 !important; /* Brings the invisible input to the very front */
+    z-index: 20 !important;
     display: block !important;
+    pointer-events: auto !important; /* 🚀 ADD THIS TO FORCE TAP RECOGNITION */
 }
