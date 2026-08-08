@@ -509,9 +509,13 @@ function triggerTypewriter() {
     typing();
 }
 // --- THE ULTIMATE BULLETPROOF SCRATCH CARD ---
+// --- 1. REPLACE YOUR ENTIRE initPopupScratchCard FUNCTION WITH THIS ---
 function initPopupScratchCard() {
+    const scratchCanvas = document.getElementById('popup-scratch-pad');
     if(!scratchCanvas) return;
-    const ctx = scratchCanvas.getContext('2d'); 
+    
+    // willReadFrequently stops mobile browser hanging
+    const ctx = scratchCanvas.getContext('2d', { willReadFrequently: true }); 
     const rect = scratchCanvas.parentElement.getBoundingClientRect();
     scratchCanvas.width = rect.width; 
     scratchCanvas.height = rect.height;
@@ -528,12 +532,15 @@ function initPopupScratchCard() {
 
     let isDrawing = false;
     let lastAudioTime = 0;
+    const scratchSound = document.getElementById('scratch-sound');
 
-    // Get exact coordinates safely
+    // Get exact coordinates safely for mobile
     function getTouchPos(e) {
         const r = scratchCanvas.getBoundingClientRect();
         return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
     }
+    
+    // Get exact coordinates safely for desktop
     function getMousePos(e) {
         const r = scratchCanvas.getBoundingClientRect();
         return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -553,6 +560,31 @@ function initPopupScratchCard() {
         }
     }
 
+    // Desktop Events
+    scratchCanvas.onmousedown = (e) => { isDrawing = true; const pos = getMousePos(e); scratchDraw(pos.x, pos.y); };
+    scratchCanvas.onmouseup = () => { isDrawing = false; };
+    scratchCanvas.onmousemove = (e) => { if(isDrawing) { const pos = getMousePos(e); scratchDraw(pos.x, pos.y); } };
+
+    // Mobile Events (CRITICAL: passive: false allows e.preventDefault to stop screen scroll)
+    scratchCanvas.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        isDrawing = true; 
+        const pos = getTouchPos(e); 
+        scratchDraw(pos.x, pos.y); 
+    }, { passive: false });
+    
+    scratchCanvas.addEventListener('touchend', () => { 
+        isDrawing = false; 
+    }, { passive: false });
+    
+    scratchCanvas.addEventListener('touchmove', (e) => { 
+        e.preventDefault(); 
+        if(isDrawing) { 
+            const pos = getTouchPos(e); 
+            scratchDraw(pos.x, pos.y); 
+        } 
+    }, { passive: false });
+}
     // Mouse Events (For Desktop testing)
     scratchCanvas.onmousedown = (e) => { isDrawing = true; const pos = getMousePos(e); scratchDraw(pos.x, pos.y); };
     scratchCanvas.onmouseup = () => { isDrawing = false; };
@@ -1039,6 +1071,26 @@ document.addEventListener("DOMContentLoaded", () => {
         finalExportBtn.addEventListener('click', (e) => {
             e.preventDefault();
             exportModalUI.classList.add('show');
+        });
+    }
+});
+// --- 2. PASTE THIS AT THE VERY BOTTOM OF script.js ---
+// This guarantees the export button works, even if other code fails higher up.
+window.addEventListener('load', () => {
+    const finalExportBtn = document.getElementById('export-trigger-btn');
+    const exportModalUI = document.getElementById('export-modal');
+    const closeExportBtn = document.getElementById('close-export-modal');
+    
+    if (finalExportBtn && exportModalUI) {
+        finalExportBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            exportModalUI.classList.add('show');
+        });
+    }
+    
+    if (closeExportBtn && exportModalUI) {
+        closeExportBtn.addEventListener('click', () => {
+            exportModalUI.classList.remove('show');
         });
     }
 });
