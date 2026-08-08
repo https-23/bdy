@@ -577,22 +577,25 @@ document.addEventListener("mousemove", throttle((e) => {
     targetX = x; targetY = y;
 }, 20));
 
-// --- PARALLAX OPTIMIZATION (PHASE 2 FIX) ---
+// --- PARALLAX OPTIMIZATION (PHASE 3: GPU HARDWARE ACCELERATION) ---
 function renderParallax() {
-    currentX += (targetX - currentX) * 0.1; 
-    currentY += (targetY - currentY) * 0.1;
-    
-    // ARCHITECTURE FIX: Only query and animate elements that are on the currently visible screen.
-    // Animating hidden DOM elements wastes massive amounts of mobile CPU/GPU.
-    const activeScreen = document.querySelector(".screen.active");
-    
-    if (activeScreen) {
-        activeScreen.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
-            const depth = el.classList.contains('glass') ? 0.4 : 1;
-            el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
-        });
+    // Only animate if the phone is actually moving to save battery/CPU
+    if (Math.abs(targetX - currentX) > 0.1 || Math.abs(targetY - currentY) > 0.1) {
+        currentX += (targetX - currentX) * 0.1; 
+        currentY += (targetY - currentY) * 0.1;
+        
+        const activeScreen = document.querySelector(".screen.active");
+        if (activeScreen) {
+            // Fetch elements once per frame, apply 3D transform to force GPU rendering
+            const movingEls = activeScreen.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers");
+            for (let i = 0; i < movingEls.length; i++) {
+                const el = movingEls[i];
+                const depth = el.classList.contains('glass') ? 0.4 : 1;
+                // BUG FIX: translate3d forces Hardware Acceleration, eliminating the lag
+                el.style.transform = `translate3d(${currentX * depth}px, ${currentY * depth}px, 0)`;
+            }
+        }
     }
-    
     requestAnimationFrame(renderParallax);
 }
 renderParallax();
@@ -892,13 +895,12 @@ function initExportViralLoop() {
             img.src = imageUrl;
         });
     }
-
-    // 4. Template Builders
+    // 4. Template Builders (FIXED: Removed CORS tags that crash Base64 images)
     function buildFilmStrip() {
         let imagesHtml = '';
         for(let i = 0; i < 3; i++) {
             if(window.magicalState.images[i]) {
-                imagesHtml += `<img src="${window.magicalState.images[i]}" class="film-img" crossorigin="anonymous">`;
+                imagesHtml += `<img src="${window.magicalState.images[i]}" class="film-img">`;
             }
         }
         return `<div class="film-strip-container">${imagesHtml}</div>`;
@@ -909,7 +911,7 @@ function initExportViralLoop() {
         const name = window.magicalState.partnerName || 'Someone Special';
         return `
             <div class="polaroid-frame">
-                ${imgSrc ? `<img src="${imgSrc}" crossorigin="anonymous">` : '<div style="width:850px;height:850px;background:#eee;"></div>'}
+                ${imgSrc ? `<img src="${imgSrc}">` : '<div style="width:850px;height:850px;background:#eee;"></div>'}
                 <div class="polaroid-text">For ${name}</div>
             </div>
         `;
@@ -919,13 +921,13 @@ function initExportViralLoop() {
         const imgSrc = window.magicalState.images[0] || '';
         const poem = window.magicalState.mainWish || 'A beautiful memory...';
         return `
-            ${imgSrc ? `<img src="${imgSrc}" class="ghazal-bg" crossorigin="anonymous">` : ''}
+            ${imgSrc ? `<img src="${imgSrc}" class="ghazal-bg">` : ''}
             <div class="poem-card">
                 <p class="ghazal-text">${poem}</p>
             </div>
         `;
     }
-
+    
     // 5. Wire up the Style Selection Buttons (NOW FULLY WIRED TO DOWNLOAD)
     styleBtns.forEach(btn => {
         // NOTICE: This must be async to await the download
