@@ -592,7 +592,8 @@ const closePhotoModalBtn = document.getElementById('close-photo-modal');
 document.querySelectorAll('.ig-card').forEach(card => {
     let lastTap = 0;
     let tapTimer;
-
+// 🚀 ADD THIS LINE TO KILL THE NATIVE LONG-PRESS MENU:
+    card.addEventListener('contextmenu', (e) => e.preventDefault());
     card.addEventListener('click', (e) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
