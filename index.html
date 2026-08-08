@@ -348,7 +348,43 @@
 
         </div>
     </div>
+                    <!-- EXISTNG PAY BUTTON (Keep this) -->
+                    <button id="pay-now-btn" class="magic-btn" style="background: linear-gradient(to right, #28a745, #218838); margin-top: 25px; width: 100%;">
+                        <span class="btn-text">PAY ₹99 & GET LINK 🔗</span>
+                    </button>
+                    
+                    <!-- 1. NEW: HIDDEN 5-MINUTE COPY BUTTON (Add this) -->
+                    <button id="persistent-copy-btn" class="magic-btn" style="background: linear-gradient(to right, #3498db, #2980b9); margin-top: 15px; width: 100%; display: none;">
+                        <span class="btn-text">📋 COPY LINK AGAIN</span>
+                    </button>
+                </div>
+            </section>
 
+        </div>
+    </div> <!-- End of Preview Container -->
+
+    <!-- =========================================
+         2. NEW: BEAUTIFUL SKY & BIRDS MODAL (Add this before your audio tags)
+         ========================================= -->
+    <div id="success-modal" class="hidden-modal">
+        <div class="success-modal-content">
+            <button id="close-success-modal">✖</button>
+            <div class="sky-header">
+                <span class="bird">🕊️</span>
+                <span class="cloud cloud1">☁️</span>
+                <span class="cloud cloud2">☁️</span>
+            </div>
+            <h2 style="color: #2c3e50; margin-top: 15px; font-size: 2rem;">Magic Secured! ✨</h2>
+            <p style="color: #34495e; font-size: 1rem; margin-bottom: 15px; padding: 0 15px;">Your surprise for ❤️ is ready. Copy the link below to share it!</p>
+            
+            <div class="copy-box">
+                <input type="text" id="generated-link-input" readonly>
+                <button id="modal-copy-btn">📋 COPY</button>
+            </div>
+            <p id="copy-status" style="color: #27ae60; font-size: 0.9rem; margin-top: 10px; font-weight: bold; opacity: 0; transition: opacity 0.3s;">Link Copied! 🎉</p>
+        </div>
+    </div>
+    
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
