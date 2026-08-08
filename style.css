@@ -190,7 +190,6 @@ html, body {
     --font-heading: 'Caveat', cursive;
     --font-body: 'Fredoka', sans-serif;
 }
-
 /* --- Global Reset --- */
 body {
     margin: 0;
@@ -204,8 +203,19 @@ body {
     height: 100vh;
     overflow: hidden;
     touch-action: manipulation;
+    
+    /* 🚀 NEW: Block text selection on the entire background */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
 }
 
+/* 🚀 NEW: Re-enable selection ONLY for the form inputs so typing still works */
+input, textarea {
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
+}
 /* Canvas for Background Particles */
 #particle-canvas {
     position: absolute;
