@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if(order.error) throw new Error(order.error);
 
+                                
                 var options = {
                     "key": "rzp_test_TLeNXeVeDyigeU", // Make sure this matches your Vercel Env Var
                     "amount": "9900",
@@ -192,15 +193,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": function (payment_response){
-                        // The backend webhook handles the database now! 
-                        // We just generate the link directly for the user on the frontend.
-                        payBtn.innerText = "Generating Link..."; 
+                        payBtn.innerText = "Link Generated ✔";
+                        payBtn.style.background = "linear-gradient(to right, #27ae60, #2ecc71)";
                         
                         const frontend_url = window.location.origin;
                         const gift_link = `${frontend_url}/?gift=${order.gift_id}`;
                         
-                        prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", gift_link);
-                        payBtn.innerText = "Link Generated ✔";
+                        // 1. POPULATE AND SHOW THE BEAUTIFUL MODAL
+                        const successModal = document.getElementById('success-modal');
+                        const linkInput = document.getElementById('generated-link-input');
+                        if (linkInput) linkInput.value = gift_link;
+                        if (successModal) successModal.classList.add('show');
+
+                        // 2. SHOW THE PERSISTENT COPY BUTTON ON SCREEN 8
+                        const persistentBtn = document.getElementById('persistent-copy-btn');
+                        if (persistentBtn) {
+                            persistentBtn.style.display = 'block';
+                            
+                            // 3. HIDE IT AUTOMATICALLY AFTER 5 MINUTES (300,000 milliseconds)
+                            setTimeout(() => {
+                                persistentBtn.style.display = 'none';
+                            }, 300000);
+                        }
                     },
                     "theme": { "color": "#c0392b" }
                 };
