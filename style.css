@@ -301,12 +301,19 @@ p {
     pointer-events: none; 
 }
 
-/* --- 3D Parallax Hardware Acceleration --- */
+/* --- 3D Parallax Hardware Acceleration (PHASE 2 FIX) --- */
 .character, .glass, .envelope-wrapper, .cake, .flowers {
     transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform; 
 }
 
+/* Only allocate dedicated GPU memory when the screen is actually active */
+.screen.active .character, 
+.screen.active .glass, 
+.screen.active .envelope-wrapper, 
+.screen.active .cake, 
+.screen.active .flowers {
+    will-change: transform; 
+}
 /* Custom Penguin Adjustments */
 #screen1 { justify-content: space-evenly; padding: 30px 0; overflow: hidden; }
 .middle-part, .bottom-part { display: flex; flex-direction: column; align-items: center; width: 100%; }
