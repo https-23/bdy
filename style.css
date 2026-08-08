@@ -1179,3 +1179,11 @@ h1, h2 {
     touch-action: none !important; /* Forces the browser to stop scrolling and start scratching */
     cursor: pointer;
 }
+/* --- 3. ABSOLUTE FAILSAFE FOR CLICKS AND BUTTONS --- */
+#preloader { pointer-events: none !important; }
+.hidden-modal { pointer-events: none; }
+.hidden-modal.show { pointer-events: auto !important; }
+.backBtn, #export-trigger-btn, .mini-card, .heartNext { 
+    z-index: 99999 !important; 
+    position: relative; 
+}
