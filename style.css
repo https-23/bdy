@@ -246,13 +246,16 @@ input, textarea {
 #app {
     width: 100%;
     max-width: 420px;
-    height: 100vh;
+    
+    /* ARCHITECT FIX: Prevent layout thrashing on mobile browsers */
+    height: 100vh; /* Fallback for older browsers */
+    height: 100dvh; /* Modern dynamic height that accounts for mobile URL bars */
+    
     position: relative;
     background-color: transparent;
     z-index: 1;
     overflow-x: hidden;
 }
-
 /* --- Screens State Machine --- */
 .screen {
     display: none; 
