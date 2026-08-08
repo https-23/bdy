@@ -107,6 +107,21 @@ html, body {
     position: relative;
     transition: transform 0.3s ease;
 }
+/* 🚀 NEW: The tiny instruction text for the photo boxes */
+.upload-text {
+    position: absolute;
+    top: 3px; /* Places it perfectly inside your 15px fake top bar */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 8px; /* Extremely small so it fits safely */
+    font-family: sans-serif;
+    color: #999999; /* Soft gray so it doesn't clash with your colors */
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    pointer-events: none; /* Ensures it doesn't block the JavaScript tap */
+    z-index: 5;
+}
 
 /* Fake Instagram Top Bar */
 .ig-style::before {
