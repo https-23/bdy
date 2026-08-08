@@ -489,17 +489,15 @@ function triggerTypewriter() {
     }
     typing();
 }
-
-// --- OPTIMIZED CUSTOM SCRATCH CARDS ---
+//CUSTOME SCRATCH CARD 
 let isDrawing = false; 
 let lastAudioTime = 0; 
 let scratchEventsBound = false; 
-let isScrubbing = false; // BUG FIX: Explicitly declared the variable here
 
 function initPopupScratchCard() {
     if(!scratchCanvas) return;
     
-    // BUG FIX: Fetch the context ONCE with willReadFrequently for performance
+    // willReadFrequently stops mobile browser hanging when rapidly editing canvas pixels
     const ctx = scratchCanvas.getContext('2d', { willReadFrequently: true });
     const rect = scratchCanvas.parentElement.getBoundingClientRect();
     scratchCanvas.width = rect.width; 
@@ -516,47 +514,55 @@ function initPopupScratchCard() {
     ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
 
     if (!scratchEventsBound) {
-        function scratch(e) {
+        // BUG FIX: Aggressive tracking for Android/iOS touches
+        const scratch = (e) => {
             if (!isDrawing) return;
             e.preventDefault();
-            
-            if (isScrubbing) return;
-            isScrubbing = true;
 
             const canvasRect = scratchCanvas.getBoundingClientRect();
+            let clientX, clientY;
             
-            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
+            // Safely extract coordinates whether it's a touch or a mouse click
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            if (!clientX || !clientY) return;
+
             let x = clientX - canvasRect.left;
             let y = clientY - canvasRect.top;
 
-            requestAnimationFrame(() => {
-                // BUG FIX: Use the already defined 'ctx' instead of grabbing a new one
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath(); 
-                ctx.arc(x, y, 40, 0, Math.PI * 2); 
-                ctx.fill();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); 
+            ctx.arc(x, y, 45, 0, Math.PI * 2); // Brush size
+            ctx.fill();
 
-                const now = Date.now();
-                if (now - lastAudioTime > 150) { 
-                    if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(err => {}); }
-                    lastAudioTime = now;
-                }
-                
-                isScrubbing = false; 
-            });
-        }
+            const now = Date.now();
+            if (now - lastAudioTime > 150) { 
+                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(err => {}); }
+                lastAudioTime = now;
+            }
+        };
 
-        scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
-        scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
-        scratchCanvas.addEventListener('mousemove', scratch);
+        // Pointer Events (Modern standard for flawless touch/click tracking)
+        scratchCanvas.addEventListener('pointerdown', (e) => { isDrawing = true; scratch(e); });
+        scratchCanvas.addEventListener('pointerup', () => { isDrawing = false; });
+        scratchCanvas.addEventListener('pointermove', scratch);
+        scratchCanvas.addEventListener('pointercancel', () => { isDrawing = false; });
+        
+        // Fallback for older mobile browsers
         scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
-        scratchCanvas.addEventListener('touchend', () => isDrawing = false);
+        scratchCanvas.addEventListener('touchend', () => { isDrawing = false; });
         scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
+        
         scratchEventsBound = true; 
     }
 }
+
 
 // --- PARALLAX OPTIMIZATION ---
 let targetX = 0, targetY = 0; 
@@ -976,17 +982,19 @@ async function triggerHtml2CanvasDownload(button) {
         button.innerHTML = 'Rendering Magic... ✨';
         loader.style.display = 'flex';
 
-        // html2canvas cannot render elements that are off-screen (-9999px)
-        // We temporarily bring it into the viewport, but make it practically invisible
+        // Bring it to the viewport but keep it practically invisible
         stageWrapper.style.top = '0';
         stageWrapper.style.left = '0';
         stageWrapper.style.opacity = '0.01';
         stageWrapper.style.zIndex = '-1';
 
+        // BUG FIX: Give the browser 300ms to actually render the CSS changes before taking the screenshot
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         const canvas = await html2canvas(stage, {
-            scale: 2, // High-res export
+            scale: 2, 
             useCORS: true,
-            allowTaint: true,
+            // allowTaint has been removed because it explicitly blocks mobile image downloads!
             backgroundColor: null
         });
 
@@ -1004,12 +1012,14 @@ async function triggerHtml2CanvasDownload(button) {
     } catch (error) {
         console.error("Export failed:", error);
         alert("Failed to save memory. Please try again.");
+        stageWrapper.style.top = '-9999px'; // Reset safely on error
     } finally {
         // Restore UI
         button.innerHTML = originalText;
         loader.style.display = 'none';
     }
 }
+
 // ==========================================
 // 🚀 CRITICAL FIX: INITIALIZE EXPORT ENGINE
 // ==========================================
