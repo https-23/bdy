@@ -20,8 +20,11 @@ async function compressImage(file) {
             img.src = event.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
+                
+                // PHASE 4 FIX: Dropped max dimensions from 800 to 600.
+                // This slashes the memory weight of the site, preventing it from freezing.
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
                 let width = img.width;
                 let height = img.height;
 
@@ -32,9 +35,13 @@ async function compressImage(file) {
                 }
                 canvas.width = width;
                 canvas.height = height;
+                
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/webp', 0.55));
+                
+                // PHASE 4 FIX: Quality dropped from 0.55 to 0.4.
+                // Looks identical on mobile screens but drastically speeds up the backend upload.
+                resolve(canvas.toDataURL('image/webp', 0.4));
             };
             img.onerror = reject;
         };
@@ -404,9 +411,21 @@ Object.keys(nextMap).forEach(selector => {
     document.querySelector(selector)?.addEventListener("click", () => { playPopSound(); showScreen(nextMap[selector]); });
 });
 
-document.querySelectorAll(".backBtn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-        e.stopPropagation(); playPopSound(); showScreen(btn.getAttribute("data-back"));
+document.querySelectorAll('.mini-card').forEach(card => {
+    card.addEventListener('click', () => {
+        playPopSound();
+        const cardId = card.getAttribute('data-id');
+        const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
+        
+        if(modalContent) {
+            modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
+        }
+
+        if(modal) modal.classList.add('show');
+        
+        // BUG FIX: Wait 550ms so the CSS modal animation completely finishes 
+        // before calculating the exact width/height of the scratch canvas!
+        setTimeout(initPopupScratchCard, 550);
     });
 });
 
