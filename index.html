@@ -353,7 +353,12 @@
                     </p>
                     <h2>Take Care ✨</h2>
                     <h2 id="secret-name" class="glowing-name">For Someone Special 💖</h2>
-                    
+
+                <!-- Viral Export Trigger -->
+<button id="export-trigger-btn" class="magic-btn" style="background: linear-gradient(to right, #8e44ad, #9b59b6); margin-top: 15px; width: 100%;">
+    <span class="btn-text">✨ Save this Memory ✨</span>
+</button>
+                
                     <!-- NEW PAY BUTTON -->
                     <button id="pay-now-btn" class="magic-btn" style="background: linear-gradient(to right, #28a745, #218838); margin-top: 25px; width: 100%;">
                         <span class="btn-text">PAY ₹99 & GET LINK 🔗</span>
@@ -390,6 +395,49 @@
             <p id="copy-status" style="color: #27ae60; font-size: 0.9rem; margin-top: 10px; font-weight: bold; opacity: 0; transition: opacity 0.3s;">Link Copied! 🎉</p>
         </div>
     </div>
+    <!-- =========================================
+     VIRAL EXPORT ENGINE UI & TEMPLATES
+     ========================================= -->
+<!-- 1. The Selection Modal -->
+<div id="export-modal" class="modal-overlay">
+    <div class="export-modal-content">
+        <button id="close-export-modal" class="close-btn">✖</button>
+        <h2 style="color: #5a1829; font-family: var(--font-heading); font-size: 2.2rem; margin-bottom: 5px;">Share the Magic</h2>
+        <p style="color: #7f8fa6; font-family: var(--font-body); font-size: 1rem; margin-bottom: 20px;">Choose a style for your Instagram Story.</p>
+        
+        <div class="export-options">
+            <button class="style-btn" data-template="film-strip">🎞️ The Film Strip</button>
+            <button class="style-btn" data-template="polaroid">📸 The Polaroid</button>
+            <button class="style-btn" data-template="ghazal">📜 The Digital Ghazal</button>
+        </div>
+        
+        <!-- Processing State -->
+        <div id="export-loader" style="display: none; margin-top: 20px; align-items: center; flex-direction: column;">
+            <span class="loader" style="position: relative; border-top-color: #8e44ad; width: 25px; height: 25px;"></span>
+            <p style="font-size: 0.9rem; color: #8e44ad; font-weight: bold; margin-top: 15px; font-family: var(--font-body);">Rendering high-res memory...</p>
+        </div>
+    </div>
+</div>
+
+<!-- 2. The Hidden Export Stage (Strictly 1080x1920) -->
+<!-- Pushed -9999px off-screen to completely isolate it from the viewport render tree -->
+<div id="export-wrapper" style="position: absolute; top: -9999px; left: -9999px; width: 0; height: 0; overflow: hidden; z-index: -999;">
+    
+    <div id="export-stage" style="width: 1080px; height: 1920px; position: relative; background-color: #ffe6ea;">
+        
+        <!-- Dynamic templates will be injected here by JS -->
+        <div id="dynamic-template-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; z-index: 2;">
+        </div>
+
+        <!-- The Viral Watermark (Locked to bottom) -->
+        <div class="watermark" style="position: absolute; bottom: 80px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+            <div id="qrcode-container" style="background: white; padding: 15px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.15);"></div>
+            <p style="font-family: 'Fredoka', sans-serif; font-size: 2.5rem; color: rgba(255,255,255,0.95); font-weight: 600; text-shadow: 0 4px 15px rgba(0,0,0,0.3); margin: 0; letter-spacing: 1px;">Made with love on</p>
+            <p style="font-family: 'Caveat', cursive; font-size: 3.8rem; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.3); margin: 5px 0 0 0;">10petalx.vercel.app</p>
+        </div>
+
+    </div>
+</div>
     
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
