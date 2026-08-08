@@ -607,16 +607,25 @@ document.addEventListener("mousemove", throttle((e) => {
     targetX = x; targetY = y;
 }, 20));
 
+// --- PARALLAX OPTIMIZATION (PHASE 2 FIX) ---
 function renderParallax() {
     currentX += (targetX - currentX) * 0.1; 
     currentY += (targetY - currentY) * 0.1;
-    document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
-        const depth = el.classList.contains('glass') ? 0.4 : 1;
-        el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
-    });
+    
+    // ARCHITECTURE FIX: Only query and animate elements that are on the currently visible screen.
+    // Animating hidden DOM elements wastes massive amounts of mobile CPU/GPU.
+    const activeScreen = document.querySelector(".screen.active");
+    
+    if (activeScreen) {
+        activeScreen.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
+            const depth = el.classList.contains('glass') ? 0.4 : 1;
+            el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
+        });
+    }
+    
     requestAnimationFrame(renderParallax);
 }
-renderParallax(); 
+renderParallax();
 
 // --- INSTAGRAM DOUBLE TAP & LIGHTBOX ---
 const photoModal = document.getElementById('photo-modal');
