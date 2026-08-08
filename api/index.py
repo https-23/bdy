@@ -160,7 +160,7 @@ def razorpay_webhook():
         print(f"Webhook Error: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
-@app.route('/api/verify-and-generate-link', methods=['POST'])
+, methods=['POST'])
 def verify_payment():
     data = request.json or {}
     try:
