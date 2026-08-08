@@ -1033,3 +1033,129 @@ h1, h2 {
     display: block !important;
     pointer-events: none !important; /* Stops ghost touches, relies entirely on our JS */
 }
+/* =========================================
+   PHASE 2: VIRAL EXPORT ENGINE UI & TEMPLATES
+   ========================================= */
+
+/* 1. The Selection Modal Enhancements */
+.export-options .style-btn {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    color: var(--primary-color);
+    border: 2px solid rgba(255, 117, 140, 0.4);
+    padding: 16px;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.export-options .style-btn:active {
+    background: var(--btn-gradient);
+    color: white;
+    transform: scale(0.96);
+    border-color: transparent;
+}
+
+/* 2. Hidden Export Stage Global Settings */
+#export-stage {
+    /* JS Color Thief will dynamically override this background */
+    background-color: #ffe6ea; 
+    overflow: hidden;
+}
+
+.export-template {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* --- TEMPLATE A: THE FILM STRIP --- */
+.film-strip-container {
+    background: #111;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    border-radius: 30px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    border: 2px solid #333;
+}
+
+.film-img {
+    width: 750px;
+    height: 500px;
+    object-fit: cover;
+    border: 15px solid #222;
+    border-radius: 10px;
+    filter: contrast(1.1) saturate(1.1); /* Subtle vintage punch */
+}
+
+/* --- TEMPLATE B: THE POLAROID --- */
+.polaroid-frame {
+    background: white;
+    padding: 50px 50px 180px 50px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+    transform: rotate(-2deg);
+    border-radius: 10px;
+}
+
+.polaroid-frame img {
+    width: 850px;
+    height: 850px;
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+}
+
+.polaroid-text {
+    font-family: 'Caveat', cursive; 
+    font-size: 7.5rem; /* Scaled up for 1080p */
+    color: #2c3e50;
+    margin-top: 60px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* --- TEMPLATE C: THE DIGITAL GHAZAL --- */
+/* Full-bleed background image blurred heavily */
+.ghazal-bg {
+    position: absolute;
+    top: -5%; 
+    left: -5%; 
+    width: 110%; 
+    height: 110%;
+    object-fit: cover;
+    filter: blur(45px) brightness(0.85);
+    z-index: 1;
+}
+
+/* The Glassmorphism card sitting on top */
+.poem-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(25px);
+    padding: 100px 80px;
+    width: 85%;
+    border-radius: 50px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.2);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    text-align: center;
+    z-index: 2; 
+}
+
+/* STRICTLY CAVEAT FONT & PRE-WRAP FOR LINE BREAKS */
+.ghazal-text {
+    font-family: 'Caveat', cursive !important;
+    font-size: 5.5rem;
+    color: #5a1829;
+    line-height: 1.4;
+    white-space: pre-wrap; /* Crucial: preserves poetry line breaks */
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
