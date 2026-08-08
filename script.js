@@ -774,6 +774,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const data = result.data;
                 const secretNameEl = document.getElementById('secret-name');
                 if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} 💖`;
+                // 👇 ADD THESE THREE LINES TO REVEAL THE BUTTON 👇
+    const exportBtn = document.getElementById('export-trigger-btn');
+    if (exportBtn) {
+        exportBtn.style.setProperty('display', 'block', 'important');
+    }
                 
                 const dummyUser = document.getElementById('dummy-username');
                 if (dummyUser) dummyUser.value = data.partner_name;
@@ -843,11 +848,8 @@ function initExportViralLoop() {
     function generateQRCode() {
         const qrContainer = document.getElementById('qrcode-container');
         if (!qrContainer) return;
-        
         qrContainer.innerHTML = ''; 
-        
         const currentUrl = window.location.href;
-
         new QRCode(qrContainer, {
             text: currentUrl,
             width: 140,
@@ -858,7 +860,7 @@ function initExportViralLoop() {
         });
     }
 
-    // 3. Color Thief Engine (WITH 3-SECOND KILLSWITCH)
+    // 3. Color Thief Engine (With 3-second safety killswitch)
     function applyDominantColor(imageUrl) {
         return new Promise((resolve) => {
             if (!imageUrl) return resolve();
@@ -866,14 +868,13 @@ function initExportViralLoop() {
             const img = new Image();
             img.crossOrigin = 'Anonymous'; 
             
-            // 🚀 NEW: 3-Second Killswitch to prevent freezing
             const safetyTimeout = setTimeout(() => {
                 console.warn("ColorThief timed out. Using default background.");
                 resolve();
             }, 3000);
 
             img.onload = () => {
-                clearTimeout(safetyTimeout);
+                clearTimeout(safetyTimeout); 
                 try {
                     const colorThief = new ColorThief();
                     const color = colorThief.getColor(img);
@@ -885,7 +886,6 @@ function initExportViralLoop() {
                     }
                     resolve();
                 } catch (error) {
-                    console.warn("ColorThief extraction failed.", error);
                     resolve();
                 }
             };
@@ -915,7 +915,7 @@ function initExportViralLoop() {
         return `
             <div class="polaroid-frame">
                 ${imgSrc ? `<img src="${imgSrc}" crossorigin="anonymous">` : '<div style="width:850px;height:850px;background:#eee;"></div>'}
-                <div class="polaroid-text" style="font-family: 'Caveat', cursive;">For ${name}</div>
+                <div class="polaroid-text">For ${name}</div>
             </div>
         `;
     }
@@ -926,22 +926,19 @@ function initExportViralLoop() {
         return `
             ${imgSrc ? `<img src="${imgSrc}" class="ghazal-bg" crossorigin="anonymous">` : ''}
             <div class="poem-card">
-                <p class="ghazal-text" style="font-family: 'Caveat', cursive;">${poem}</p>
+                <p class="ghazal-text">${poem}</p>
             </div>
         `;
     }
 
-    // 5. Wire up the Style Selection Buttons
+    // 5. Wire up the Style Selection Buttons (NOW FULLY WIRED TO DOWNLOAD)
     styleBtns.forEach(btn => {
+        // NOTICE: This must be async to await the download
         btn.addEventListener('click', async (e) => {
             const templateType = e.target.getAttribute('data-template');
             const primaryImage = window.magicalState.images[0];
             
-            const loader = document.getElementById('export-loader');
-            if(loader) loader.style.display = 'flex';
-            
             dynamicContainer.innerHTML = '';
-            
             generateQRCode();
             await applyDominantColor(primaryImage);
 
@@ -952,71 +949,9 @@ function initExportViralLoop() {
             } else if (templateType === 'ghazal') {
                 dynamicContainer.innerHTML = buildGhazal();
             }
-            
-            // --- TRIGGER PHASE 4 HOOK ---
+
+            // 🚀 CRITICAL FIX: The missing trigger hook is now safely executed
             await triggerHtml2CanvasDownload(e.target);
-            
-            console.log(`[Export Engine] ${templateType} template staged and ready for capture.`);
         });
     });
-}
-
-// Initialize the engine once the DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    initExportViralLoop();
-});
-
-// ==========================================
-// 📸 PHASE 4: HIGH-RES CANVAS CAPTURE & DOWNLOAD (Fixed Scale: 1)
-// ==========================================
-
-async function triggerHtml2CanvasDownload(clickedBtn) {
-    const originalText = clickedBtn.innerHTML;
-    const stage = document.getElementById('export-stage');
-    const wrapper = document.getElementById('export-wrapper');
-    const loader = document.getElementById('export-loader');
-
-    if (clickedBtn.disabled) return; 
-
-    try {
-        clickedBtn.disabled = true;
-        clickedBtn.innerHTML = 'Generating Magic... ✨';
-        if (loader) loader.style.display = 'flex';
-
-        wrapper.style.width = '1080px';
-        wrapper.style.height = '1920px';
-        wrapper.style.overflow = 'visible';
-
-        await new Promise(resolve => setTimeout(resolve, 250));
-
-        const canvas = await html2canvas(stage, {
-            scale: 1, // 🚀 CRITICAL FIX: Changed to 1 to prevent mobile crashes
-            useCORS: true, 
-            allowTaint: false,
-            logging: false, 
-            backgroundColor: '#ffffff' 
-        });
-
-        const dataUrl = canvas.toDataURL("image/png");
-        const downloadLink = document.createElement('a');
-        
-        downloadLink.href = dataUrl;
-        downloadLink.download = "magical_memory.png";
-        
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-
-    } catch (error) {
-        console.error("Export Engine Crash:", error);
-        alert("Oops! The magic took too much energy. Please try again.");
-    } finally {
-        wrapper.style.width = '0';
-        wrapper.style.height = '0';
-        wrapper.style.overflow = 'hidden';
-        
-        clickedBtn.disabled = false;
-        clickedBtn.innerHTML = originalText;
-        if (loader) loader.style.display = 'none';
-    }
 }
