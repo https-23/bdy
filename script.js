@@ -180,35 +180,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     "handler": async function (payment_response){
                         payBtn.innerText = "Generating Link..."; 
                         try {
-                            const verifyRes = await fetch('/api/verify-and-generate-link', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    order_id: payment_response.razorpay_order_id,
-                                    payment_id: payment_response.razorpay_payment_id,
-                                    signature: payment_response.razorpay_signature,
-                                    partner_name: window.magicalState.partnerName,
-                                    user_name: window.magicalState.userName,
-                                    envelope_msg: window.magicalState.envelopeMsg,
-                                    main_wish: window.magicalState.mainWish,
-                                    audio_link: window.magicalState.audioLink,
-                                    images: window.magicalState.images,
-                                    scratch_msgs: window.magicalState.scratchMsgs // Send custom messages to DB
-                                })
-                            });
-                            
-                            const result = await verifyRes.json();
-                            if(result.status === "success") {
-                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-                                payBtn.innerText = "Link Generated ✔";
-                            } else {
-                                throw new Error(result.error);
-                            }
-                        } catch (verificationError) {
-                            console.error("Backend Error:", verificationError);
-                            alert("Payment successful, but link generation failed. Contact support with your payment ID.");
-                            payBtn.innerText = "Error (See Console)";
-                        }
+                            // SEND THE PAYLOAD HERE
+                const response = await fetch('/api/create-order', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        partner_name: window.magicalState.partnerName,
+                        user_name: window.magicalState.userName,
+                        envelope_msg: window.magicalState.envelopeMsg,
+                        main_wish: window.magicalState.mainWish,
+                        audio_link: window.magicalState.audioLink,
+                        images: window.magicalState.images,
+                        scratch_msgs: window.magicalState.scratchMsgs
+                    })
+                });
+                
+                const order = await response.json();
+
+                if(order.error) throw new Error(order.error);
+
+                var options = {
+                    "key": "rzp_test_TLeNXeVeDyigeU", // Make sure this matches your Vercel Env Var
+                    "amount": "9900",
+                    "currency": "INR",
+                    "name": "Magical Surprises",
+                    "order_id": order.id, 
+                    "handler": function (payment_response){
+                        // The backend webhook is now handling the database status update securely!
+                        // We just generate the link directly for the user on the frontend.
+                        payBtn.innerText = "Generating Link..."; 
+                        
+                        const frontend_url = window.location.origin;
+                        const gift_link = `${frontend_url}/?gift=${order.gift_id}`;
+                        
+                        prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", gift_link);
+                        payBtn.innerText = "Link Generated ✔";
                     },
                     "theme": { "color": "#c0392b" }
                 };
