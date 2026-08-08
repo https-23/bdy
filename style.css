@@ -973,3 +973,26 @@ h1, h2 {
     font-size: 0.95rem; font-family: var(--font-body);
 }
 #modal-copy-btn:active { background: #219150; transform: scale(0.92); }
+
+/* =========================================
+   BUG FIX: PREVENT NATIVE MOBILE HIGHLIGHTING
+   ========================================= */
+.ig-style, 
+.ig-card, 
+.upload-icon, 
+.gallery-img,
+.photo-upload-box,
+.mini-card {
+    -webkit-tap-highlight-color: transparent !important; /* Removes the blue flash on tap */
+    -webkit-touch-callout: none !important; /* Prevents long-press context menu */
+    -webkit-user-select: none !important; /* Prevents text selection highlight */
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Ensure the file input itself doesn't cause weird tap areas */
+.photo-upload-box input[type="file"] {
+    display: none !important;
+}
