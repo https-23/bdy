@@ -88,6 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         parentBox.style.border = 'none';
                         const plusIcon = parentBox.querySelector('.upload-icon');
                         if (plusIcon) plusIcon.style.display = 'none';
+                        const textHint = parentBox.querySelector('.upload-text');
+                        if (textHint) textHint.style.display = 'none';
                     }
                 } catch (error) {
                     console.error("Compression failed:", error);
