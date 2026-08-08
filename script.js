@@ -490,40 +490,17 @@ function triggerTypewriter() {
     typing();
 }
 
-// --- CUSTOM SCRATCH CARDS ---
-const modal = document.getElementById('scratch-modal');
-const modalContent = document.getElementById('modal-message-content');
-const scratchCanvas = document.getElementById('popup-scratch-pad');
-const scratchSound = document.getElementById('scratch-sound');
-
-document.querySelectorAll('.mini-card').forEach(card => {
-    card.addEventListener('click', () => {
-        playPopSound();
-        const cardId = card.getAttribute('data-id');
-        const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
-        
-        // Dynamically style the user's custom text
-        if(modalContent) {
-            modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
-        }
-
-        if(modal) modal.classList.add('show');
-        setTimeout(initPopupScratchCard, 300);
-    });
-});
-
-document.getElementById('close-modal')?.addEventListener('click', () => { 
-    playPopSound(); 
-    if(modal) modal.classList.remove('show'); 
-});
-
+// --- OPTIMIZED CUSTOM SCRATCH CARDS ---
 let isDrawing = false; 
 let lastAudioTime = 0; 
 let scratchEventsBound = false; 
+let isScrubbing = false; // BUG FIX: Explicitly declared the variable here
 
 function initPopupScratchCard() {
     if(!scratchCanvas) return;
-    const ctx = scratchCanvas.getContext('2d');
+    
+    // BUG FIX: Fetch the context ONCE with willReadFrequently for performance
+    const ctx = scratchCanvas.getContext('2d', { willReadFrequently: true });
     const rect = scratchCanvas.parentElement.getBoundingClientRect();
     scratchCanvas.width = rect.width; 
     scratchCanvas.height = rect.height;
@@ -548,7 +525,6 @@ function initPopupScratchCard() {
 
             const canvasRect = scratchCanvas.getBoundingClientRect();
             
-            // CRITICAL FIX: Extract touch coordinates immediately before the browser deletes them
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
@@ -556,11 +532,11 @@ function initPopupScratchCard() {
             let y = clientY - canvasRect.top;
 
             requestAnimationFrame(() => {
-                const dynamicCtx = scratchCanvas.getContext('2d', { willReadFrequently: true });
-                dynamicCtx.globalCompositeOperation = 'destination-out';
-                dynamicCtx.beginPath(); 
-                dynamicCtx.arc(x, y, 40, 0, Math.PI * 2); 
-                dynamicCtx.fill();
+                // BUG FIX: Use the already defined 'ctx' instead of grabbing a new one
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath(); 
+                ctx.arc(x, y, 40, 0, Math.PI * 2); 
+                ctx.fill();
 
                 const now = Date.now();
                 if (now - lastAudioTime > 150) { 
@@ -568,10 +544,9 @@ function initPopupScratchCard() {
                     lastAudioTime = now;
                 }
                 
-                isScrubbing = false; // Unlock for next movement
+                isScrubbing = false; 
             });
         }
-
 
         scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
         scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
@@ -687,31 +662,36 @@ let hasShot = false;
 
 if (archeryScreen) {
     archeryScreen.addEventListener('click', () => {
-        if (hasShot) return; // Prevent double-shooting
+        if (hasShot) return; 
         hasShot = true;
 
-        // Hide the "Tap anywhere" text immediately
         const tapText = archeryScreen.querySelector('.swipe');
         if(tapText) tapText.style.opacity = '0';
 
-        // Fly arrow
         theBow.classList.add('fly');
 
         setTimeout(() => {
-            // IMPACT! Hide arrow, burst heart, blast confetti
             theBow.classList.add('hidden');
             theHeart.classList.add('burst');
             fireConfetti();
             playPopSound();
 
-            // Wait to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
                 showScreen('screen1');
+                
+                // BUG FIX: Reset the archery stage silently in the background for replayability 
+                setTimeout(() => {
+                    hasShot = false;
+                    theBow.classList.remove('fly', 'hidden');
+                    theHeart.classList.remove('burst');
+                    if(tapText) tapText.style.opacity = '1';
+                }, 1000);
             }, 4200);
 
-        }, 350); // Matches the flight time
+        }, 350); 
     });
 }
+
 // ==========================================
 // 🕊️ NEW: SUCCESS MODAL & COPY LOGIC
 // ==========================================
