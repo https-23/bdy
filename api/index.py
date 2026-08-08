@@ -160,56 +160,6 @@ def razorpay_webhook():
         print(f"Webhook Error: {str(e)}")
         return jsonify({'error': str(e)}), 400
 
-, methods=['POST'])
-def verify_payment():
-    data = request.json or {}
-    try:
-        # 1. Verify Payment Signature
-        client = get_razorpay_client()
-        client.utility.verify_payment_signature({
-            'razorpay_order_id': data.get('order_id', ''),
-            'razorpay_payment_id': data.get('payment_id', ''),
-            'razorpay_signature': data.get('signature', '')
-        })
-
-        unique_gift_id = str(uuid.uuid4())
-        
-        # 2. Connect to Database
-        db, bucket = get_db_and_bucket()
-        
-        # 3. Process Images
-        raw_images = data.get('images', {})
-        final_images = process_and_upload_images(raw_images, unique_gift_id, bucket)
-        
-        # 4. Save to Firestore
-        doc_data = {
-            'order_id': data.get('order_id'),
-            'payment_id': data.get('payment_id'),
-            'partner_name': data.get('partner_name', 'Someone Special'),
-            'user_name': data.get('user_name', ''),
-            'envelope_msg': data.get('envelope_msg', ''),
-            'main_wish': data.get('main_wish', ''),
-            'audio_link': data.get('audio_link', ''),
-            'scratch_msgs': data.get('scratch_msgs', {}),
-            'images': final_images,
-            'created_at': datetime.datetime.utcnow(),
-            'status': 'paid_and_secured'
-        }
-        
-        db.collection('magical_gifts').document(unique_gift_id).set(doc_data)
-        
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://10petalx.vercel.app').rstrip('/')
-        gift_link = f"{frontend_url}/?gift={unique_gift_id}"
-        
-        return jsonify({'status': 'success', 'link': gift_link}), 200
-        
-    except Exception as e:
-        # If it fails, log the exact detailed traceback to the Vercel console
-        error_trace = traceback.format_exc()
-        print("CRITICAL BACKEND ERROR:")
-        print(error_trace) 
-        return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
-
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
     try:
@@ -219,7 +169,7 @@ def get_gift(gift_id):
         if doc.exists:
             data = doc.to_dict()
             
-            # 👇 FIX: Convert the Firestore datetime to a string so JSON doesn't crash!
+            # Convert the Firestore datetime to a string so JSON doesn't crash!
             if 'created_at' in data:
                 data['created_at'] = str(data['created_at'])
                 
