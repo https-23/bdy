@@ -659,6 +659,67 @@ if (archeryScreen) {
         }, 350); // Matches the flight time
     });
 }
+// ==========================================
+// 🕊️ NEW: SUCCESS MODAL & COPY LOGIC
+// ==========================================
+const successModal = document.getElementById('success-modal');
+const closeSuccessModalBtn = document.getElementById('close-success-modal');
+const modalCopyBtn = document.getElementById('modal-copy-btn');
+const generatedLinkInput = document.getElementById('generated-link-input');
+const copyStatus = document.getElementById('copy-status');
+const persistentBtn = document.getElementById('persistent-copy-btn');
+
+// Close the modal when 'X' is clicked
+if (closeSuccessModalBtn) {
+    closeSuccessModalBtn.addEventListener('click', () => {
+        if (successModal) successModal.classList.remove('show');
+    });
+}
+
+// Re-open the modal if they click the 5-minute persistent button on Screen 8
+if (persistentBtn) {
+    persistentBtn.addEventListener('click', () => {
+        if (successModal) successModal.classList.add('show');
+    });
+}
+
+// Copy the link to the phone's clipboard safely
+if (modalCopyBtn && generatedLinkInput) {
+    modalCopyBtn.addEventListener('click', () => {
+        // Select the text (Helps mobile browsers know what to copy)
+        generatedLinkInput.select();
+        generatedLinkInput.setSelectionRange(0, 99999); 
+        
+        // Modern Clipboard API with fallback for older phones/webviews
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(generatedLinkInput.value).then(showCopiedFeedback);
+            } else {
+                document.execCommand("copy");
+                showCopiedFeedback();
+            }
+        } catch (err) {
+            document.execCommand("copy");
+            showCopiedFeedback();
+        }
+    });
+}
+
+// Visual feedback for the customer
+function showCopiedFeedback() {
+    if (copyStatus) {
+        copyStatus.style.opacity = '1';
+        modalCopyBtn.innerText = "✔ COPIED";
+        modalCopyBtn.style.background = "#218838";
+        
+        // Reset the button visual after 3 seconds
+        setTimeout(() => {
+            copyStatus.style.opacity = '0';
+            modalCopyBtn.innerText = "📋 COPY";
+            modalCopyBtn.style.background = "#27ae60";
+        }, 3000);
+    }
+}
 
 // ==========================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
