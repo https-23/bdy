@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import concurrent.futures
 import base64
 import sys
 import datetime
@@ -71,9 +72,11 @@ def get_db_and_bucket():
 
 def process_and_upload_images(images_dict, gift_id, bucket):
     processed_images = {}
-    for key, base64_str in images_dict.items():
+    
+    # 1. Define the isolated task
+    def upload_single(key, base64_str):
         if not base64_str or not isinstance(base64_str, str):
-            continue
+            return key, base64_str
         if bucket and base64_str.startswith('data:image'):
             try:
                 header, encoded = base64_str.split(',', 1)
@@ -82,11 +85,21 @@ def process_and_upload_images(images_dict, gift_id, bucket):
                 blob = bucket.blob(blob_path)
                 blob.upload_from_string(img_data, content_type='image/webp')
                 blob.make_public()
-                processed_images[str(key)] = blob.public_url
-                continue
+                return key, blob.public_url
             except Exception as e:
                 print(f"Storage upload failed: {e}")
-        processed_images[str(key)] = base64_str
+        return key, base64_str
+
+    # 2. Architect Fix: Execute uploads concurrently (in parallel)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        # Submit all image uploads to the worker pool at the exact same time
+        futures = [executor.submit(upload_single, k, v) for k, v in images_dict.items()]
+        
+        # Gather results as they finish
+        for future in concurrent.futures.as_completed(futures):
+            key, result = future.result()
+            processed_images[str(key)] = result
+            
     return processed_images
 
 @app.route('/api/create-order', methods=['POST'])
