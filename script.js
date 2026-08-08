@@ -536,21 +536,32 @@ function initPopupScratchCard() {
         function scratch(e) {
             if (!isDrawing) return;
             e.preventDefault();
-            const dynamicCtx = scratchCanvas.getContext('2d');
-            const canvasRect = scratchCanvas.getBoundingClientRect();
-            let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
-            let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
+            
+            // Throttle: If we are already calculating a frame, ignore this micro-movement
+            if (isScrubbing) return;
+            isScrubbing = true;
 
-            dynamicCtx.globalCompositeOperation = 'destination-out';
-            dynamicCtx.beginPath(); 
-            dynamicCtx.arc(x, y, 25, 0, Math.PI * 2); 
-            dynamicCtx.fill();
+            requestAnimationFrame(() => {
+                const dynamicCtx = scratchCanvas.getContext('2d', { willReadFrequently: true });
+                const canvasRect = scratchCanvas.getBoundingClientRect();
+                let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
+                let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
 
-            const now = Date.now();
-            if (now - lastAudioTime > 150) { 
-                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(e => {}); }
-                lastAudioTime = now;
-            }
+                dynamicCtx.globalCompositeOperation = 'destination-out';
+                dynamicCtx.beginPath(); 
+                
+                // Increased brush size from 25 to 40 for a smoother, faster reveal
+                dynamicCtx.arc(x, y, 40, 0, Math.PI * 2); 
+                dynamicCtx.fill();
+
+                const now = Date.now();
+                if (now - lastAudioTime > 150) { 
+                    if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(err => {}); }
+                    lastAudioTime = now;
+                }
+                
+                isScrubbing = false; // Unlock for the next frame
+            });
         }
 
         scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
@@ -954,4 +965,50 @@ function initExportViralLoop() {
             await triggerHtml2CanvasDownload(e.target);
         });
     });
+}
+// Add this to the bottom of script.js
+async function triggerHtml2CanvasDownload(button) {
+    const stageWrapper = document.getElementById('export-wrapper');
+    const stage = document.getElementById('export-stage');
+    const loader = document.getElementById('export-loader');
+    const originalText = button.innerHTML;
+
+    try {
+        // UI Feedback
+        button.innerHTML = 'Rendering Magic... ✨';
+        loader.style.display = 'flex';
+
+        // html2canvas cannot render elements that are off-screen (-9999px)
+        // We temporarily bring it into the viewport, but make it practically invisible
+        stageWrapper.style.top = '0';
+        stageWrapper.style.left = '0';
+        stageWrapper.style.opacity = '0.01';
+        stageWrapper.style.zIndex = '-1';
+
+        const canvas = await html2canvas(stage, {
+            scale: 2, // High-res export
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null
+        });
+
+        // Push it back off-screen immediately
+        stageWrapper.style.top = '-9999px';
+        stageWrapper.style.opacity = '1';
+
+        // Trigger native download
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const link = document.createElement('a');
+        link.download = 'Beautiful_Memory.jpg';
+        link.href = dataUrl;
+        link.click();
+
+    } catch (error) {
+        console.error("Export failed:", error);
+        alert("Failed to save memory. Please try again.");
+    } finally {
+        // Restore UI
+        button.innerHTML = originalText;
+        loader.style.display = 'none';
+    }
 }
