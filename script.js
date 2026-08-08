@@ -816,3 +816,220 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
     }
 });
+// ==========================================
+// 🚀 PHASE 3: VIRAL EXPORT ENGINE LOGIC
+// ==========================================
+
+function initExportViralLoop() {
+    const exportBtn = document.getElementById('export-trigger-btn');
+    const exportModal = document.getElementById('export-modal');
+    const closeExportBtn = document.getElementById('close-export-modal');
+    const styleBtns = document.querySelectorAll('.style-btn');
+    const dynamicContainer = document.getElementById('dynamic-template-container');
+
+    // 1. Modal Toggle Logic
+    if (exportBtn && exportModal) {
+        exportBtn.addEventListener('click', () => {
+            exportModal.classList.add('show');
+        });
+    }
+    
+    if (closeExportBtn && exportModal) {
+        closeExportBtn.addEventListener('click', () => {
+            exportModal.classList.remove('show');
+        });
+    }
+
+    // 2. QR Code Generator
+    function generateQRCode() {
+        const qrContainer = document.getElementById('qrcode-container');
+        if (!qrContainer) return;
+        
+        qrContainer.innerHTML = ''; // Clear any existing QR code
+        
+        // Grab the exact URL the user is on (useful if they are viewing a specific ?gift= ID)
+        const currentUrl = window.location.href;
+
+        new QRCode(qrContainer, {
+            text: currentUrl,
+            width: 140,
+            height: 140,
+            colorDark: "#5a1829", // Matched to your premium maroon/text color
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    // 3. Color Thief Engine (Strict Image Onload Handling)
+    function applyDominantColor(imageUrl) {
+        return new Promise((resolve) => {
+            if (!imageUrl) return resolve();
+
+            const img = new Image();
+            // CRITICAL: Prevent canvas tainting for Phase 4
+            img.crossOrigin = 'Anonymous'; 
+            img.src = imageUrl;
+            
+            img.onload = () => {
+                try {
+                    const colorThief = new ColorThief();
+                    const color = colorThief.getColor(img);
+                    
+                    // Create a soft, aesthetic gradient using the extracted RGB values
+                    const dominantRgb = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)`;
+                    const stage = document.getElementById('export-stage');
+                    
+                    if (stage) {
+                        stage.style.background = `linear-gradient(135deg, ${dominantRgb} 0%, #fdfbfb 100%)`;
+                    }
+                    resolve();
+                } catch (error) {
+                    console.warn("ColorThief extraction failed. Proceeding with default background.", error);
+                    resolve();
+                }
+            };
+            
+            img.onerror = () => {
+                console.warn("Image failed to load for ColorThief.");
+                resolve();
+            };
+        });
+    }
+
+    // 4. Template Builders
+    function buildFilmStrip() {
+        let imagesHtml = '';
+        // Limit to 3 images so it fits beautifully inside the 1920px height
+        for(let i = 0; i < 3; i++) {
+            if(window.magicalState.images[i]) {
+                imagesHtml += `<img src="${window.magicalState.images[i]}" class="film-img" crossorigin="anonymous">`;
+            }
+        }
+        return `<div class="film-strip-container">${imagesHtml}</div>`;
+    }
+
+    function buildPolaroid() {
+        const imgSrc = window.magicalState.images[0] || '';
+        const name = window.magicalState.partnerName || 'Someone Special';
+        return `
+            <div class="polaroid-frame">
+                ${imgSrc ? `<img src="${imgSrc}" crossorigin="anonymous">` : '<div style="width:850px;height:850px;background:#eee;"></div>'}
+                <div class="polaroid-text">For ${name}</div>
+            </div>
+        `;
+    }
+
+    function buildGhazal() {
+        const imgSrc = window.magicalState.images[0] || '';
+        const poem = window.magicalState.mainWish || 'A beautiful memory...';
+        return `
+            ${imgSrc ? `<img src="${imgSrc}" class="ghazal-bg" crossorigin="anonymous">` : ''}
+            <div class="poem-card">
+                <p class="ghazal-text">${poem}</p>
+            </div>
+        `;
+    }
+
+    // 5. Wire up the Style Selection Buttons
+    styleBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const templateType = e.target.getAttribute('data-template');
+            const primaryImage = window.magicalState.images[0];
+            
+            // Show loading state (Optional, but good for UX)
+            const loader = document.getElementById('export-loader');
+            if(loader) loader.style.display = 'flex';
+            
+            // Ensure stage is clean
+            dynamicContainer.innerHTML = '';
+            
+            // Execute preparations concurrently for speed
+            generateQRCode();
+            await applyDominantColor(primaryImage);
+
+            // Inject the requested template
+            if (templateType === 'film-strip') {
+                dynamicContainer.innerHTML = buildFilmStrip();
+            } else if (templateType === 'polaroid') {
+                dynamicContainer.innerHTML = buildPolaroid();
+            } else if (templateType === 'ghazal') {
+                dynamicContainer.innerHTML = buildGhazal();
+            }
+            // --- TRIGGER PHASE 4 ---
+            await triggerHtml2CanvasDownload(e.target);
+            
+            // --- PHASE 4 HOOK WILL GO HERE ---
+            // ==========================================
+// 📸 PHASE 4: HIGH-RES CANVAS CAPTURE & DOWNLOAD
+// ==========================================
+
+async function triggerHtml2CanvasDownload(clickedBtn) {
+    const originalText = clickedBtn.innerHTML;
+    const stage = document.getElementById('export-stage');
+    const wrapper = document.getElementById('export-wrapper');
+    const loader = document.getElementById('export-loader');
+
+    try {
+        // 1. User Feedback State
+        clickedBtn.disabled = true;
+        clickedBtn.innerHTML = 'Generating Magic... ✨';
+        if (loader) loader.style.display = 'flex';
+
+        // 2. The Mobile Hidden Element Fix
+        // Even though it is -9999px off-screen, the wrapper currently has width/height 0.
+        // We must expand it so the mobile browser's rendering engine computes the layout.
+        wrapper.style.width = '1080px';
+        wrapper.style.height = '1920px';
+        wrapper.style.overflow = 'visible';
+
+        // CRITICAL: Yield to the main thread for 100ms. 
+        // This gives the browser time to load the CSS background images and compute the layout geometry.
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 3. The Canvas Capture Engine
+        const canvas = await html2canvas(stage, {
+            scale: 2, // Retina-ready (Outputs a massive 2160x3840 image)
+            useCORS: true, // Forces cross-origin images to render
+            logging: false, // Keeps console clean in production
+            backgroundColor: '#ffffff' // Prevents transparent black background bugs
+        });
+
+        // 4. Client-Side File Generation & Download
+        const dataUrl = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement('a');
+        
+        downloadLink.href = dataUrl;
+        downloadLink.download = "magical_memory.png";
+        
+        // Firefox requires the element to be temporarily appended to the DOM to click it
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+    } catch (error) {
+        console.error("Export Engine Crash:", error);
+        alert("Oops! The magic took too much energy. Please try again.");
+    } finally {
+        // 5. Cleanup: Re-hide the wrapper and restore UI state
+        wrapper.style.width = '0';
+        wrapper.style.height = '0';
+        wrapper.style.overflow = 'hidden';
+        
+        clickedBtn.disabled = false;
+        clickedBtn.innerHTML = originalText;
+        if (loader) loader.style.display = 'none';
+    }
+}
+            
+            // await triggerHtml2CanvasDownload();
+            // ---------------------------------
+            
+            console.log(`[Export Engine] ${templateType} template staged and ready for capture.`);
+        });
+    });
+}
+
+// Initialize the engine once the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    initExportViralLoop();
+});
