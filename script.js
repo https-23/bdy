@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
+        // ==========================================
     // 💳 3. RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
     const payBtn = document.getElementById('pay-now-btn');
@@ -166,21 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             payBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/create-order', { method: 'POST' });
-                const order = await response.json();
-
-                if(order.error) throw new Error(order.error);
-
-                var options = {
-                    "key": "rzp_test_TLeNXeVeDyigeU", // Make sure this matches your Vercel Env Var
-                    "amount": "9900",
-                    "currency": "INR",
-                    "name": "Magical Surprises",
-                    "order_id": order.id, 
-                    "handler": async function (payment_response){
-                        payBtn.innerText = "Generating Link..."; 
-                        try {
-                            // SEND THE PAYLOAD HERE
+                // 1. Send Payload & Create Order in One Step
                 const response = await fetch('/api/create-order', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -206,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": function (payment_response){
-                        // The backend webhook is now handling the database status update securely!
+                        // The backend webhook handles the database now! 
                         // We just generate the link directly for the user on the frontend.
                         payBtn.innerText = "Generating Link..."; 
                         
@@ -227,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 rzp.open();
             } catch (error) {
                 console.error("Payment System Error:", error);
-                alert("Backend Error: " + error.message); 
+                alert("System Error: " + error.message); 
                 payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
