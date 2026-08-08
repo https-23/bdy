@@ -456,11 +456,17 @@ if (pCanvas) {
     }
 
     for (let i = 0; i < 30; i++) particles.push(new Particle());
+        // --- BACKGROUND PARTICLES (PHASE 3 FIX) ---
     function animateParticles() {
-        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        particles.forEach(p => { p.update(); p.draw(); });
+        // Only run the heavy canvas math if the user is actively looking at the page
+        if (document.visibilityState === 'visible') {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+        }
         requestAnimationFrame(animateParticles);
     }
+    
+    // Start the loop
     animateParticles();
 }
 
