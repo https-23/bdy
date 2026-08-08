@@ -543,20 +543,22 @@ function initPopupScratchCard() {
             if (!isDrawing) return;
             e.preventDefault();
             
-            // Throttle: If we are already calculating a frame, ignore this micro-movement
             if (isScrubbing) return;
             isScrubbing = true;
 
+            const canvasRect = scratchCanvas.getBoundingClientRect();
+            
+            // CRITICAL FIX: Extract touch coordinates immediately before the browser deletes them
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let x = clientX - canvasRect.left;
+            let y = clientY - canvasRect.top;
+
             requestAnimationFrame(() => {
                 const dynamicCtx = scratchCanvas.getContext('2d', { willReadFrequently: true });
-                const canvasRect = scratchCanvas.getBoundingClientRect();
-                let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
-                let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
-
                 dynamicCtx.globalCompositeOperation = 'destination-out';
                 dynamicCtx.beginPath(); 
-                
-                // Increased brush size from 25 to 40 for a smoother, faster reveal
                 dynamicCtx.arc(x, y, 40, 0, Math.PI * 2); 
                 dynamicCtx.fill();
 
@@ -566,9 +568,10 @@ function initPopupScratchCard() {
                     lastAudioTime = now;
                 }
                 
-                isScrubbing = false; // Unlock for the next frame
+                isScrubbing = false; // Unlock for next movement
             });
         }
+
 
         scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
         scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
@@ -1027,3 +1030,24 @@ async function triggerHtml2CanvasDownload(button) {
         loader.style.display = 'none';
     }
 }
+// ==========================================
+// 🚀 CRITICAL FIX: INITIALIZE EXPORT ENGINE
+// ==========================================
+
+// 1. Turn the export engine on
+if (typeof initExportViralLoop === "function") {
+    initExportViralLoop();
+}
+
+// 2. Wire up the final "Save this Memory" button to open the modal
+document.addEventListener("DOMContentLoaded", () => {
+    const finalExportBtn = document.getElementById('export-trigger-btn');
+    const exportModalUI = document.getElementById('export-modal');
+    
+    if (finalExportBtn && exportModalUI) {
+        finalExportBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            exportModalUI.classList.add('show');
+        });
+    }
+});
