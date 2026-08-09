@@ -40,13 +40,11 @@ def get_db_and_bucket():
             raise ValueError("FIREBASE_CREDENTIALS missing in Vercel Environment Variables.")
         
         try:
-            # Fix Vercel's JSON string escaping issues dynamically
             if firebase_creds.startswith("'") and firebase_creds.endswith("'"):
                 firebase_creds = firebase_creds[1:-1]
             
             creds_dict = json.loads(firebase_creds, strict=False)
             
-            # Heal the broken newline characters in the private key
             if 'private_key' in creds_dict:
                 creds_dict['private_key'] = creds_dict['private_key'].replace('\\n', '\n')
                 
@@ -69,44 +67,147 @@ def get_db_and_bucket():
         
     return db, bucket
 
-def process_and_upload_images(images_dict, gift_id, bucket):
-    processed_images = {}
-    for key, base64_str in images_dict.items():
-        if not base64_str or not isinstance(base64_str, str):
-            continue
-        if bucket and base64_str.startswith('data:image'):
-            try:
-                header, encoded = base64_str.split(',', 1)
-                img_data = base64.b64decode(encoded)
-                blob_path = f"gifts/{gift_id}/photo_{key}.webp"
-                blob = bucket.blob(blob_path)
-                blob.upload_from_string(img_data, content_type='image/webp')
-                blob.make_public()
-                processed_images[str(key)] = blob.public_url
-                continue
-            except Exception as e:
-                print(f"Storage upload failed: {e}")
-        processed_images[str(key)] = base64_str
-    return processed_images
+
+# ==========================================
+# 🛡️ PHASE 4: FIRESTORE SCHEMA VALIDATION
+# ==========================================
+def validate_gift_payload(data):
+    """Enforces strict limits to prevent database abuse and malformed UI rendering."""
+    
+    # 1. Validate String Lengths
+    if len(str(data.get('partner_name', ''))) > 50:
+        raise ValueError("Partner name exceeds 50 characters.")
+    if len(str(data.get('user_name', ''))) > 50:
+        raise ValueError("Your name exceeds 50 characters.")
+    if len(str(data.get('envelope_msg', ''))) > 150:
+        raise ValueError("Envelope message exceeds 150 characters.")
+    if len(str(data.get('main_wish', ''))) > 2500:
+        raise ValueError("Main wish exceeds the maximum allowed length.")
+    if len(str(data.get('audio_link', ''))) > 500:
+        raise ValueError("Audio link is too long.")
+    
+    # 2. Validate Scratch Messages
+    scratch_msgs = data.get('scratch_msgs', {})
+    if not isinstance(scratch_msgs, dict):
+        raise ValueError("Invalid scratch messages format.")
+    if len(scratch_msgs) > 4:
+        raise ValueError("Maximum 4 scratch messages allowed.")
+        
+    for key, msg in scratch_msgs.items():
+        if len(str(msg)) > 250:
+            raise ValueError(f"Scratch message {key} exceeds 250 characters.")
+            
+    # 3. Validate Images Payload
+    images = data.get('images', {})
+    if not isinstance(images, dict) or len(images) > 4:
+        raise ValueError("Invalid image payload. Maximum 4 images allowed.")
+        
+    return True
+
+
+# ==========================================
+# 🚀 CORE API ROUTES
+# ==========================================
+
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    # Phase 3: Securely provide the Key ID to the frontend
+    return jsonify({
+        'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
+    }), 200
+
+
+@app.route('/api/generate-upload-urls', methods=['POST'])
+def generate_upload_urls():
+    # Phase 1: Client-to-Cloud direct upload URLs
+    try:
+        data = request.json or {}
+        image_count = data.get('count', 0)
+        
+        db, bucket = get_db_and_bucket()
+        if not bucket:
+            return jsonify({'error': 'Storage bucket not configured'}), 500
+
+        unique_gift_id = str(uuid.uuid4())
+        upload_urls = {}
+        public_urls = {}
+
+        for i in range(image_count):
+            blob_path = f"gifts/{unique_gift_id}/photo_{i}.webp"
+            blob = bucket.blob(blob_path)
+            
+            signed_url = blob.generate_signed_url(
+                version="v4",
+                expiration=datetime.timedelta(minutes=15),
+                method="PUT",
+                content_type="image/webp"
+            )
+            upload_urls[i] = signed_url
+            public_urls[i] = f"https://storage.googleapis.com/{bucket.name}/{blob_path}"
+
+        return jsonify({
+            'gift_id': unique_gift_id,
+            'upload_urls': upload_urls,
+            'public_urls': public_urls
+        }), 200
+
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
+    # Phase 2 & 4: Validate Data, Save Pending Draft, Init Razorpay
     try:
+        data = request.json or {}
+        
+        # 🛡️ Run Phase 4 Schema Validation
+        validate_gift_payload(data)
+        
         client = get_razorpay_client()
+        
         razorpay_order = client.order.create({
             "amount": 9900,
             "currency": "INR",
             "payment_capture": 1
         })
-        return jsonify({'id': razorpay_order['id']}), 200
+        
+        order_id = razorpay_order['id']
+        gift_id = data.get('gift_id') 
+        
+        if not gift_id:
+            raise ValueError("Gift ID is required to create a draft.")
+        
+        db, _ = get_db_and_bucket()
+        doc_data = {
+            'order_id': order_id,
+            'partner_name': data.get('partner_name', 'Someone Special'),
+            'user_name': data.get('user_name', ''),
+            'envelope_msg': data.get('envelope_msg', ''),
+            'main_wish': data.get('main_wish', ''),
+            'audio_link': data.get('audio_link', ''),
+            'scratch_msgs': data.get('scratch_msgs', {}),
+            'images': data.get('images', {}), 
+            'created_at': datetime.datetime.utcnow(),
+            'status': 'payment_pending' 
+        }
+        db.collection('magical_gifts').document(gift_id).set(doc_data)
+
+        return jsonify({'id': order_id}), 200
+        
+    except ValueError as ve:
+        return jsonify({'error': str(ve)}), 400
     except Exception as e:
-        return jsonify({'error': f"Payment Initialization Failed: {str(e)}"}), 500
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/verify-and-generate-link', methods=['POST'])
 def verify_payment():
+    # Finalize the order from the Frontend
     data = request.json or {}
     try:
-        # 1. Verify Payment Signature
         client = get_razorpay_client()
         client.utility.verify_payment_signature({
             'razorpay_order_id': data.get('order_id', ''),
@@ -114,17 +215,16 @@ def verify_payment():
             'razorpay_signature': data.get('signature', '')
         })
 
-        # 2. Connect to Database
         db, _ = get_db_and_bucket()
-        
-        # 3. Retrieve pre-generated ID and URLs from Phase 1
         unique_gift_id = data.get('gift_id')
-        final_images = data.get('images', {})
+        final_images = data.get('images', {}) 
         
         if not unique_gift_id:
             raise ValueError("Gift ID is missing from the payload.")
+            
+        # 🛡️ Run Phase 4 Schema Validation here as well just to be safe
+        validate_gift_payload(data)
         
-        # 4. Save to Firestore
         doc_data = {
             'order_id': data.get('order_id'),
             'payment_id': data.get('payment_id'),
@@ -151,7 +251,44 @@ def verify_payment():
         print("CRITICAL BACKEND ERROR:")
         print(error_trace) 
         return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
+
+
+@app.route('/api/webhook/razorpay', methods=['POST'])
+def razorpay_webhook():
+    # Phase 2: Asynchronous Payment Resilience
+    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
+    webhook_signature = request.headers.get('X-Razorpay-Signature')
+    
+    try:
+        client = get_razorpay_client()
         
+        client.utility.verify_webhook_signature(
+            request.get_data(as_text=True), 
+            webhook_signature, 
+            webhook_secret
+        )
+        
+        payload = request.json
+        if payload['event'] == 'order.paid':
+            order_id = payload['payload']['order']['entity']['id']
+            payment_id = payload['payload']['payment']['entity']['id']
+            
+            db, _ = get_db_and_bucket()
+            docs = db.collection('magical_gifts').where('order_id', '==', order_id).limit(1).stream()
+            
+            for doc in docs:
+                doc.reference.update({
+                    'status': 'paid_and_secured',
+                    'payment_id': payment_id
+                })
+                
+        return jsonify({'status': 'ok'}), 200
+        
+    except Exception as e:
+        print(f"Webhook Integrity Error: {str(e)}")
+        return jsonify({'error': 'Invalid Signature or Server Error'}), 400
+
+
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
     try:
@@ -160,28 +297,19 @@ def get_gift(gift_id):
         doc = doc_ref.get()
         if doc.exists:
             data = doc.to_dict()
-            
-            # 👇 FIX: Convert the Firestore datetime to a string so JSON doesn't crash!
             if 'created_at' in data:
                 data['created_at'] = str(data['created_at'])
-                
             return jsonify({'status': 'success', 'data': data}), 200
         else:
             return jsonify({'status': 'error', 'message': 'Surprise link not found.'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def catch_all(path):
     return jsonify({"error": "API route not found."}), 404
-@app.route('/api/config', methods=['GET'])
-def get_config():
-    # Only expose the safe KEY_ID. Never expose the KEY_SECRET!
-    return jsonify({
-        'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
-    }), 200
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
-    
