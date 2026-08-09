@@ -158,75 +158,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 💳 3. RAZORPAY ATOMIC TRANSACTION 
     // ==========================================
-    const payBtn = document.getElementById('pay-now-btn');
+        const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
         payBtn.addEventListener('click', async function(e){
             e.preventDefault();
-            payBtn.innerText = "Securing Magic...";
+            payBtn.innerText = "Securing Magic (Uploading Photos)...";
             payBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/create-order', { method: 'POST' });
-                const order = await response.json();
+                // --- PHASE 3: Fetch Secure Razorpay Key ---
+                const configRes = await fetch('/api/config');
+                const configData = await configRes.json();
+                if (!configData.razorpay_key_id) {
+                    throw new Error("Razorpay Key ID missing from server configuration.");
+                }
 
+                // --- PHASE 1: Upload Images Direct to Cloud ---
+                const activeImages = Object.keys(window.magicalState.images).filter(k => window.magicalState.images[k] !== null);
+                
+                const urlRes = await fetch('/api/generate-upload-urls', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ count: activeImages.length })
+                });
+                const urlData = await urlRes.json();
+                if (urlData.error) throw new Error(urlData.error);
+                
+                const finalImageUrls = {};
+                for (let i = 0; i < activeImages.length; i++) {
+                    const key = activeImages[i];
+                    const blob = await (await fetch(window.magicalState.images[key])).blob();
+                    await fetch(urlData.upload_urls[i], { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob });
+                    finalImageUrls[key] = urlData.public_urls[i];
+                }
+
+                // --- PHASE 2: Create Order & Pending Draft ---
+                payBtn.innerText = "Initializing Payment...";
+                const orderRes = await fetch('/api/create-order', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        gift_id: urlData.gift_id, 
+                        partner_name: window.magicalState.partnerName,
+                        user_name: window.magicalState.userName,
+                        envelope_msg: window.magicalState.envelopeMsg,
+                        main_wish: window.magicalState.mainWish,
+                        audio_link: window.magicalState.audioLink,
+                        scratch_msgs: window.magicalState.scratchMsgs,
+                        images: finalImageUrls
+                    })
+                });
+                const order = await orderRes.json();
                 if(order.error) throw new Error(order.error);
 
+                // --- OPEN RAZORPAY ---
                 var options = {
-                    "key": "rzp_test_TLeNXeVeDyigeU", // Make sure this matches your Vercel Env Var
+                    "key": configData.razorpay_key_id, // Dynamically injected
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
-                    "order_id": order.id, 
+                    "order_id": order.id,
                     "handler": async function (payment_response) {
-    payBtn.innerText = "Verifying Magic..."; 
-    try {
-        // We ALREADY uploaded images and got the urlData.gift_id in Step 1 & 2!
-        // Just verify the payment and finalize the link.
-        const verifyRes = await fetch('/api/verify-and-generate-link', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                order_id: payment_response.razorpay_order_id,
-                payment_id: payment_response.razorpay_payment_id,
-                signature: payment_response.razorpay_signature,
-                gift_id: urlData.gift_id, // Passed down from the earlier fetch
-                partner_name: window.magicalState.partnerName,
-                user_name: window.magicalState.userName,
-                envelope_msg: window.magicalState.envelopeMsg,
-                main_wish: window.magicalState.mainWish,
-                audio_link: window.magicalState.audioLink,
-                images: finalImageUrls, // Passed down from the earlier fetch
-                scratch_msgs: window.magicalState.scratchMsgs
-            })
-        });
+                        payBtn.innerText = "Verifying Magic..."; 
+                        try {
+                            const verifyRes = await fetch('/api/verify-and-generate-link', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    order_id: payment_response.razorpay_order_id,
+                                    payment_id: payment_response.razorpay_payment_id,
+                                    signature: payment_response.razorpay_signature,
+                                    gift_id: urlData.gift_id, 
+                                    partner_name: window.magicalState.partnerName,
+                                    user_name: window.magicalState.userName,
+                                    envelope_msg: window.magicalState.envelopeMsg,
+                                    main_wish: window.magicalState.mainWish,
+                                    audio_link: window.magicalState.audioLink,
+                                    images: finalImageUrls, 
+                                    scratch_msgs: window.magicalState.scratchMsgs
+                                })
+                            });
                             
-        const result = await verifyRes.json();
-        if(result.status === "success") {
-            prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-            payBtn.innerText = "Link Generated ✔";
-        } else {
-                // --- 3. OPEN RAZORPAY ---
-payBtn.innerText = "Initializing Payment...";
-
-// Fetch the secure key dynamically from your Flask backend
-const configRes = await fetch('/api/config');
-const configData = await configRes.json();
-
-if (!configData.razorpay_key_id) {
-    throw new Error("Razorpay Key ID missing from server configuration.");
-}
-
-var options = {
-    "key": configData.razorpay_key_id, // Dynamically injected!
-    "amount": "9900",
-    "currency": "INR",
-    "name": "Magical Surprises",
-    "order_id": order.id,
-    "handler": async function (payment_response) {
-        // ... (Insert the corrected handler code from above here)
-    },
-    "theme": { "color": "#c0392b" }
-};
+                            const result = await verifyRes.json();
+                            if(result.status === "success") {
+                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                                payBtn.innerText = "Link Generated ✔";
+                            } else {
+                                throw new Error(result.error);
+                            }
+                        } catch (verificationError) {
+                            console.error("Backend Error:", verificationError);
+                            alert("Payment successful, but link generation failed. Contact support with your payment ID.");
+                            payBtn.innerText = "Error (See Console)";
+                        }
+                    },
+                    "theme": { "color": "#c0392b" }
+                };
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
@@ -234,15 +261,16 @@ var options = {
                     payBtn.disabled = false;
                 });
                 rzp.open();
+                
             } catch (error) {
                 console.error("Payment System Error:", error);
-                alert("Backend Error: " + error.message); 
+                alert("Error: " + error.message); 
                 payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
         });
     }
-});
+
 
 // ==========================================
 // 🎩 4. ORIGINAL MAGICAL APP LOGIC
