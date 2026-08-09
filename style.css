@@ -900,3 +900,31 @@ h1, h2 {
     font-size: 1.1rem;
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
 }
+/* =========================================
+   PHASE 2: GLOBAL MUTE TOGGLE
+   ========================================= */
+#mute-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 2px solid #ffb6c1;
+    color: #c0392b;
+    font-size: 1.3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999999; /* Stays above all modals and parallax elements */
+    box-shadow: 0 4px 15px rgba(255, 117, 140, 0.3);
+    transition: transform 0.2s, background 0.3s;
+    padding: 0;
+}
+
+#mute-toggle-btn:active {
+    transform: scale(0.85);
+}
