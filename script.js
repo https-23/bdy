@@ -3,7 +3,6 @@
 // ==========================================
 window.addEventListener('error', function(event) {
     console.error("🚨 Frontend Crash Detected:", event.error);
-    // If the pay button is stuck loading due to a crash, reset it
     const payBtn = document.getElementById('pay-now-btn');
     if (payBtn && payBtn.disabled) {
         payBtn.innerText = "System Error - Try Again";
@@ -16,7 +15,7 @@ window.addEventListener('unhandledrejection', function(event) {
 });
 
 // ==========================================
-// 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
+// 🧠 0. GLOBAL STATE
 // ==========================================
 window.magicalState = {
     partnerName: "",
@@ -25,10 +24,12 @@ window.magicalState = {
     mainWish: "",
     audioLink: "",
     images: { 0: null, 1: null, 2: null, 3: null },
-    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } // NEW: Stores custom scratch texts
+    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } 
 };
 
-// --- UPDATED COMPRESSION ENGINE (UNIVERSAL JPEG) ---
+// ==========================================
+// 📸 1. PHOTO COMPRESSION & UPLOAD LOGIC
+// ==========================================
 async function compressImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -53,7 +54,6 @@ async function compressImage(file) {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
                 
-                // FIX: Use image/jpeg instead of webp for 100% mobile compatibility
                 const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                 if (dataUrl === 'data:,') {
                     reject(new Error("Browser does not support canvas export."));
@@ -67,8 +67,15 @@ async function compressImage(file) {
     });
 }
 
-// --- UPDATED PHOTO UPLOAD LOGIC (WITH LOADING STATE) ---
+function extractYouTubeId(url) {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Photo Upload Event Listeners
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
         input.addEventListener('change', async function(e) {
@@ -77,14 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parentLabel = input.parentElement;
                 const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
                 
-                // 1. Show UI feedback instantly
-                if (plusIcon) plusIcon.innerText = "⏳";
+                if (plusIcon) plusIcon.innerText = "⏳"; // Show loading spinner
 
                 try {
                     const base64Data = await compressImage(file);
                     window.magicalState.images[index] = base64Data;
                     
-                    // 2. Apply background securely
                     if (parentLabel) {
                         parentLabel.style.background = `url(${base64Data}) center/cover no-repeat`;
                         parentLabel.style.border = '2px solid #c0392b';
@@ -93,52 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (error) {
                     console.error("Compression failed:", error);
                     alert("Could not process this image. Your browser might be restricting it. Try another photo.");
-                    if (plusIcon) plusIcon.innerText = "+"; // Reset icon
+                    if (plusIcon) plusIcon.innerText = "+"; 
                 } finally {
-                    // 3. Clear the input so the user can re-select the same photo if they made a mistake
                     e.target.value = ''; 
                 }
             }
         });
     });
-// ... (Keep the rest of your DOMContentLoaded logic exactly as is)
 
-function extractYouTubeId(url) {
-    if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|shorts\/)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-}
-
-// ==========================================
-// 📸 1. PHOTO UPLOAD & AUTO-WISH
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-    const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
-    photoInputs.forEach((input, index) => {
-        input.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                try {
-                    const base64Data = await compressImage(file);
-                    window.magicalState.images[index] = base64Data;
-                    const parentLabel = input.parentElement;
-                    if (parentLabel) {
-                        parentLabel.style.backgroundImage = `url('${base64Data}')`;
-                        parentLabel.style.backgroundSize = 'cover';
-                        parentLabel.style.backgroundPosition = 'center';
-                        parentLabel.style.border = 'none';
-                        const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
-                        if (plusIcon) plusIcon.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error("Compression failed:", error);
-                    alert("Could not process this image. Please try a different one.");
-                }
-            }
-        });
-    });
-
+    // 2. AI Generate Wish
     const aiBtn = document.getElementById('ai-generate-btn'); 
     const wishTextarea = document.getElementById('main-wish-msg'); 
     if (aiBtn && wishTextarea) {
@@ -148,9 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 🚀 2. PREVIEW BUTTON & STATE CAPTURE
-    // ==========================================
+    // 3. Preview Button Logic
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
         previewBtn.addEventListener('click', () => {
@@ -162,14 +128,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Capture all form inputs
             window.magicalState.partnerName = partnerName;
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
             window.magicalState.envelopeMsg = document.getElementById('envelope-msg')?.value.trim() || "";
             window.magicalState.mainWish = document.getElementById('main-wish-msg')?.value.trim() || "";
             window.magicalState.audioLink = document.getElementById('audio-link-input')?.value.trim() || "";
             
-            // Capture custom Scratch Messages
             window.magicalState.scratchMsgs[1] = document.getElementById('scratch-1')?.value || "Message 1";
             window.magicalState.scratchMsgs[2] = document.getElementById('scratch-2')?.value || "Message 2";
             window.magicalState.scratchMsgs[3] = document.getElementById('scratch-3')?.value || "Message 3";
@@ -193,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.magicalState.images[index]) {
                     img.src = window.magicalState.images[index];
                 }
-                // If empty, the CSS camera placeholder takes over automatically
             });
 
             const dummyUser = document.getElementById('dummy-username');
@@ -216,10 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 💳 3. RAZORPAY ATOMIC TRANSACTION 
-    // ==========================================
-        const payBtn = document.getElementById('pay-now-btn');
+    // 4. Pay Button & Razorpay Logic
+    const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
         payBtn.addEventListener('click', async function(e){
             e.preventDefault();
@@ -227,14 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
             payBtn.disabled = true;
 
             try {
-                // --- PHASE 3: Fetch Secure Razorpay Key ---
                 const configRes = await fetch('/api/config');
                 const configData = await configRes.json();
                 if (!configData.razorpay_key_id) {
                     throw new Error("Razorpay Key ID missing from server configuration.");
                 }
 
-                // --- PHASE 1: Upload Images Direct to Cloud ---
                 const activeImages = Object.keys(window.magicalState.images).filter(k => window.magicalState.images[k] !== null);
                 
                 const urlRes = await fetch('/api/generate-upload-urls', {
@@ -253,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     finalImageUrls[key] = urlData.public_urls[i];
                 }
 
-                // --- PHASE 2: Create Order & Pending Draft ---
                 payBtn.innerText = "Initializing Payment...";
                 const orderRes = await fetch('/api/create-order', { 
                     method: 'POST',
@@ -272,9 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const order = await orderRes.json();
                 if(order.error) throw new Error(order.error);
 
-                // --- OPEN RAZORPAY ---
                 var options = {
-                    "key": configData.razorpay_key_id, // Dynamically injected
+                    "key": configData.razorpay_key_id, 
                     "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
@@ -331,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+}); // <--- THIS PROPERLY CLOSES THE DOMCONTENTLOADED EVENT LISTENER!
 
 // ==========================================
 // 🎩 4. ORIGINAL MAGICAL APP LOGIC
@@ -364,12 +321,10 @@ function showScreen(screenId) {
 
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
-        // ⚡ PHASE 6: JUST-IN-TIME LAZY LOADING
-        // Find any image in this screen that hasn't been loaded yet
         const lazyImages = targetScreen.querySelectorAll('img[data-lazy-src]');
         lazyImages.forEach(img => {
-            img.src = img.getAttribute('data-lazy-src'); // Trigger the network request
-            img.removeAttribute('data-lazy-src'); // Remove the attribute so it doesn't load twice
+            img.src = img.getAttribute('data-lazy-src'); 
+            img.removeAttribute('data-lazy-src'); 
         });
 
         targetScreen.style.display = 'flex';
@@ -393,6 +348,7 @@ function showScreen(screenId) {
     }
 }
 
+// Login Screen Physics
 const loginScreen = document.getElementById('login-screen');
 const tiltCard = document.getElementById('tilt-card');
 const unlockBtn = document.getElementById('unlock-btn');
@@ -453,22 +409,20 @@ if(unlockBtn) {
             showScreen("big-penguin-screen");
 
             setTimeout(() => {
-                // Apply shadow fade effect after 1 second
                 const giantPeng = document.getElementById('giant-penguin-img');
                 if(giantPeng) giantPeng.classList.add('hide-shadow');
                 
-                // Wait 500ms for animation to finish, then show archery
                 setTimeout(() => {
                     showScreen("archery-screen");
                 }, 500);
                 
-            }, 3800); // 1500ms = 5.4 second exactly
+            }, 3800); 
             
         }, 1500);
     });
 }
 
-// --- BASIC NAVIGATION ---
+// BASIC NAVIGATION
 document.getElementById("yesBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen2"); });
 document.getElementById("noBtn")?.addEventListener("click", () => { playPopSound(); showScreen("angry"); });
 document.getElementById("tryAgain")?.addEventListener("click", () => { playPopSound(); showScreen("screen1"); });
@@ -492,7 +446,7 @@ document.querySelectorAll(".backBtn").forEach(btn => {
     });
 });
 
-// --- ENVELOPE LOGIC ---
+// ENVELOPE LOGIC
 const envelopeWrapper = document.getElementById("envelope-wrapper");
 if (envelopeWrapper) {
     envelopeWrapper.addEventListener("click", () => {
@@ -508,7 +462,7 @@ if (envelopeWrapper) {
 }
 document.getElementById("envelopeNextBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
 
-// --- BACKGROUND PARTICLES ---
+// BACKGROUND PARTICLES
 const pCanvas = document.getElementById("particle-canvas");
 if (pCanvas) {
     const pCtx = pCanvas.getContext("2d");
@@ -546,7 +500,7 @@ if (pCanvas) {
     animateParticles();
 }
 
-// --- TYPEWRITER ---
+// TYPEWRITER
 function triggerTypewriter() {
     const pElement = document.getElementById("final-message");
     if (!pElement) return;
@@ -566,8 +520,7 @@ function triggerTypewriter() {
     }
     typing();
 }
-
-// --- CUSTOM SCRATCH CARDS ---
+// CUSTOM SCRATCH CARDS-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const modal = document.getElementById('scratch-modal');
 const modalContent = document.getElementById('modal-message-content');
 const scratchCanvas = document.getElementById('popup-scratch-pad');
@@ -579,7 +532,6 @@ document.querySelectorAll('.mini-card').forEach(card => {
         const cardId = card.getAttribute('data-id');
         const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
         
-        // Dynamically style the user's custom text
         if(modalContent) {
             modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
         }
@@ -646,7 +598,7 @@ function initPopupScratchCard() {
     }
 }
 
-// --- PARALLAX OPTIMIZATION ---
+// PARALLAX OPTIMIZATION
 let targetX = 0, targetY = 0; 
 let currentX = 0, currentY = 0;
 
@@ -690,7 +642,7 @@ function renderParallax() {
 }
 renderParallax(); 
 
-// --- INSTAGRAM DOUBLE TAP & LIGHTBOX ---
+// INSTAGRAM DOUBLE TAP & LIGHTBOX
 const photoModal = document.getElementById('photo-modal');
 const modalImage = document.getElementById('modal-image');
 const closePhotoModalBtn = document.getElementById('close-photo-modal');
@@ -732,7 +684,8 @@ if(closePhotoModalBtn) {
         if(photoModal) photoModal.classList.remove('show');
     });
 }
-// --- NEW ARCHERY "TAP ANYWHERE" LOGIC ---
+
+// NEW ARCHERY "TAP ANYWHERE" LOGIC
 const archeryScreen = document.getElementById('archery-screen');
 const theBow = document.getElementById('the-bow');
 const theHeart = document.getElementById('the-heart');
@@ -740,29 +693,25 @@ let hasShot = false;
 
 if (archeryScreen) {
     archeryScreen.addEventListener('click', () => {
-        if (hasShot) return; // Prevent double-shooting
+        if (hasShot) return; 
         hasShot = true;
 
-        // Hide the "Tap anywhere" text immediately
         const tapText = archeryScreen.querySelector('.swipe');
         if(tapText) tapText.style.opacity = '0';
 
-        // Fly arrow
         theBow.classList.add('fly');
 
         setTimeout(() => {
-            // IMPACT! Hide arrow, burst heart, blast confetti
             theBow.classList.add('hidden');
             theHeart.classList.add('burst');
             fireConfetti();
             playPopSound();
 
-            // Wait to enjoy the confetti, then automatically go to YES/NO screen
             setTimeout(() => {
                 showScreen('screen1');
             }, 4200);
 
-        }, 350); // Matches the flight time
+        }, 350); 
     });
 }
 
@@ -780,7 +729,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const payBtn = document.getElementById('pay-now-btn');
     
     if (giftId) {
-        // STRICT LOCKDOWN: If it's a receiver link, permanently destroy the creator form & pay button
         if (orderForm) orderForm.remove(); 
         if (payBtn) payBtn.remove();
         
@@ -805,18 +753,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const finalMsg = document.getElementById('final-message');
                 if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
                 
-                                // Hydrate Images (⚡ PHASE 6: DEFERRED LOADING)
                 if (data.images) {
                     const galleryImgs = document.querySelectorAll('.gallery-img');
                     galleryImgs.forEach((img, index) => {
                         const imgUrl = data.images[index] || data.images[index.toString()];
                         if (imgUrl) {
-                            // Do not load the image yet. Store it for Just-In-Time loading.
                             img.setAttribute('data-lazy-src', imgUrl);
                         }
                     });
                 }
-                // Hydrate Custom Scratch Messages
+                
                 if (data.scratch_msgs) {
                     window.magicalState.scratchMsgs = data.scratch_msgs;
                 }
