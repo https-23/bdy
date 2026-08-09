@@ -414,7 +414,7 @@ if(unlockBtn) {
             if (videoId) {
                 const iframe = document.createElement('iframe');
                 // ⚡ MOBILE AUDIO FIX: Strict policies met, hidden visually
-                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&playsinline=1`;
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&playsinline=1&enablejsapi=1`;
                 iframe.style.position = 'absolute';
                 iframe.style.width = '1px';
                 iframe.style.height = '1px';
@@ -808,3 +808,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
     }
 });
+// ==========================================
+// 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC
+// ==========================================
+let isSystemMuted = false;
+const muteToggleBtn = document.getElementById('mute-toggle-btn');
+
+if (muteToggleBtn) {
+    muteToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevents triggering background taps
+        isSystemMuted = !isSystemMuted;
+        muteToggleBtn.innerText = isSystemMuted ? "🔇" : "🔊";
+
+        // 1. Mute HTML5 Background Music & SFX
+        const bgMusic = document.getElementById("bg-music");
+        if (bgMusic) bgMusic.muted = isSystemMuted;
+        
+        const popSound = document.getElementById("pop-sound");
+        if (popSound) popSound.muted = isSystemMuted;
+        
+        const scratchSound = document.getElementById("scratch-sound");
+        if (scratchSound) scratchSound.muted = isSystemMuted;
+
+        // 2. Mute YouTube Iframe (if custom link was used)
+        const ytIframe = document.querySelector('iframe');
+        if (ytIframe && ytIframe.contentWindow) {
+            ytIframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: isSystemMuted ? 'mute' : 'unMute',
+                args: []
+            }), '*');
+        }
+    });
+}
+
+// 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS
+// This hooks into your existing showScreen function safely
+const originalShowScreen = showScreen;
+window.showScreen = function(screenId) {
+    originalShowScreen(screenId);
+    // Only reveal the mute button once the user enters the portal
+    if (screenId === "big-penguin-screen" && muteToggleBtn) {
+        muteToggleBtn.style.display = "flex";
+    }
+};
