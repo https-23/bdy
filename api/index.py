@@ -1,7 +1,6 @@
 import os
 import json
 import uuid
-import base64
 import sys
 import datetime
 import traceback
@@ -32,7 +31,6 @@ if 'pkg_resources' not in sys.modules:
 # ⚡ SERVERLESS GLOBAL CACHING
 cached_razorpay = None
 cached_db = None
-cached_bucket = None
 
 def get_razorpay_client():
     global cached_razorpay
@@ -48,13 +46,13 @@ def get_razorpay_client():
     cached_razorpay = razorpay.Client(auth=(key_id, key_secret))
     return cached_razorpay
 
-def get_db_and_bucket():
-    global cached_db, cached_bucket
+def get_db():
+    global cached_db
     if cached_db:
-        return cached_db, cached_bucket
+        return cached_db
         
     import firebase_admin
-    from firebase_admin import credentials, firestore, storage
+    from firebase_admin import credentials, firestore
     
     if not firebase_admin._apps:
         firebase_creds = os.environ.get('FIREBASE_CREDENTIALS')
@@ -73,23 +71,13 @@ def get_db_and_bucket():
         except Exception as e:
             raise ValueError(f"Failed to parse Firebase JSON. Ensure it is a valid JSON string: {str(e)}")
             
-        bucket_name = os.environ.get('FIREBASE_STORAGE_BUCKET', '')
         cred = credentials.Certificate(creds_dict)
-        
-        if bucket_name:
-            firebase_admin.initialize_app(cred, {'storageBucket': bucket_name})
-        else:
-            firebase_admin.initialize_app(cred)
+        firebase_admin.initialize_app(cred)
             
     cached_db = firestore.client()
-    try:
-        cached_bucket = storage.bucket() if os.environ.get('FIREBASE_STORAGE_BUCKET') else None
-    except Exception:
-        cached_bucket = None
-        
-    return cached_db, cached_bucket
+    return cached_db
 
-# 🛡️ FIRESTORE SCHEMA VALIDATION
+# 🛡️ FIRESTORE SCHEMA VALIDATION (Updated for direct Base64 storage)
 def validate_gift_payload(data):
     if len(str(data.get('partner_name', ''))) > 50:
         raise ValueError("Partner name exceeds 50 characters.")
@@ -108,14 +96,15 @@ def validate_gift_payload(data):
     if len(scratch_msgs) > 4:
         raise ValueError("Maximum 4 scratch messages allowed.")
         
-    for key, msg in scratch_msgs.items():
-        if len(str(msg)) > 250:
-            raise ValueError(f"Scratch message {key} exceeds 250 characters.")
-            
     images = data.get('images', {})
     if not isinstance(images, dict) or len(images) > 4:
         raise ValueError("Invalid image payload. Maximum 4 images allowed.")
         
+    # Protect the 1MB Firestore document limit
+    for key, img_str in images.items():
+        if img_str and len(str(img_str)) > 500000: # ~375KB per image max
+            raise ValueError(f"An image is too large. Please use a smaller photo.")
+            
     return True
 
 # 🚀 CORE API ROUTES
@@ -133,44 +122,6 @@ def get_config():
         'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
     }), 200
 
-@app.route('/api/generate-upload-urls', methods=['POST'])
-def generate_upload_urls():
-    try:
-        data = request.json or {}
-        image_count = data.get('count', 0)
-        
-        db, bucket = get_db_and_bucket()
-        if not bucket:
-            return jsonify({'error': 'Storage bucket not configured'}), 500
-
-        unique_gift_id = str(uuid.uuid4())
-        upload_urls = {}
-        public_urls = {}
-
-        for i in range(image_count):
-            blob_path = f"gifts/{unique_gift_id}/photo_{i}.jpg"
-            blob = bucket.blob(blob_path)
-            
-            signed_url = blob.generate_signed_url(
-                version="v4",
-                expiration=datetime.timedelta(minutes=15),
-                method="PUT",
-                content_type="image/jpeg"
-            )
-            upload_urls[i] = signed_url
-            public_urls[i] = f"https://storage.googleapis.com/{bucket.name}/{blob_path}"
-
-        return jsonify({
-            'gift_id': unique_gift_id,
-            'upload_urls': upload_urls,
-            'public_urls': public_urls
-        }), 200
-
-    except Exception as e:
-        error_trace = traceback.format_exc()
-        logger.error(error_trace)
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
     try:
@@ -185,12 +136,9 @@ def create_order():
         })
         
         order_id = razorpay_order['id']
-        gift_id = data.get('gift_id') 
+        gift_id = str(uuid.uuid4()) # Backend generates the ID directly now
         
-        if not gift_id:
-            raise ValueError("Gift ID is required to create a draft.")
-        
-        db, _ = get_db_and_bucket()
+        db = get_db()
         doc_data = {
             'order_id': order_id,
             'partner_name': data.get('partner_name', 'Someone Special'),
@@ -199,13 +147,14 @@ def create_order():
             'main_wish': data.get('main_wish', ''),
             'audio_link': data.get('audio_link', ''),
             'scratch_msgs': data.get('scratch_msgs', {}),
-            'images': data.get('images', {}), 
+            'images': data.get('images', {}), # Saving base64 directly
             'created_at': datetime.datetime.utcnow(),
             'status': 'payment_pending' 
         }
         db.collection('magical_gifts').document(gift_id).set(doc_data)
 
-        return jsonify({'id': order_id}), 200
+        # Return both the Razorpay order ID and the generated Gift ID to the frontend
+        return jsonify({'id': order_id, 'gift_id': gift_id}), 200
         
     except ValueError as ve:
         logger.error(f"Validation Error: {str(ve)}")
@@ -225,30 +174,20 @@ def verify_payment():
             'razorpay_signature': data.get('signature', '')
         })
 
-        db, _ = get_db_and_bucket()
         unique_gift_id = data.get('gift_id')
-        final_images = data.get('images', {}) 
         
         if not unique_gift_id:
             raise ValueError("Gift ID is missing from the payload.")
             
         validate_gift_payload(data)
         
-        doc_data = {
-            'order_id': data.get('order_id'),
+        # We only need to update the status and payment ID now, 
+        # since the data was already saved in create_order!
+        db = get_db()
+        db.collection('magical_gifts').document(unique_gift_id).update({
             'payment_id': data.get('payment_id'),
-            'partner_name': data.get('partner_name', 'Someone Special'),
-            'user_name': data.get('user_name', ''),
-            'envelope_msg': data.get('envelope_msg', ''),
-            'main_wish': data.get('main_wish', ''),
-            'audio_link': data.get('audio_link', ''),
-            'scratch_msgs': data.get('scratch_msgs', {}),
-            'images': final_images,
-            'created_at': datetime.datetime.utcnow(),
             'status': 'paid_and_secured'
-        }
-        
-        db.collection('magical_gifts').document(unique_gift_id).set(doc_data)
+        })
         
         frontend_url = os.environ.get('FRONTEND_URL', 'https://10petalx.vercel.app').rstrip('/')
         gift_link = f"{frontend_url}/?gift={unique_gift_id}"
@@ -279,7 +218,7 @@ def razorpay_webhook():
             order_id = payload['payload']['order']['entity']['id']
             payment_id = payload['payload']['payment']['entity']['id']
             
-            db, _ = get_db_and_bucket()
+            db = get_db()
             docs = db.collection('magical_gifts').where('order_id', '==', order_id).limit(1).stream()
             
             for doc in docs:
@@ -298,7 +237,7 @@ def razorpay_webhook():
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
     try:
-        db, _ = get_db_and_bucket()
+        db = get_db()
         doc_ref = db.collection('magical_gifts').document(gift_id)
         doc = doc_ref.get()
         if doc.exists:
@@ -319,4 +258,3 @@ def catch_all(path):
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
