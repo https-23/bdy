@@ -20,17 +20,33 @@ if 'pkg_resources' not in sys.modules:
         pass
     mock_pkg_resources.DistributionNotFound = DistributionNotFound
     sys.modules['pkg_resources'] = mock_pkg_resources
-# ---------------------------------------------
+# -----
+# ⚡ PHASE 5: SERVERLESS GLOBAL CACHING
+# ==========================================
+# These variables persist in memory during a Vercel "Warm Start"
+cached_razorpay = None
+cached_db = None
+cached_bucket = None
 
 def get_razorpay_client():
+    global cached_razorpay
+    if cached_razorpay:
+        return cached_razorpay
+        
     import razorpay
     key_id = os.environ.get('RAZORPAY_KEY_ID')
     key_secret = os.environ.get('RAZORPAY_KEY_SECRET')
     if not key_id or not key_secret:
         raise ValueError("Razorpay API keys are missing in Vercel Environment Variables.")
-    return razorpay.Client(auth=(key_id, key_secret))
+        
+    cached_razorpay = razorpay.Client(auth=(key_id, key_secret))
+    return cached_razorpay
 
 def get_db_and_bucket():
+    global cached_db, cached_bucket
+    if cached_db:
+        return cached_db, cached_bucket
+        
     import firebase_admin
     from firebase_admin import credentials, firestore, storage
     
@@ -59,14 +75,14 @@ def get_db_and_bucket():
         else:
             firebase_admin.initialize_app(cred)
             
-    db = firestore.client()
+    # Cache the actual database connections so they don't rebuild on every request
+    cached_db = firestore.client()
     try:
-        bucket = storage.bucket() if os.environ.get('FIREBASE_STORAGE_BUCKET') else None
+        cached_bucket = storage.bucket() if os.environ.get('FIREBASE_STORAGE_BUCKET') else None
     except Exception:
-        bucket = None
+        cached_bucket = None
         
-    return db, bucket
-
+    return cached_db, cached_bucket
 
 # ==========================================
 # 🛡️ PHASE 4: FIRESTORE SCHEMA VALIDATION
