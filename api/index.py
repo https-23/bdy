@@ -119,9 +119,9 @@ def verify_payment():
         # 2. Connect to Database
         db, bucket = get_db_and_bucket()
         
-        # 3. Process Images
-        raw_images = data.get('images', {})
-        final_images = process_and_upload_images(raw_images, unique_gift_id, bucket)
+        # 3. Use the pre-generated gift_id and public image URLs
+        unique_gift_id = data.get('gift_id')
+        final_images = data.get('images', {}) # Now these are just standard URL strings
         
         # 4. Save to Firestore
         doc_data = {
