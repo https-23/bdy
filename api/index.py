@@ -176,6 +176,46 @@ def get_gift(gift_id):
 def catch_all(path):
     return jsonify({"error": "API route not found."}), 404
 
+@app.route('/api/generate-upload-urls', methods=['POST'])
+def generate_upload_urls():
+    try:
+        data = request.json or {}
+        image_count = data.get('count', 0)
+        
+        db, bucket = get_db_and_bucket()
+        if not bucket:
+            return jsonify({'error': 'Storage bucket not configured'}), 500
+
+        unique_gift_id = str(uuid.uuid4())
+        upload_urls = {}
+        public_urls = {}
+
+        for i in range(image_count):
+            blob_path = f"gifts/{unique_gift_id}/photo_{i}.webp"
+            blob = bucket.blob(blob_path)
+            
+            # Generate a signed URL valid for 15 minutes for the client to PUT the file
+            signed_url = blob.generate_signed_url(
+                version="v4",
+                expiration=datetime.timedelta(minutes=15),
+                method="PUT",
+                content_type="image/webp"
+            )
+            upload_urls[i] = signed_url
+            # Construct the final public URL to save in Firestore later
+            public_urls[i] = f"https://storage.googleapis.com/{bucket.name}/{blob_path}"
+
+        return jsonify({
+            'gift_id': unique_gift_id,
+            'upload_urls': upload_urls,
+            'public_urls': public_urls
+        }), 200
+
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(error_trace)
+        return jsonify({'error': str(e)}), 500
+        
 if __name__ == '__main__':
     app.run(debug=True)
     
