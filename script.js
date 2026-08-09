@@ -1,4 +1,21 @@
 // ==========================================
+// 🛡️ PHASE 7: GLOBAL ERROR TRACKING
+// ==========================================
+window.addEventListener('error', function(event) {
+    console.error("🚨 Frontend Crash Detected:", event.error);
+    // If the pay button is stuck loading due to a crash, reset it
+    const payBtn = document.getElementById('pay-now-btn');
+    if (payBtn && payBtn.disabled) {
+        payBtn.innerText = "System Error - Try Again";
+        payBtn.disabled = false;
+    }
+});
+
+window.addEventListener('unhandledrejection', function(event) {
+    console.error("🚨 Unhandled Promise Rejection:", event.reason);
+});
+
+// ==========================================
 // 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
 // ==========================================
 window.magicalState = {
