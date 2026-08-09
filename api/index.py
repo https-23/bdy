@@ -175,7 +175,13 @@ def get_gift(gift_id):
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def catch_all(path):
     return jsonify({"error": "API route not found."}), 404
-
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    # Only expose the safe KEY_ID. Never expose the KEY_SECRET!
+    return jsonify({
+        'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
+    }), 200
+    
 if __name__ == '__main__':
     app.run(debug=True)
     
