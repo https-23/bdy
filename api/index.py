@@ -114,14 +114,15 @@ def verify_payment():
             'razorpay_signature': data.get('signature', '')
         })
 
-        unique_gift_id = str(uuid.uuid4())
-        
         # 2. Connect to Database
-        db, bucket = get_db_and_bucket()
+        db, _ = get_db_and_bucket()
         
-        # 3. Process Images
-        raw_images = data.get('images', {})
-        final_images = process_and_upload_images(raw_images, unique_gift_id, bucket)
+        # 3. Retrieve pre-generated ID and URLs from Phase 1
+        unique_gift_id = data.get('gift_id')
+        final_images = data.get('images', {})
+        
+        if not unique_gift_id:
+            raise ValueError("Gift ID is missing from the payload.")
         
         # 4. Save to Firestore
         doc_data = {
@@ -146,12 +147,11 @@ def verify_payment():
         return jsonify({'status': 'success', 'link': gift_link}), 200
         
     except Exception as e:
-        # If it fails, log the exact detailed traceback to the Vercel console
         error_trace = traceback.format_exc()
         print("CRITICAL BACKEND ERROR:")
         print(error_trace) 
         return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
-
+        
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
     try:
