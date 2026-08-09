@@ -73,9 +73,36 @@ function extractYouTubeId(url) {
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
 }
+// ==========================================
+// 🚀 PHASE 1: FREE CLOUD STORAGE (ImgBB API)
+// ==========================================
+const IMGBB_API_KEY = '935c12ec57f6c4b599f4971a88669bf2'; // Replace with your free key
 
+async function uploadToImgBB(base64Data) {
+    try {
+        // Remove the data:image/jpeg;base64, prefix required for ImgBB
+        const base64String = base64Data.split(',')[1];
+        const formData = new FormData();
+        formData.append('image', base64String);
+
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            return data.data.url; // Returns the live image link
+        } else {
+            throw new Error('Cloud storage rejected the image.');
+        }
+    } catch (error) {
+        console.error("ImgBB Upload Error:", error);
+        throw error;
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
-    // --- PHOTO UPLOAD LOGIC ---
+    // --- PHOTO UPLOAD LOGIC (UPDATED FOR CLOUD STORAGE) ---
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
         input.addEventListener('change', async function(e) {
@@ -84,23 +111,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parentLabel = input.parentElement;
                 const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
                 
+                // Show loading state so the user doesn't click twice
                 if (plusIcon) plusIcon.innerText = "⏳"; 
+                parentLabel.style.pointerEvents = "none"; // Prevent form bugs from double-clicking
 
                 try {
+                    // 1. Compress image locally (Saves user data)
                     const base64Data = await compressImage(file);
-                    window.magicalState.images[index] = base64Data;
                     
+                    // 2. Upload to Free Cloud Storage (ImgBB)
+                    const liveImageUrl = await uploadToImgBB(base64Data);
+                    
+                    // 3. Save the lightweight URL to the state, NOT the heavy base64
+                    window.magicalState.images[index] = liveImageUrl;
+                    
+                    // 4. Update the UI to show the uploaded image
                     if (parentLabel) {
                         parentLabel.style.background = `url(${base64Data}) center/cover no-repeat`;
-                        parentLabel.style.border = '2px solid #c0392b';
+                        parentLabel.style.border = '2px solid #28a745'; // Green border for success
                         if (plusIcon) plusIcon.style.display = 'none';
                     }
                 } catch (error) {
-                    console.error("Compression failed:", error);
-                    alert("Could not process this image. Your browser might be restricting it. Try another photo.");
+                    console.error("Upload process failed:", error);
+                    alert("Could not upload this image to the cloud. Try a smaller photo.");
                     if (plusIcon) plusIcon.innerText = "+"; 
                 } finally {
                     e.target.value = ''; 
+                    parentLabel.style.pointerEvents = "auto"; // Re-enable clicking
                 }
             }
         });
