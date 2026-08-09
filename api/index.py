@@ -92,15 +92,39 @@ def process_and_upload_images(images_dict, gift_id, bucket):
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
     try:
+        data = request.json or {}
         client = get_razorpay_client()
+        
+        # 1. Create Order
         razorpay_order = client.order.create({
             "amount": 9900,
             "currency": "INR",
             "payment_capture": 1
         })
-        return jsonify({'id': razorpay_order['id']}), 200
+        
+        order_id = razorpay_order['id']
+        gift_id = data.get('gift_id')  # Generated during Phase 1 image upload
+        
+        # 2. Save Draft to Firestore BEFORE opening Razorpay
+        db, _ = get_db_and_bucket()
+        doc_data = {
+            'order_id': order_id,
+            'partner_name': data.get('partner_name', 'Someone Special'),
+            'user_name': data.get('user_name', ''),
+            'envelope_msg': data.get('envelope_msg', ''),
+            'main_wish': data.get('main_wish', ''),
+            'audio_link': data.get('audio_link', ''),
+            'scratch_msgs': data.get('scratch_msgs', {}),
+            'images': data.get('images', {}), # Public URLs from Phase 1
+            'created_at': datetime.datetime.utcnow(),
+            'status': 'payment_pending' # 🔴 Important: Locked until paid!
+        }
+        db.collection('magical_gifts').document(gift_id).set(doc_data)
+
+        return jsonify({'id': order_id}), 200
+        
     except Exception as e:
-        return jsonify({'error': f"Payment Initialization Failed: {str(e)}"}), 500
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/verify-and-generate-link', methods=['POST'])
 def verify_payment():
@@ -215,6 +239,45 @@ def generate_upload_urls():
         error_trace = traceback.format_exc()
         print(error_trace)
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/webhook/razorpay', methods=['POST'])
+def razorpay_webhook():
+    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
+    
+    # Razorpay sends the signature in this specific header
+    webhook_signature = request.headers.get('X-Razorpay-Signature')
+    
+    try:
+        client = get_razorpay_client()
+        
+        # Verify the signature using the RAW request body to prevent spoofing
+        client.utility.verify_webhook_signature(
+            request.get_data(as_text=True), 
+            webhook_signature, 
+            webhook_secret
+        )
+        
+        payload = request.json
+        if payload['event'] == 'order.paid':
+            order_id = payload['payload']['order']['entity']['id']
+            payment_id = payload['payload']['payment']['entity']['id']
+            
+            # Find the pending gift by order_id and authorize it
+            db, _ = get_db_and_bucket()
+            docs = db.collection('magical_gifts').where('order_id', '==', order_id).limit(1).stream()
+            
+            for doc in docs:
+                doc.reference.update({
+                    'status': 'paid_and_secured',
+                    'payment_id': payment_id
+                })
+                
+        return jsonify({'status': 'ok'}), 200
+        
+    except Exception as e:
+        print(f"Webhook Integrity Error: {str(e)}")
+        # Return 400 so Razorpay knows the webhook failed and will retry it later
+        return jsonify({'error': 'Invalid Signature or Server Error'}), 400
         
 if __name__ == '__main__':
     app.run(debug=True)
