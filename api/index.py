@@ -5,68 +5,18 @@ import base64
 import sys
 import datetime
 import traceback
-import logging # ⚡ PHASE 7: IMPORT LOGGING
+import logging 
 from unittest.mock import MagicMock
 from flask import Flask, request, jsonify
+
 app = Flask(__name__)
 
-# ⚡ PHASE 7: CONFIGURE STRUCTURED LOGGING
+# ⚡ CONFIGURE STRUCTURED LOGGING
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-# ... (Keep your Vercel Razorpay Patch and Global Caching logic here) ...
-
-# ==========================================
-# ⚡ PHASE 7: UPTIME HEALTH CHECK
-# ==========================================
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """Endpoint for monitoring services like UptimeRobot to ping."""
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.datetime.utcnow().isoformat(),
-        'environment': 'vercel-serverless'
-    }), 200
-
-# ... (Inside your other routes, replace print() with logger) ...
-
-@app.route('/api/verify-and-generate-link', methods=['POST'])
-def verify_payment():
-    data = request.json or {}
-    try:
-        # ... (Keep existing logic) ...
-        return jsonify({'status': 'success', 'link': gift_link}), 200
-        
-    except Exception as e:
-        error_trace = traceback.format_exc()
-        # ⚡ PHASE 7: LOG THE ERROR STRUCTURALLY
-        logger.error(f"Payment Verification Failed: {str(e)}")
-        logger.error(f"Traceback: {error_trace}") 
-        return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
-
-@app.route('/api/webhook/razorpay', methods=['POST'])
-def razorpay_webhook():
-    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
-    webhook_signature = request.headers.get('X-Razorpay-Signature')
-    
-    try:
-        # ... (Keep existing logic) ...
-        
-        payload = request.json
-        if payload['event'] == 'order.paid':
-            # ⚡ PHASE 7: INFO LOGGING FOR SUCCESSFUL WEBHOOKS
-            logger.info(f"Webhook received! Order {order_id} has been paid successfully.")
-            # ... (Firestore update logic) ...
-                
-        return jsonify({'status': 'ok'}), 200
-        
-    except Exception as e:
-        # ⚡ PHASE 7: ERROR LOGGING
-        logger.error(f"Webhook Integrity Error: {str(e)}")
-        return jsonify({'error': 'Invalid Signature or Server Error'}), 400
 
 # --- 🚀 THE BULLETPROOF VERCEL RAZORPAY PATCH ---
 if 'pkg_resources' not in sys.modules:
@@ -79,9 +29,7 @@ if 'pkg_resources' not in sys.modules:
     mock_pkg_resources.DistributionNotFound = DistributionNotFound
     sys.modules['pkg_resources'] = mock_pkg_resources
 
-# ⚡ PHASE 5: SERVERLESS GLOBAL CACHING
-# ==========================================
-# These variables persist in memory during a Vercel "Warm Start"
+# ⚡ SERVERLESS GLOBAL CACHING
 cached_razorpay = None
 cached_db = None
 cached_bucket = None
@@ -133,7 +81,6 @@ def get_db_and_bucket():
         else:
             firebase_admin.initialize_app(cred)
             
-    # Cache the actual database connections so they don't rebuild on every request
     cached_db = firestore.client()
     try:
         cached_bucket = storage.bucket() if os.environ.get('FIREBASE_STORAGE_BUCKET') else None
@@ -142,13 +89,8 @@ def get_db_and_bucket():
         
     return cached_db, cached_bucket
 
-# ==========================================
-# 🛡️ PHASE 4: FIRESTORE SCHEMA VALIDATION
-# ==========================================
+# 🛡️ FIRESTORE SCHEMA VALIDATION
 def validate_gift_payload(data):
-    """Enforces strict limits to prevent database abuse and malformed UI rendering."""
-    
-    # 1. Validate String Lengths
     if len(str(data.get('partner_name', ''))) > 50:
         raise ValueError("Partner name exceeds 50 characters.")
     if len(str(data.get('user_name', ''))) > 50:
@@ -160,7 +102,6 @@ def validate_gift_payload(data):
     if len(str(data.get('audio_link', ''))) > 500:
         raise ValueError("Audio link is too long.")
     
-    # 2. Validate Scratch Messages
     scratch_msgs = data.get('scratch_msgs', {})
     if not isinstance(scratch_msgs, dict):
         raise ValueError("Invalid scratch messages format.")
@@ -171,28 +112,29 @@ def validate_gift_payload(data):
         if len(str(msg)) > 250:
             raise ValueError(f"Scratch message {key} exceeds 250 characters.")
             
-    # 3. Validate Images Payload
     images = data.get('images', {})
     if not isinstance(images, dict) or len(images) > 4:
         raise ValueError("Invalid image payload. Maximum 4 images allowed.")
         
     return True
 
-
-# ==========================================
 # 🚀 CORE API ROUTES
-# ==========================================
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.datetime.utcnow().isoformat(),
+        'environment': 'vercel-serverless'
+    }), 200
 
 @app.route('/api/config', methods=['GET'])
 def get_config():
-    # Phase 3: Securely provide the Key ID to the frontend
     return jsonify({
         'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
     }), 200
 
 @app.route('/api/generate-upload-urls', methods=['POST'])
 def generate_upload_urls():
-    # Phase 1: Client-to-Cloud direct upload URLs
     try:
         data = request.json or {}
         image_count = data.get('count', 0)
@@ -206,16 +148,14 @@ def generate_upload_urls():
         public_urls = {}
 
         for i in range(image_count):
-            # FIX 1: Change .webp to .jpg
-            blob_path = f"gifts/{unique_gift_id}/photo_{i}.jpg" 
+            blob_path = f"gifts/{unique_gift_id}/photo_{i}.jpg"
             blob = bucket.blob(blob_path)
             
             signed_url = blob.generate_signed_url(
                 version="v4",
                 expiration=datetime.timedelta(minutes=15),
                 method="PUT",
-                # FIX 2: Change image/webp to image/jpeg
-                content_type="image/jpeg" 
+                content_type="image/jpeg"
             )
             upload_urls[i] = signed_url
             public_urls[i] = f"https://storage.googleapis.com/{bucket.name}/{blob_path}"
@@ -228,20 +168,16 @@ def generate_upload_urls():
 
     except Exception as e:
         error_trace = traceback.format_exc()
-        logger.error(error_trace) # Ensure you use logger.error here based on Phase 7
+        logger.error(error_trace)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
-    # Phase 2 & 4: Validate Data, Save Pending Draft, Init Razorpay
     try:
         data = request.json or {}
-        
-        # 🛡️ Run Phase 4 Schema Validation
         validate_gift_payload(data)
         
         client = get_razorpay_client()
-        
         razorpay_order = client.order.create({
             "amount": 9900,
             "currency": "INR",
@@ -272,14 +208,14 @@ def create_order():
         return jsonify({'id': order_id}), 200
         
     except ValueError as ve:
+        logger.error(f"Validation Error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400
     except Exception as e:
+        logger.error(f"Order Creation Error: {str(e)}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/verify-and-generate-link', methods=['POST'])
 def verify_payment():
-    # Finalize the order from the Frontend
     data = request.json or {}
     try:
         client = get_razorpay_client()
@@ -296,7 +232,6 @@ def verify_payment():
         if not unique_gift_id:
             raise ValueError("Gift ID is missing from the payload.")
             
-        # 🛡️ Run Phase 4 Schema Validation here as well just to be safe
         validate_gift_payload(data)
         
         doc_data = {
@@ -322,20 +257,17 @@ def verify_payment():
         
     except Exception as e:
         error_trace = traceback.format_exc()
-        print("CRITICAL BACKEND ERROR:")
-        print(error_trace) 
+        logger.error(f"Payment Verification Failed: {str(e)}")
+        logger.error(f"Traceback: {error_trace}") 
         return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
-
 
 @app.route('/api/webhook/razorpay', methods=['POST'])
 def razorpay_webhook():
-    # Phase 2: Asynchronous Payment Resilience
     webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
     webhook_signature = request.headers.get('X-Razorpay-Signature')
     
     try:
         client = get_razorpay_client()
-        
         client.utility.verify_webhook_signature(
             request.get_data(as_text=True), 
             webhook_signature, 
@@ -351,6 +283,7 @@ def razorpay_webhook():
             docs = db.collection('magical_gifts').where('order_id', '==', order_id).limit(1).stream()
             
             for doc in docs:
+                logger.info(f"Webhook received! Order {order_id} has been paid successfully.")
                 doc.reference.update({
                     'status': 'paid_and_secured',
                     'payment_id': payment_id
@@ -359,9 +292,8 @@ def razorpay_webhook():
         return jsonify({'status': 'ok'}), 200
         
     except Exception as e:
-        print(f"Webhook Integrity Error: {str(e)}")
+        logger.error(f"Webhook Integrity Error: {str(e)}")
         return jsonify({'error': 'Invalid Signature or Server Error'}), 400
-
 
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
@@ -377,8 +309,8 @@ def get_gift(gift_id):
         else:
             return jsonify({'status': 'error', 'message': 'Surprise link not found.'}), 404
     except Exception as e:
+        logger.error(f"Error fetching gift: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['GET', 'POST'])
@@ -387,3 +319,4 @@ def catch_all(path):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
