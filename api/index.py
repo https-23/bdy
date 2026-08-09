@@ -190,7 +190,6 @@ def get_config():
         'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
     }), 200
 
-
 @app.route('/api/generate-upload-urls', methods=['POST'])
 def generate_upload_urls():
     # Phase 1: Client-to-Cloud direct upload URLs
@@ -207,14 +206,16 @@ def generate_upload_urls():
         public_urls = {}
 
         for i in range(image_count):
-            blob_path = f"gifts/{unique_gift_id}/photo_{i}.webp"
+            # FIX 1: Change .webp to .jpg
+            blob_path = f"gifts/{unique_gift_id}/photo_{i}.jpg" 
             blob = bucket.blob(blob_path)
             
             signed_url = blob.generate_signed_url(
                 version="v4",
                 expiration=datetime.timedelta(minutes=15),
                 method="PUT",
-                content_type="image/webp"
+                # FIX 2: Change image/webp to image/jpeg
+                content_type="image/jpeg" 
             )
             upload_urls[i] = signed_url
             public_urls[i] = f"https://storage.googleapis.com/{bucket.name}/{blob_path}"
@@ -227,9 +228,8 @@ def generate_upload_urls():
 
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(error_trace)
+        logger.error(error_trace) # Ensure you use logger.error here based on Phase 7
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
