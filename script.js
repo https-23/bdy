@@ -293,7 +293,7 @@ function fireConfetti() {
         }());
     }
 }
-
+    
 function showScreen(screenId) {
     const allScreens = document.querySelectorAll(".screen");
     allScreens.forEach(screen => {
@@ -303,6 +303,14 @@ function showScreen(screenId) {
 
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
+        // ⚡ PHASE 6: JUST-IN-TIME LAZY LOADING
+        // Find any image in this screen that hasn't been loaded yet
+        const lazyImages = targetScreen.querySelectorAll('img[data-lazy-src]');
+        lazyImages.forEach(img => {
+            img.src = img.getAttribute('data-lazy-src'); // Trigger the network request
+            img.removeAttribute('data-lazy-src'); // Remove the attribute so it doesn't load twice
+        });
+
         targetScreen.style.display = 'flex';
         targetScreen.classList.add("active");
     }
@@ -736,15 +744,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const finalMsg = document.getElementById('final-message');
                 if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
                 
-                // Hydrate Images
+                                // Hydrate Images (⚡ PHASE 6: DEFERRED LOADING)
                 if (data.images) {
                     const galleryImgs = document.querySelectorAll('.gallery-img');
                     galleryImgs.forEach((img, index) => {
                         const imgUrl = data.images[index] || data.images[index.toString()];
-                        if (imgUrl) img.src = imgUrl;
+                        if (imgUrl) {
+                            // Do not load the image yet. Store it for Just-In-Time loading.
+                            img.setAttribute('data-lazy-src', imgUrl);
+                        }
                     });
                 }
-                
                 // Hydrate Custom Scratch Messages
                 if (data.scratch_msgs) {
                     window.magicalState.scratchMsgs = data.scratch_msgs;
