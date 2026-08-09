@@ -178,24 +178,62 @@ document.addEventListener('DOMContentLoaded', () => {
                     "name": "Magical Surprises",
                     "order_id": order.id, 
                     "handler": async function (payment_response){
-                        payBtn.innerText = "Generating Link..."; 
-                        try {
-                            const verifyRes = await fetch('/api/verify-and-generate-link', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    order_id: payment_response.razorpay_order_id,
-                                    payment_id: payment_response.razorpay_payment_id,
-                                    signature: payment_response.razorpay_signature,
-                                    partner_name: window.magicalState.partnerName,
-                                    user_name: window.magicalState.userName,
-                                    envelope_msg: window.magicalState.envelopeMsg,
-                                    main_wish: window.magicalState.mainWish,
-                                    audio_link: window.magicalState.audioLink,
-                                    images: window.magicalState.images,
-                                    scratch_msgs: window.magicalState.scratchMsgs // Send custom messages to DB
-                                })
-                            });
+    payBtn.innerText = "Uploading Magic..."; 
+    try {
+        // 1. Get how many images the user actually added
+        const activeImages = Object.keys(window.magicalState.images).filter(k => window.magicalState.images[k] !== null);
+        
+        // 2. Request Signed URLs from Flask
+        const urlRes = await fetch('/api/generate-upload-urls', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ count: activeImages.length })
+        });
+        const urlData = await urlRes.json();
+        
+        if (urlData.error) throw new Error(urlData.error);
+        
+        // 3. Upload binary images directly to Firebase Storage
+        const finalImageUrls = {};
+        for (let i = 0; i < activeImages.length; i++) {
+            const key = activeImages[i];
+            const base64Data = window.magicalState.images[key];
+            
+            // Convert Base64 to Blob
+            const res = await fetch(base64Data);
+            const blob = await res.blob();
+            
+            // PUT directly to Google Cloud Storage
+            await fetch(urlData.upload_urls[i], {
+                method: 'PUT',
+                headers: { 'Content-Type': 'image/webp' },
+                body: blob
+            });
+            
+            // Map the final public URL to the correct key
+            finalImageUrls[key] = urlData.public_urls[i];
+        }
+
+        payBtn.innerText = "Generating Link..."; 
+        
+        // 4. Verify Payment & Save to Firestore
+        const verifyRes = await fetch('/api/verify-and-generate-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: payment_response.razorpay_order_id,
+                payment_id: payment_response.razorpay_payment_id,
+                signature: payment_response.razorpay_signature,
+                gift_id: urlData.gift_id, // Pass the generated ID
+                partner_name: window.magicalState.partnerName,
+                user_name: window.magicalState.userName,
+                envelope_msg: window.magicalState.envelopeMsg,
+                main_wish: window.magicalState.mainWish,
+                audio_link: window.magicalState.audioLink,
+                images: finalImageUrls, // Send URLs, NOT Base64
+                scratch_msgs: window.magicalState.scratchMsgs
+            })
+        });
                             
                             const result = await verifyRes.json();
                             if(result.status === "success") {
