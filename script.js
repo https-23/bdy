@@ -28,6 +28,7 @@ window.magicalState = {
     scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } // NEW: Stores custom scratch texts
 };
 
+// --- UPDATED COMPRESSION ENGINE (UNIVERSAL JPEG) ---
 async function compressImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -51,13 +52,56 @@ async function compressImage(file) {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/webp', 0.55));
+                
+                // FIX: Use image/jpeg instead of webp for 100% mobile compatibility
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                if (dataUrl === 'data:,') {
+                    reject(new Error("Browser does not support canvas export."));
+                } else {
+                    resolve(dataUrl);
+                }
             };
             img.onerror = reject;
         };
         reader.onerror = reject;
     });
 }
+
+// --- UPDATED PHOTO UPLOAD LOGIC (WITH LOADING STATE) ---
+document.addEventListener('DOMContentLoaded', () => {
+    const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
+    photoInputs.forEach((input, index) => {
+        input.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const parentLabel = input.parentElement;
+                const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
+                
+                // 1. Show UI feedback instantly
+                if (plusIcon) plusIcon.innerText = "⏳";
+
+                try {
+                    const base64Data = await compressImage(file);
+                    window.magicalState.images[index] = base64Data;
+                    
+                    // 2. Apply background securely
+                    if (parentLabel) {
+                        parentLabel.style.background = `url(${base64Data}) center/cover no-repeat`;
+                        parentLabel.style.border = '2px solid #c0392b';
+                        if (plusIcon) plusIcon.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Compression failed:", error);
+                    alert("Could not process this image. Your browser might be restricting it. Try another photo.");
+                    if (plusIcon) plusIcon.innerText = "+"; // Reset icon
+                } finally {
+                    // 3. Clear the input so the user can re-select the same photo if they made a mistake
+                    e.target.value = ''; 
+                }
+            }
+        });
+    });
+// ... (Keep the rest of your DOMContentLoaded logic exactly as is)
 
 function extractYouTubeId(url) {
     if (!url) return null;
@@ -205,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let i = 0; i < activeImages.length; i++) {
                     const key = activeImages[i];
                     const blob = await (await fetch(window.magicalState.images[key])).blob();
-                    await fetch(urlData.upload_urls[i], { method: 'PUT', headers: { 'Content-Type': 'image/webp' }, body: blob });
+                    await fetch(urlData.upload_urls[i], { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
                     finalImageUrls[key] = urlData.public_urls[i];
                 }
 
