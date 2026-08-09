@@ -455,3 +455,272 @@ function triggerTypewriter() {
     typing();
 }
 
+// --- CUSTOM SCRATCH CARDS ---
+const modal = document.getElementById('scratch-modal');
+const modalContent = document.getElementById('modal-message-content');
+const scratchCanvas = document.getElementById('popup-scratch-pad');
+const scratchSound = document.getElementById('scratch-sound');
+
+document.querySelectorAll('.mini-card').forEach(card => {
+    card.addEventListener('click', () => {
+        playPopSound();
+        const cardId = card.getAttribute('data-id');
+        const customMsg = window.magicalState.scratchMsgs[cardId] || "A special message for you!";
+        
+        // Dynamically style the user's custom text
+        if(modalContent) {
+            modalContent.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); font-family: 'Fredoka', sans-serif; line-height: 1.4; display: block; padding: 10px;">${customMsg.replace(/\n/g, '<br>')}</span>`;
+        }
+
+        if(modal) modal.classList.add('show');
+        setTimeout(initPopupScratchCard, 300);
+    });
+});
+
+document.getElementById('close-modal')?.addEventListener('click', () => { 
+    playPopSound(); 
+    if(modal) modal.classList.remove('show'); 
+});
+
+let isDrawing = false; 
+let lastAudioTime = 0; 
+let scratchEventsBound = false; 
+
+function initPopupScratchCard() {
+    if(!scratchCanvas) return;
+    const ctx = scratchCanvas.getContext('2d');
+    const rect = scratchCanvas.parentElement.getBoundingClientRect();
+    scratchCanvas.width = rect.width; 
+    scratchCanvas.height = rect.height;
+
+    ctx.globalCompositeOperation = 'source-over'; 
+    ctx.fillStyle = '#b3b3b3'; 
+    ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+    
+    ctx.font = "bold 24px 'Fredoka', sans-serif"; 
+    ctx.fillStyle = "#ffffff";
+    ctx.textAlign = "center"; 
+    ctx.textBaseline = "middle";
+    ctx.fillText("Scratch Me! ✨", scratchCanvas.width / 2, scratchCanvas.height / 2);
+
+    if (!scratchEventsBound) {
+        function scratch(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const dynamicCtx = scratchCanvas.getContext('2d');
+            const canvasRect = scratchCanvas.getBoundingClientRect();
+            let x = (e.touches ? e.touches[0].clientX : e.clientX) - canvasRect.left;
+            let y = (e.touches ? e.touches[0].clientY : e.clientY) - canvasRect.top;
+
+            dynamicCtx.globalCompositeOperation = 'destination-out';
+            dynamicCtx.beginPath(); 
+            dynamicCtx.arc(x, y, 25, 0, Math.PI * 2); 
+            dynamicCtx.fill();
+
+            const now = Date.now();
+            if (now - lastAudioTime > 150) { 
+                if (scratchSound) { scratchSound.currentTime = 0; scratchSound.play().catch(e => {}); }
+                lastAudioTime = now;
+            }
+        }
+
+        scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
+        scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
+        scratchCanvas.addEventListener('mousemove', scratch);
+        scratchCanvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
+        scratchCanvas.addEventListener('touchend', () => isDrawing = false);
+        scratchCanvas.addEventListener('touchmove', scratch, {passive: false});
+        scratchEventsBound = true; 
+    }
+}
+
+// --- PARALLAX OPTIMIZATION ---
+let targetX = 0, targetY = 0; 
+let currentX = 0, currentY = 0;
+
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
+
+window.addEventListener("deviceorientation", throttle((e) => {
+    if (!e.gamma || !e.beta) return;
+    let tiltX = e.gamma; 
+    let tiltY = e.beta;  
+    if (tiltX > 25) tiltX = 25; 
+    if (tiltX < -25) tiltX = -25;
+    if (tiltY > 55) tiltY = 55; 
+    if (tiltY < 25) tiltY = 25; 
+    targetX = (tiltX / 25) * 15; 
+    targetY = ((tiltY - 40) / 15) * 15; 
+}, 20));
+
+document.addEventListener("mousemove", throttle((e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 30; 
+    const y = (e.clientY / window.innerHeight - 0.5) * 30;
+    targetX = x; targetY = y;
+}, 20));
+
+function renderParallax() {
+    currentX += (targetX - currentX) * 0.1; 
+    currentY += (targetY - currentY) * 0.1;
+    document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
+        const depth = el.classList.contains('glass') ? 0.4 : 1;
+        el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
+    });
+    requestAnimationFrame(renderParallax);
+}
+renderParallax(); 
+
+// --- INSTAGRAM DOUBLE TAP & LIGHTBOX ---
+const photoModal = document.getElementById('photo-modal');
+const modalImage = document.getElementById('modal-image');
+const closePhotoModalBtn = document.getElementById('close-photo-modal');
+
+document.querySelectorAll('.ig-card').forEach(card => {
+    let lastTap = 0;
+    let tapTimer;
+
+    card.addEventListener('click', (e) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        
+        if (tapLength < 300 && tapLength > 0) {
+            clearTimeout(tapTimer); 
+            e.preventDefault();
+            if ("vibrate" in navigator) navigator.vibrate([30, 50, 30]); 
+            const heart = document.createElement('div');
+            heart.classList.add('popup-heart');
+            heart.innerText = '❤️';
+            card.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        } else {
+            tapTimer = setTimeout(() => {
+                playPopSound();
+                const img = card.querySelector('.gallery-img');
+                if(img && modalImage && photoModal) {
+                    modalImage.src = img.src;
+                    photoModal.classList.add('show');
+                }
+            }, 300); 
+        }
+        lastTap = currentTime;
+    });
+});
+
+if(closePhotoModalBtn) {
+    closePhotoModalBtn.addEventListener('click', () => {
+        playPopSound();
+        if(photoModal) photoModal.classList.remove('show');
+    });
+}
+// --- NEW ARCHERY "TAP ANYWHERE" LOGIC ---
+const archeryScreen = document.getElementById('archery-screen');
+const theBow = document.getElementById('the-bow');
+const theHeart = document.getElementById('the-heart');
+let hasShot = false;
+
+if (archeryScreen) {
+    archeryScreen.addEventListener('click', () => {
+        if (hasShot) return; // Prevent double-shooting
+        hasShot = true;
+
+        // Hide the "Tap anywhere" text immediately
+        const tapText = archeryScreen.querySelector('.swipe');
+        if(tapText) tapText.style.opacity = '0';
+
+        // Fly arrow
+        theBow.classList.add('fly');
+
+        setTimeout(() => {
+            // IMPACT! Hide arrow, burst heart, blast confetti
+            theBow.classList.add('hidden');
+            theHeart.classList.add('burst');
+            fireConfetti();
+            playPopSound();
+
+            // Wait to enjoy the confetti, then automatically go to YES/NO screen
+            setTimeout(() => {
+                showScreen('screen1');
+            }, 4200);
+
+        }, 350); // Matches the flight time
+    });
+}
+
+// ==========================================
+// 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
+// ==========================================
+document.addEventListener("DOMContentLoaded", async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const giftId = urlParams.get('gift');
+    
+    const preloader = document.getElementById('preloader');
+    const orderForm = document.getElementById('order-form-container');
+    const previewContainer = document.getElementById('preview-container');
+    const loginScreen = document.getElementById('login-screen');
+    const payBtn = document.getElementById('pay-now-btn');
+    
+    if (giftId) {
+        // STRICT LOCKDOWN: If it's a receiver link, permanently destroy the creator form & pay button
+        if (orderForm) orderForm.remove(); 
+        if (payBtn) payBtn.remove();
+        
+        if (preloader) { preloader.style.opacity = '1'; preloader.style.visibility = 'visible'; }
+        
+        try {
+            const response = await fetch(`/api/get-gift/${giftId}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                const data = result.data;
+                const secretNameEl = document.getElementById('secret-name');
+                if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} 💖`;
+                
+                const dummyUser = document.getElementById('dummy-username');
+                if (dummyUser) dummyUser.value = data.partner_name;
+                
+                const envelopeText = document.querySelector('.letter p');
+                if (envelopeText && data.envelope_msg) envelopeText.innerHTML = `${data.envelope_msg}<br><br>Hope you like this little surprise!`;
+                
+                const finalMsg = document.getElementById('final-message');
+                if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
+                
+                // Hydrate Images
+                if (data.images) {
+                    const galleryImgs = document.querySelectorAll('.gallery-img');
+                    galleryImgs.forEach((img, index) => {
+                        const imgUrl = data.images[index] || data.images[index.toString()];
+                        if (imgUrl) img.src = imgUrl;
+                    });
+                }
+                
+                // Hydrate Custom Scratch Messages
+                if (data.scratch_msgs) {
+                    window.magicalState.scratchMsgs = data.scratch_msgs;
+                }
+                
+                if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
+                
+                if (previewContainer) previewContainer.style.display = 'block';
+                if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
+            } else {
+                alert("Oops! This magical link seems broken or has expired.");
+            }
+        } catch (error) {
+            console.error("Failed to load gift data:", error);
+            alert("Error loading the surprise. Please refresh the page.");
+        } finally {
+            if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
+        }
+    } else {
+        if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
+    }
+});
