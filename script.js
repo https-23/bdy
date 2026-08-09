@@ -24,7 +24,7 @@ window.magicalState = {
     mainWish: "",
     audioLink: "",
     images: { 0: null, 1: null, 2: null, 3: null },
-    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } 
+    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" }
 };
 
 // ==========================================
@@ -75,7 +75,7 @@ function extractYouTubeId(url) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Photo Upload Event Listeners
+    // --- PHOTO UPLOAD LOGIC ---
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
         input.addEventListener('change', async function(e) {
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parentLabel = input.parentElement;
                 const plusIcon = parentLabel.querySelector('.upload-icon') || parentLabel.querySelector('span');
                 
-                if (plusIcon) plusIcon.innerText = "⏳"; // Show loading spinner
+                if (plusIcon) plusIcon.innerText = "⏳"; 
 
                 try {
                     const base64Data = await compressImage(file);
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. AI Generate Wish
+    // --- AI GENERATE WISH ---
     const aiBtn = document.getElementById('ai-generate-btn'); 
     const wishTextarea = document.getElementById('main-wish-msg'); 
     if (aiBtn && wishTextarea) {
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Preview Button Logic
+    // --- PREVIEW BUTTON LOGIC ---
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
         previewBtn.addEventListener('click', () => {
@@ -179,12 +179,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Pay Button & Razorpay Logic
+    // --- PAY BUTTON & RAZORPAY LOGIC (NO FIREBASE STORAGE NEEDED) ---
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
         payBtn.addEventListener('click', async function(e){
             e.preventDefault();
-            payBtn.innerText = "Securing Magic (Uploading Photos)...";
+            payBtn.innerText = "Securing Magic...";
             payBtn.disabled = true;
 
             try {
@@ -194,37 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error("Razorpay Key ID missing from server configuration.");
                 }
 
-                const activeImages = Object.keys(window.magicalState.images).filter(k => window.magicalState.images[k] !== null);
-                
-                const urlRes = await fetch('/api/generate-upload-urls', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ count: activeImages.length })
-                });
-                const urlData = await urlRes.json();
-                if (urlData.error) throw new Error(urlData.error);
-                
-                const finalImageUrls = {};
-                for (let i = 0; i < activeImages.length; i++) {
-                    const key = activeImages[i];
-                    const blob = await (await fetch(window.magicalState.images[key])).blob();
-                    await fetch(urlData.upload_urls[i], { method: 'PUT', headers: { 'Content-Type': 'image/jpeg' }, body: blob });
-                    finalImageUrls[key] = urlData.public_urls[i];
-                }
-
                 payBtn.innerText = "Initializing Payment...";
                 const orderRes = await fetch('/api/create-order', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        gift_id: urlData.gift_id, 
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
                         envelope_msg: window.magicalState.envelopeMsg,
                         main_wish: window.magicalState.mainWish,
                         audio_link: window.magicalState.audioLink,
                         scratch_msgs: window.magicalState.scratchMsgs,
-                        images: finalImageUrls
+                        images: window.magicalState.images // 🚀 Passing Base64 directly!
                     })
                 });
                 const order = await orderRes.json();
@@ -246,13 +227,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                     order_id: payment_response.razorpay_order_id,
                                     payment_id: payment_response.razorpay_payment_id,
                                     signature: payment_response.razorpay_signature,
-                                    gift_id: urlData.gift_id, 
+                                    gift_id: order.gift_id, // Passed from backend!
                                     partner_name: window.magicalState.partnerName,
                                     user_name: window.magicalState.userName,
                                     envelope_msg: window.magicalState.envelopeMsg,
                                     main_wish: window.magicalState.mainWish,
                                     audio_link: window.magicalState.audioLink,
-                                    images: finalImageUrls, 
+                                    images: window.magicalState.images, 
                                     scratch_msgs: window.magicalState.scratchMsgs
                                 })
                             });
@@ -395,9 +376,15 @@ if(unlockBtn) {
 
             if (videoId) {
                 const iframe = document.createElement('iframe');
-                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0`;
-                iframe.style.display = 'none';
-                iframe.allow = 'autoplay';
+                // ⚡ MOBILE AUDIO FIX: Strict policies met, hidden visually
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&playsinline=1`;
+                iframe.style.position = 'absolute';
+                iframe.style.width = '1px';
+                iframe.style.height = '1px';
+                iframe.style.opacity = '0.01';
+                iframe.style.pointerEvents = 'none';
+                iframe.style.zIndex = '-9999';
+                iframe.allow = 'autoplay; encrypted-media';
                 document.body.appendChild(iframe);
             } else {
                 const bgMusic = document.getElementById("bg-music");
@@ -445,7 +432,6 @@ document.querySelectorAll(".backBtn").forEach(btn => {
         e.stopPropagation(); playPopSound(); showScreen(btn.getAttribute("data-back"));
     });
 });
-
 // ENVELOPE LOGIC
 const envelopeWrapper = document.getElementById("envelope-wrapper");
 if (envelopeWrapper) {
@@ -520,7 +506,8 @@ function triggerTypewriter() {
     }
     typing();
 }
-// CUSTOM SCRATCH CARDS-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// CUSTOM SCRATCH CARDS
 const modal = document.getElementById('scratch-modal');
 const modalContent = document.getElementById('modal-message-content');
 const scratchCanvas = document.getElementById('popup-scratch-pad');
