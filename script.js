@@ -1,16 +1,4 @@
 // ==========================================
-// 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
-// ==========================================
-window.magicalState = {
-    partnerName: "",
-    userName: "",
-    envelopeMsg: "",
-    mainWish: "",
-    audioLink: "",
-    images: { 0: null, 1: null, 2: null, 3: null },
-    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } // NEW: Stores custom scratch texts
-};
-// ==========================================
 // 🛡️ PHASE 7: GLOBAL ERROR TRACKING
 // ==========================================
 window.addEventListener('error', function(event) {
@@ -26,6 +14,19 @@ window.addEventListener('error', function(event) {
 window.addEventListener('unhandledrejection', function(event) {
     console.error("🚨 Unhandled Promise Rejection:", event.reason);
 });
+
+// ==========================================
+// 🧠 0. GLOBAL STATE & COMPRESSION ENGINE
+// ==========================================
+window.magicalState = {
+    partnerName: "",
+    userName: "",
+    envelopeMsg: "",
+    mainWish: "",
+    audioLink: "",
+    images: { 0: null, 1: null, 2: null, 3: null },
+    scratchMsgs: { 1: "", 2: "", 3: "", 4: "" } // NEW: Stores custom scratch texts
+};
 
 // --- UPDATED COMPRESSION ENGINE (UNIVERSAL JPEG) ---
 async function compressImage(file) {
