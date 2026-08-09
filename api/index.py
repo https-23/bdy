@@ -5,10 +5,68 @@ import base64
 import sys
 import datetime
 import traceback
+import logging # ⚡ PHASE 7: IMPORT LOGGING
 from unittest.mock import MagicMock
 from flask import Flask, request, jsonify
-
 app = Flask(__name__)
+
+# ⚡ PHASE 7: CONFIGURE STRUCTURED LOGGING
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# ... (Keep your Vercel Razorpay Patch and Global Caching logic here) ...
+
+# ==========================================
+# ⚡ PHASE 7: UPTIME HEALTH CHECK
+# ==========================================
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Endpoint for monitoring services like UptimeRobot to ping."""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.datetime.utcnow().isoformat(),
+        'environment': 'vercel-serverless'
+    }), 200
+
+# ... (Inside your other routes, replace print() with logger) ...
+
+@app.route('/api/verify-and-generate-link', methods=['POST'])
+def verify_payment():
+    data = request.json or {}
+    try:
+        # ... (Keep existing logic) ...
+        return jsonify({'status': 'success', 'link': gift_link}), 200
+        
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        # ⚡ PHASE 7: LOG THE ERROR STRUCTURALLY
+        logger.error(f"Payment Verification Failed: {str(e)}")
+        logger.error(f"Traceback: {error_trace}") 
+        return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
+
+@app.route('/api/webhook/razorpay', methods=['POST'])
+def razorpay_webhook():
+    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
+    webhook_signature = request.headers.get('X-Razorpay-Signature')
+    
+    try:
+        # ... (Keep existing logic) ...
+        
+        payload = request.json
+        if payload['event'] == 'order.paid':
+            # ⚡ PHASE 7: INFO LOGGING FOR SUCCESSFUL WEBHOOKS
+            logger.info(f"Webhook received! Order {order_id} has been paid successfully.")
+            # ... (Firestore update logic) ...
+                
+        return jsonify({'status': 'ok'}), 200
+        
+    except Exception as e:
+        # ⚡ PHASE 7: ERROR LOGGING
+        logger.error(f"Webhook Integrity Error: {str(e)}")
+        return jsonify({'error': 'Invalid Signature or Server Error'}), 400
 
 # --- 🚀 THE BULLETPROOF VERCEL RAZORPAY PATCH ---
 if 'pkg_resources' not in sys.modules:
@@ -20,7 +78,7 @@ if 'pkg_resources' not in sys.modules:
         pass
     mock_pkg_resources.DistributionNotFound = DistributionNotFound
     sys.modules['pkg_resources'] = mock_pkg_resources
-# -----
+
 # ⚡ PHASE 5: SERVERLESS GLOBAL CACHING
 # ==========================================
 # These variables persist in memory during a Vercel "Warm Start"
