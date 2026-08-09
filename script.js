@@ -818,7 +818,7 @@ if (muteToggleBtn) {
     muteToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevents triggering background taps
         isSystemMuted = !isSystemMuted;
-        muteToggleBtn.innerText = isSystemMuted ? "🔇" : "🔊";
+        muteToggleBtn.innerText = isSystemMuted ? "🔇" : "🎶";
 
         // 1. Mute HTML5 Background Music & SFX
         const bgMusic = document.getElementById("bg-music");
