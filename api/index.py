@@ -1,7 +1,6 @@
 import os
 import json
 import uuid
-import concurrent.futures
 import base64
 import sys
 import datetime
@@ -72,11 +71,9 @@ def get_db_and_bucket():
 
 def process_and_upload_images(images_dict, gift_id, bucket):
     processed_images = {}
-    
-    # 1. Define the isolated task
-    def upload_single(key, base64_str):
+    for key, base64_str in images_dict.items():
         if not base64_str or not isinstance(base64_str, str):
-            return key, base64_str
+            continue
         if bucket and base64_str.startswith('data:image'):
             try:
                 header, encoded = base64_str.split(',', 1)
@@ -85,45 +82,51 @@ def process_and_upload_images(images_dict, gift_id, bucket):
                 blob = bucket.blob(blob_path)
                 blob.upload_from_string(img_data, content_type='image/webp')
                 blob.make_public()
-                return key, blob.public_url
+                processed_images[str(key)] = blob.public_url
+                continue
             except Exception as e:
                 print(f"Storage upload failed: {e}")
-        return key, base64_str
-
-    # 2. Architect Fix: Execute uploads concurrently (in parallel)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        # Submit all image uploads to the worker pool at the exact same time
-        futures = [executor.submit(upload_single, k, v) for k, v in images_dict.items()]
-        
-        # Gather results as they finish
-        for future in concurrent.futures.as_completed(futures):
-            key, result = future.result()
-            processed_images[str(key)] = result
-            
+        processed_images[str(key)] = base64_str
     return processed_images
 
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
-    data = request.json or {}
     try:
-        # 1. Initialize Payment
         client = get_razorpay_client()
         razorpay_order = client.order.create({
             "amount": 9900,
             "currency": "INR",
             "payment_capture": 1
         })
-        
-        # 2. Secure the Data as "Pending" BEFORE the user pays
-        db, bucket = get_db_and_bucket()
+        return jsonify({'id': razorpay_order['id']}), 200
+    except Exception as e:
+        return jsonify({'error': f"Payment Initialization Failed: {str(e)}"}), 500
+
+@app.route('/api/verify-and-generate-link', methods=['POST'])
+def verify_payment():
+    data = request.json or {}
+    try:
+        # 1. Verify Payment Signature
+        client = get_razorpay_client()
+        client.utility.verify_payment_signature({
+            'razorpay_order_id': data.get('order_id', ''),
+            'razorpay_payment_id': data.get('payment_id', ''),
+            'razorpay_signature': data.get('signature', '')
+        })
+
         unique_gift_id = str(uuid.uuid4())
         
-        # Upload images to storage now
+        # 2. Connect to Database
+        db, bucket = get_db_and_bucket()
+        
+        # 3. Process Images
         raw_images = data.get('images', {})
         final_images = process_and_upload_images(raw_images, unique_gift_id, bucket)
         
+        # 4. Save to Firestore
         doc_data = {
-            'order_id': razorpay_order['id'],
+            'order_id': data.get('order_id'),
+            'payment_id': data.get('payment_id'),
             'partner_name': data.get('partner_name', 'Someone Special'),
             'user_name': data.get('user_name', ''),
             'envelope_msg': data.get('envelope_msg', ''),
@@ -132,46 +135,22 @@ def create_order():
             'scratch_msgs': data.get('scratch_msgs', {}),
             'images': final_images,
             'created_at': datetime.datetime.utcnow(),
-            'status': 'pending' # Status is pending until webhook fires
+            'status': 'paid_and_secured'
         }
         
         db.collection('magical_gifts').document(unique_gift_id).set(doc_data)
         
-        # Return BOTH the razorpay order ID and the new database gift ID
-        return jsonify({'id': razorpay_order['id'], 'gift_id': unique_gift_id}), 200
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://10petalx.vercel.app').rstrip('/')
+        gift_link = f"{frontend_url}/?gift={unique_gift_id}"
+        
+        return jsonify({'status': 'success', 'link': gift_link}), 200
         
     except Exception as e:
+        # If it fails, log the exact detailed traceback to the Vercel console
         error_trace = traceback.format_exc()
-        print(error_trace)
-        return jsonify({'error': f"Payment Initialization Failed: {str(e)}"}), 500
-
-# NEW: The Razorpay Webhook Endpoint
-@app.route('/api/webhook', methods=['POST'])
-def razorpay_webhook():
-    webhook_secret = os.environ.get('RAZORPAY_WEBHOOK_SECRET')
-    signature = request.headers.get('X-Razorpay-Signature')
-    payload = request.get_data(as_text=True)
-
-    try:
-        client = get_razorpay_client()
-        # Verify the request actually came from Razorpay
-        client.utility.verify_webhook_signature(payload, signature, webhook_secret)
-        
-        event = request.json
-        if event['event'] == 'payment.captured':
-            order_id = event['payload']['payment']['entity']['order_id']
-            
-            db, _ = get_db_and_bucket()
-            
-            # Find the pending order and mark it as paid
-            docs = db.collection('magical_gifts').where('order_id', '==', order_id).get()
-            for doc in docs:
-                doc.reference.update({'status': 'paid_and_secured'})
-                
-        return jsonify({'status': 'ok'}), 200
-    except Exception as e:
-        print(f"Webhook Error: {str(e)}")
-        return jsonify({'error': str(e)}), 400
+        print("CRITICAL BACKEND ERROR:")
+        print(error_trace) 
+        return jsonify({'status': 'failed', 'error': str(e), 'trace': error_trace}), 500
 
 @app.route('/api/get-gift/<gift_id>', methods=['GET'])
 def get_gift(gift_id):
@@ -182,7 +161,7 @@ def get_gift(gift_id):
         if doc.exists:
             data = doc.to_dict()
             
-            # Convert the Firestore datetime to a string so JSON doesn't crash!
+            # 👇 FIX: Convert the Firestore datetime to a string so JSON doesn't crash!
             if 'created_at' in data:
                 data['created_at'] = str(data['created_at'])
                 
