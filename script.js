@@ -177,38 +177,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     "currency": "INR",
                     "name": "Magical Surprises",
                     "order_id": order.id, 
-                    "handler": async function (payment_response){
-                        payBtn.innerText = "Generating Link..."; 
-                        try {
-                            const verifyRes = await fetch('/api/verify-and-generate-link', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    order_id: payment_response.razorpay_order_id,
-                                    payment_id: payment_response.razorpay_payment_id,
-                                    signature: payment_response.razorpay_signature,
-                                    partner_name: window.magicalState.partnerName,
-                                    user_name: window.magicalState.userName,
-                                    envelope_msg: window.magicalState.envelopeMsg,
-                                    main_wish: window.magicalState.mainWish,
-                                    audio_link: window.magicalState.audioLink,
-                                    images: window.magicalState.images,
-                                    scratch_msgs: window.magicalState.scratchMsgs // Send custom messages to DB
-                                })
-                            });
+                    "handler": async function (payment_response) {
+    payBtn.innerText = "Verifying Magic..."; 
+    try {
+        // We ALREADY uploaded images and got the urlData.gift_id in Step 1 & 2!
+        // Just verify the payment and finalize the link.
+        const verifyRes = await fetch('/api/verify-and-generate-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: payment_response.razorpay_order_id,
+                payment_id: payment_response.razorpay_payment_id,
+                signature: payment_response.razorpay_signature,
+                gift_id: urlData.gift_id, // Passed down from the earlier fetch
+                partner_name: window.magicalState.partnerName,
+                user_name: window.magicalState.userName,
+                envelope_msg: window.magicalState.envelopeMsg,
+                main_wish: window.magicalState.mainWish,
+                audio_link: window.magicalState.audioLink,
+                images: finalImageUrls, // Passed down from the earlier fetch
+                scratch_msgs: window.magicalState.scratchMsgs
+            })
+        });
                             
-                            const result = await verifyRes.json();
-                            if(result.status === "success") {
-                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
-                                payBtn.innerText = "Link Generated ✔";
-                            } else {
-                                throw new Error(result.error);
-                            }
-                        } catch (verificationError) {
-                            console.error("Backend Error:", verificationError);
-                            alert("Payment successful, but link generation failed. Contact support with your payment ID.");
-                            payBtn.innerText = "Error (See Console)";
-                        }
+        const result = await verifyRes.json();
+        if(result.status === "success") {
+            prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+            payBtn.innerText = "Link Generated ✔";
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (verificationError) {
+        console.error("Backend Error:", verificationError);
+        alert("Payment successful, but link generation failed. Contact support with your payment ID.");
+        payBtn.innerText = "Error (See Console)";
+    }
                     },
                     "theme": { "color": "#c0392b" }
                 };
