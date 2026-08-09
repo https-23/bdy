@@ -205,16 +205,28 @@ document.addEventListener('DOMContentLoaded', () => {
             prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
             payBtn.innerText = "Link Generated ✔";
         } else {
-            throw new Error(result.error);
-        }
-    } catch (verificationError) {
-        console.error("Backend Error:", verificationError);
-        alert("Payment successful, but link generation failed. Contact support with your payment ID.");
-        payBtn.innerText = "Error (See Console)";
-    }
-                    },
-                    "theme": { "color": "#c0392b" }
-                };
+                // --- 3. OPEN RAZORPAY ---
+payBtn.innerText = "Initializing Payment...";
+
+// Fetch the secure key dynamically from your Flask backend
+const configRes = await fetch('/api/config');
+const configData = await configRes.json();
+
+if (!configData.razorpay_key_id) {
+    throw new Error("Razorpay Key ID missing from server configuration.");
+}
+
+var options = {
+    "key": configData.razorpay_key_id, // Dynamically injected!
+    "amount": "9900",
+    "currency": "INR",
+    "name": "Magical Surprises",
+    "order_id": order.id,
+    "handler": async function (payment_response) {
+        // ... (Insert the corrected handler code from above here)
+    },
+    "theme": { "color": "#c0392b" }
+};
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
