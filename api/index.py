@@ -100,10 +100,11 @@ def validate_gift_payload(data):
     if not isinstance(images, dict) or len(images) > 4:
         raise ValueError("Invalid image payload. Maximum 4 images allowed.")
         
-    # Protect the 1MB Firestore document limit
-    for key, img_str in images.items():
-        if img_str and len(str(img_str)) > 500000: # ~375KB per image max
-            raise ValueError(f"An image is too large. Please use a smaller photo.")
+    # 🚀 PHASE 6: Cloud URL Security Validation
+    # We now expect short ImgBB URLs instead of heavy Base64 strings
+    for key, img_url in images.items():
+        if img_url and len(str(img_url)) > 2000: 
+            raise ValueError(f"Image link rejected. Payload size limit exceeded.")
             
     return True
 
@@ -147,7 +148,7 @@ def create_order():
             'main_wish': data.get('main_wish', ''),
             'audio_link': data.get('audio_link', ''),
             'scratch_msgs': data.get('scratch_msgs', {}),
-            'images': data.get('images', {}), # Saving base64 directly
+            'images': data.get('images', {}), # Saving lightweight ImgBB URLs
             'created_at': datetime.datetime.utcnow(),
             'status': 'payment_pending' 
         }
