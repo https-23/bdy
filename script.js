@@ -413,6 +413,7 @@ if(unlockBtn) {
 
             if (videoId) {
                 const iframe = document.createElement('iframe');
+                iframe.id = 'magical-yt-iframe'; // 🐛 FIX: Unique ID so Razorpay doesn't intercept it
                 // ⚡ MOBILE AUDIO FIX: Strict policies met, hidden visually
                 iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&playsinline=1&enablejsapi=1`;
                 iframe.style.position = 'absolute';
@@ -819,7 +820,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================
 let isSystemMuted = false;
 
-// Using Event Delegation so it always triggers, even on mobile Safari/Chrome
 document.addEventListener('click', (e) => {
     const muteBtn = e.target.closest('#mute-toggle-btn');
     if (muteBtn) {
@@ -831,7 +831,10 @@ document.addEventListener('click', (e) => {
 
         // 1. Mute HTML5 Background Music & SFX
         const bgMusic = document.getElementById("bg-music");
-        if (bgMusic) bgMusic.muted = isSystemMuted;
+        if (bgMusic) {
+            bgMusic.muted = isSystemMuted;
+            bgMusic.volume = isSystemMuted ? 0 : 0.5; // Double fallback
+        }
         
         const popSound = document.getElementById("pop-sound");
         if (popSound) popSound.muted = isSystemMuted;
@@ -839,14 +842,12 @@ document.addEventListener('click', (e) => {
         const scratchSound = document.getElementById("scratch-sound");
         if (scratchSound) scratchSound.muted = isSystemMuted;
 
-        // 2. Mute YouTube Iframe
-        const ytIframe = document.querySelector('iframe');
+        // 2. Mute YouTube Iframe Safely (Bypassing Razorpay)
+        const ytIframe = document.getElementById('magical-yt-iframe');
         if (ytIframe && ytIframe.contentWindow) {
-            ytIframe.contentWindow.postMessage(JSON.stringify({
-                event: 'command',
-                func: isSystemMuted ? 'mute' : 'unMute',
-                args: []
-            }), '*');
+            const command = isSystemMuted ? 'mute' : 'unMute';
+            // Explicit string format required by YouTube API on mobile
+            ytIframe.contentWindow.postMessage(`{"event":"command","func":"${command}","args":""}`, '*');
         }
     }
 });
