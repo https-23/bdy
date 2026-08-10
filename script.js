@@ -285,6 +285,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 }
                                 payBtn.innerText = "Link Generated ✔";
                                 payBtn.style.background = "#28a745";
+                                // 🚀 TRIGGER PHASE 4 & 5: STATE MORPHING
+                                activatePostPayState(result.link);
                             } else {
                                 throw new Error(result.error);
                             }
@@ -900,4 +902,57 @@ if (closeSuccessBtn) {
     closeSuccessBtn.addEventListener('click', () => {
         document.getElementById('success-modal').style.display = 'none';
     });
+}
+// ==========================================
+// ⏳ PHASE 4 & 5: STATE MORPHING & 5-MIN TIMER
+// ==========================================
+function activatePostPayState(link) {
+    const payBtn = document.getElementById('pay-now-btn');
+    const postPayBtn = document.getElementById('post-pay-copy-btn');
+    
+    if (payBtn && postPayBtn) {
+        // 1. Swap the buttons to prevent Razorpay Ghost Clicks
+        payBtn.style.display = 'none'; 
+        postPayBtn.style.display = 'block'; 
+        
+        // 2. Secure Copy Logic
+        postPayBtn.onclick = () => {
+            navigator.clipboard.writeText(link).then(() => {
+                const originalText = postPayBtn.innerHTML;
+                postPayBtn.innerHTML = '<span class="btn-text">COPIED! ✔</span>';
+                postPayBtn.style.background = "#28a745"; // Flash green
+                
+                setTimeout(() => { 
+                    postPayBtn.innerHTML = originalText; 
+                    postPayBtn.style.background = "linear-gradient(to right, #17a2b8, #138496)"; // Return to blue
+                }, 2000);
+            }).catch(() => {
+                // Fallback: If mobile browser blocks clipboard, re-open the Phase 3 Popup!
+                const modal = document.getElementById('success-modal');
+                if(modal) modal.style.display = 'flex';
+            });
+        };
+
+        // 3. The 5-Minute Self-Destruct Timer (300 seconds)
+        let timeLeft = 300; 
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            // Only update text if it doesn't currently say "COPIED! ✔"
+            if (!postPayBtn.innerText.includes("COPIED")) {
+                postPayBtn.innerHTML = `<span class="btn-text">COPY LINK 📋 (${minutes}:${seconds < 10 ? '0' : ''}${seconds})</span>`;
+            }
+            
+            // 4. Session Expiration
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                postPayBtn.disabled = true;
+                postPayBtn.style.background = "#6c757d"; // Gray out
+                postPayBtn.innerHTML = '<span class="btn-text">SESSION EXPIRED 🔒</span>';
+                postPayBtn.onclick = null; // Remove click ability completely
+            }
+        }, 1000);
+    }
 }
