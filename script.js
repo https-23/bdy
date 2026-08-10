@@ -695,6 +695,9 @@ document.querySelectorAll('.ig-card').forEach(card => {
                 if(img && modalImage && photoModal) {
                     modalImage.src = img.src;
                     photoModal.classList.add('show');
+                    // 🐛 FIX: Hide Mute Button when Photo Modal Opens
+                    const muteBtn = document.getElementById('mute-toggle-btn');
+                    if (muteBtn) muteBtn.style.display = 'none';
                 }
             }, 300); 
         }
@@ -706,6 +709,9 @@ if(closePhotoModalBtn) {
     closePhotoModalBtn.addEventListener('click', () => {
         playPopSound();
         if(photoModal) photoModal.classList.remove('show');
+        //🐛 FIX: Restore Mute Button when Photo Modal Closes
+        const muteBtn = document.getElementById('mute-toggle-btn');
+            if (muteBtn) muteBtn.style.display = 'flex';
     });
 }
 
@@ -809,16 +815,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 // ==========================================
-// 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC
+// 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC (BUG-FREE)
 // ==========================================
 let isSystemMuted = false;
-const muteToggleBtn = document.getElementById('mute-toggle-btn');
 
-if (muteToggleBtn) {
-    muteToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevents triggering background taps
+// Using Event Delegation so it always triggers, even on mobile Safari/Chrome
+document.addEventListener('click', (e) => {
+    const muteBtn = e.target.closest('#mute-toggle-btn');
+    if (muteBtn) {
+        e.preventDefault();
+        e.stopPropagation(); 
+        
         isSystemMuted = !isSystemMuted;
-        muteToggleBtn.innerText = isSystemMuted ? "🔇" : "🎶";
+        muteBtn.innerText = isSystemMuted ? "🔇" : "🎶";
 
         // 1. Mute HTML5 Background Music & SFX
         const bgMusic = document.getElementById("bg-music");
@@ -830,7 +839,7 @@ if (muteToggleBtn) {
         const scratchSound = document.getElementById("scratch-sound");
         if (scratchSound) scratchSound.muted = isSystemMuted;
 
-        // 2. Mute YouTube Iframe (if custom link was used)
+        // 2. Mute YouTube Iframe
         const ytIframe = document.querySelector('iframe');
         if (ytIframe && ytIframe.contentWindow) {
             ytIframe.contentWindow.postMessage(JSON.stringify({
@@ -839,15 +848,14 @@ if (muteToggleBtn) {
                 args: []
             }), '*');
         }
-    });
-}
+    }
+});
 
 // 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS
-// This hooks into your existing showScreen function safely
 const originalShowScreen = showScreen;
 window.showScreen = function(screenId) {
     originalShowScreen(screenId);
-    // Only reveal the mute button once the user enters the portal
+    const muteToggleBtn = document.getElementById('mute-toggle-btn');
     if (screenId === "big-penguin-screen" && muteToggleBtn) {
         muteToggleBtn.style.display = "flex";
     }
