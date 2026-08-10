@@ -277,8 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             const result = await verifyRes.json();
                             if(result.status === "success") {
-                                prompt("🎉 Payment Successful! Ye rahi aapki magical link (Copy kar lijiye):", result.link);
+                                const successModal = document.getElementById('success-modal');
+                                const linkInput = document.getElementById('generated-link-input');
+                                if (successModal && linkInput) {
+                                    linkInput.value = result.link;
+                                    successModal.style.display = 'flex';
+                                }
                                 payBtn.innerText = "Link Generated ✔";
+                                payBtn.style.background = "#28a745";
                             } else {
                                 throw new Error(result.error);
                             }
@@ -861,3 +867,37 @@ window.showScreen = function(screenId) {
         muteToggleBtn.style.display = "flex";
     }
 };
+// ==========================================
+// 📋 PHASE 3: CLIPBOARD COPY LOGIC
+// ==========================================
+const copyLinkBtn = document.getElementById('copy-link-btn');
+if (copyLinkBtn) {
+    copyLinkBtn.addEventListener('click', () => {
+        const linkInput = document.getElementById('generated-link-input');
+        
+        // Select text safely for mobile browsers
+        linkInput.select();
+        linkInput.setSelectionRange(0, 99999);
+        
+        navigator.clipboard.writeText(linkInput.value).then(() => {
+            copyLinkBtn.innerText = "COPIED! ✔";
+            copyLinkBtn.style.background = "#218838";
+            
+            // Reset button text after 2 seconds
+            setTimeout(() => {
+                copyLinkBtn.innerText = "COPY 📋";
+                copyLinkBtn.style.background = "#28a745";
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            alert("Could not copy automatically. Please copy the link manually.");
+        });
+    });
+}
+
+const closeSuccessBtn = document.getElementById('close-success-btn');
+if (closeSuccessBtn) {
+    closeSuccessBtn.addEventListener('click', () => {
+        document.getElementById('success-modal').style.display = 'none';
+    });
+}
