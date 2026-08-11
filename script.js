@@ -990,3 +990,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+// 🚀 PHASE 3: LIGHTWEIGHT QR CODE PRE-LOADING
+// 1. We create a global variable so the Canvas in Phase 4/5 can access it instantly
+window.magicQRCode = new Image();
+
+// 2. CRITICAL FIX: We must allow Cross-Origin (CORS) or the Canvas will crash when trying to export!
+window.magicQRCode.crossOrigin = "Anonymous"; 
+
+// 3. We use a lightning-fast, library-free cloud API to generate the QR image.
+// Pointing exactly to your marketing strategy link: 10petalx.vercel.app
+window.magicQRCode.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://10petalx.vercel.app&margin=1";
+
+// 4. Silent Error Handling: If the network drops, it won't crash the site.
+window.magicQRCode.onerror = () => {
+    console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
+};
