@@ -1006,7 +1006,7 @@ window.magicQRCode.onerror = () => {
     console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
 };
 // ==========================================
-// 🚀 PHASE 4, 5 & 6: OFF-SCREEN CANVAS ENGINE, GRID & BRANDING
+// 🚀 PHASE 4, 5, 6 & 7: FULL CANVAS ENGINE & EXPORT
 // ==========================================
 async function generateMagicStoryImage() {
     const loadingText = document.getElementById('magic-loading-text');
@@ -1060,16 +1060,15 @@ async function generateMagicStoryImage() {
 
         // Grid Math
         const startX = 60; 
-        const startY = 180; // Moved up slightly to fit everything perfectly
+        const startY = 180; 
         const cellSize = 380; 
         const gap = 20;
 
-        // Draw Polaroid-style White Background (EXTENDED FOR PHASE 6)
+        // Draw Polaroid-style White Background 
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'rgba(233, 64, 87, 0.15)'; 
         ctx.shadowBlur = 40;
         ctx.shadowOffsetY = 15;
-        // Notice the height is dynamically larger to fit the QR and text
         ctx.fillRect(startX - 35, startY - 35, (cellSize * 2) + gap + 70, (cellSize * 2) + gap + 380);
         ctx.shadowColor = 'transparent'; 
 
@@ -1103,20 +1102,17 @@ async function generateMagicStoryImage() {
         // ==========================================
         const polaroidBottomY = startY + (cellSize * 2) + gap;
 
-        // 1. Draw "For [Name]" using your beautiful Caveat font
         ctx.textAlign = "center";
         ctx.fillStyle = "#2c3e50"; 
         ctx.font = "bold 80px 'Caveat', cursive"; 
         const partnerName = window.magicalState.partnerName || "Someone Special";
         ctx.fillText(`For ${partnerName}`, CANVAS_WIDTH / 2, polaroidBottomY + 110);
 
-        // 2. Draw the QR Code securely
         if (window.magicQRCode && window.magicQRCode.complete && window.magicQRCode.naturalWidth !== 0) {
             const qrSize = 140;
             const qrX = (CANVAS_WIDTH / 2) - (qrSize / 2);
             const qrY = polaroidBottomY + 160;
             
-            // Draw a cute rounded border frame for the QR Code
             ctx.fillStyle = "#ffffff";
             ctx.beginPath();
             ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 15);
@@ -1125,7 +1121,6 @@ async function generateMagicStoryImage() {
             ctx.drawImage(window.magicQRCode, qrX, qrY, qrSize, qrSize);
         }
 
-        // 3. Draw Footer Text (In the pink gradient area below the Polaroid)
         ctx.font = "600 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "rgba(233, 64, 87, 0.7)"; 
         ctx.fillText("Made with love on", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 100);
@@ -1134,9 +1129,47 @@ async function generateMagicStoryImage() {
         ctx.fillStyle = "#e94057";
         ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 50);
 
-        // --- NOTE: PHASE 7 (Export to UI) WILL GO HERE ---
+        // ==========================================
+        // 📥 PHASE 7: EXPORT & DOWNLOAD LOGIC
+        // ==========================================
+        
+        // 1. Extract as an optimized JPEG (85% quality to prevent lagging)
+        const finalDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        console.log("Phase 6: Branding and Assembly Complete! ✨");
+        // 2. Hide the loading text and reveal the image
+        if (loadingText) loadingText.style.display = 'none';
+        if (finalImg) {
+            finalImg.src = finalDataUrl;
+            finalImg.style.display = 'block';
+        }
+        
+        // 3. Safely map the download button
+        if (downloadBtn) {
+            downloadBtn.style.display = 'block';
+            
+            // Architecture Hack: Clone the button to wipe out old event listeners.
+            // This prevents the browser from downloading the file 5 times if she clicks it multiple times.
+            const newDownloadBtn = downloadBtn.cloneNode(true);
+            downloadBtn.parentNode.replaceChild(newDownloadBtn, downloadBtn);
+            
+            newDownloadBtn.addEventListener('click', () => {
+                const link = document.createElement('a');
+                // Naming it dynamically so she sees her name in her downloads folder
+                link.download = `Memories_For_${partnerName}.jpg`;
+                link.href = finalDataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cute UI Feedback
+                newDownloadBtn.innerHTML = '<span class="btn-text">Downloading... ✔️</span>';
+                setTimeout(() => {
+                    newDownloadBtn.innerHTML = '<span class="btn-text">📥 Download for Insta Story</span>';
+                }, 2000);
+            });
+        }
+
+        console.log("Phase 7: System Architecture Complete! The marketing loop is fully operational. ✨");
         
     } catch (error) {
         console.error("Canvas Generation Failed:", error);
