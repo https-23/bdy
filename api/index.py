@@ -167,7 +167,7 @@ def create_order():
         
         client = get_razorpay_client()
         razorpay_order = client.order.create({
-            "amount": 2900, # 🚀 CHANGED: Now set to ₹29
+            "amount": 4900, # 🚀 CHANGED: Now set to ₹29
             "currency": "INR",
             "payment_capture": 1
         })
