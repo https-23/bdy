@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 var options = {
                     "key": configData.razorpay_key_id, 
-                    "amount": "9900",
+                    "amount": "4900",
                     "currency": "INR",
                     "name": "Magical Surprises",
                     "order_id": order.id,
