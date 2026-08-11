@@ -5,6 +5,7 @@ import sys
 import datetime
 import traceback
 import logging 
+import requests # 🚀 ADDED: Required for making secure calls to ImgBB
 from unittest.mock import MagicMock
 from flask import Flask, request, jsonify
 
@@ -100,8 +101,6 @@ def validate_gift_payload(data):
     if not isinstance(images, dict) or len(images) > 4:
         raise ValueError("Invalid image payload. Maximum 4 images allowed.")
         
-    # 🚀 PHASE 6: Cloud URL Security Validation
-    # We now expect short ImgBB URLs instead of heavy Base64 strings
     for key, img_url in images.items():
         if img_url and len(str(img_url)) > 2000: 
             raise ValueError(f"Image link rejected. Payload size limit exceeded.")
@@ -123,6 +122,43 @@ def get_config():
         'razorpay_key_id': os.environ.get('RAZORPAY_KEY_ID', '')
     }), 200
 
+# 🚀 NEW ENDPOINT: SECURE IMAGE UPLOAD PROXY
+@app.route('/api/upload-image', methods=['POST'])
+def upload_image():
+    try:
+        data = request.json
+        base64_image = data.get('image')
+        
+        if not base64_image:
+            return jsonify({'error': 'No image provided'}), 400
+            
+        imgbb_key = os.environ.get('IMGBB_API_KEY')
+        if not imgbb_key:
+            return jsonify({'error': 'Server configuration error'}), 500
+            
+        # Send to ImgBB securely from the backend (10s timeout prevents hanging)
+        response = requests.post(
+            "https://api.imgbb.com/1/upload",
+            data={
+                "key": imgbb_key,
+                "image": base64_image
+            },
+            timeout=10 
+        )
+        
+        result = response.json()
+        
+        if result.get('success'):
+            return jsonify({'success': True, 'url': result['data']['url']}), 200
+        else:
+            if response.status_code == 429:
+                return jsonify({'error': 'Servers are busy with too much magic! Please try again in 60 seconds.'}), 429
+            return jsonify({'error': 'Cloud storage rejected the image.', 'details': result}), 400
+            
+    except Exception as e:
+        logger.error(f"Image Upload Error: {str(e)}")
+        return jsonify({'error': 'Failed to connect to image server.'}), 500
+
 @app.route('/api/create-order', methods=['POST'])
 def create_order():
     try:
@@ -131,13 +167,13 @@ def create_order():
         
         client = get_razorpay_client()
         razorpay_order = client.order.create({
-            "amount": 9900,
+            "amount": 2900, # 🚀 CHANGED: Now set to ₹29
             "currency": "INR",
             "payment_capture": 1
         })
         
         order_id = razorpay_order['id']
-        gift_id = str(uuid.uuid4()) # Backend generates the ID directly now
+        gift_id = str(uuid.uuid4())
         
         db = get_db()
         doc_data = {
@@ -148,13 +184,12 @@ def create_order():
             'main_wish': data.get('main_wish', ''),
             'audio_link': data.get('audio_link', ''),
             'scratch_msgs': data.get('scratch_msgs', {}),
-            'images': data.get('images', {}), # Saving lightweight ImgBB URLs
+            'images': data.get('images', {}),
             'created_at': datetime.datetime.utcnow(),
             'status': 'payment_pending' 
         }
         db.collection('magical_gifts').document(gift_id).set(doc_data)
 
-        # Return both the Razorpay order ID and the generated Gift ID to the frontend
         return jsonify({'id': order_id, 'gift_id': gift_id}), 200
         
     except ValueError as ve:
@@ -182,8 +217,6 @@ def verify_payment():
             
         validate_gift_payload(data)
         
-        # We only need to update the status and payment ID now, 
-        # since the data was already saved in create_order!
         db = get_db()
         db.collection('magical_gifts').document(unique_gift_id).update({
             'payment_id': data.get('payment_id'),
