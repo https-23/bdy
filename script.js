@@ -74,30 +74,31 @@ function extractYouTubeId(url) {
     return (match && match[2].length === 11) ? match[2] : null;
 }
 // ==========================================
-// 🚀 PHASE 1: FREE CLOUD STORAGE (ImgBB API)
+// 🚀 PHASE 1: SECURE CLOUD STORAGE (BACKEND PROXY)
 // ==========================================
-const IMGBB_API_KEY = '935c12ec57f6c4b599f4971a88669bf2'; // Replace with your free key
+// API Key removed for security! Backend handles it now.
 
 async function uploadToImgBB(base64Data) {
     try {
-        // Remove the data:image/jpeg;base64, prefix required for ImgBB
+        // Remove the data:image/jpeg;base64, prefix
         const base64String = base64Data.split(',')[1];
-        const formData = new FormData();
-        formData.append('image', base64String);
-
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+        
+        const response = await fetch('/api/upload-image', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64String })
         });
         
         const data = await response.json();
-        if (data.success) {
-            return data.data.url; // Returns the live image link
+        
+        if (response.ok && data.success) {
+            return data.url; // Returns the live image link securely
         } else {
-            throw new Error('Cloud storage rejected the image.');
+            // This catches rate-limit errors (429) gracefully
+            throw new Error(data.error || 'Server rejected the image.');
         }
     } catch (error) {
-        console.error("ImgBB Upload Error:", error);
+        console.error("Secure Upload Error:", error);
         throw error;
     }
 }
