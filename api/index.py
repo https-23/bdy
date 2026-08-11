@@ -143,7 +143,7 @@ def upload_image():
                 "key": imgbb_key,
                 "image": base64_image
             },
-            timeout=10 
+            timeout=8 
         )
         
         result = response.json()
