@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (error) {
                     console.error("Upload process failed:", error);
-                    alert("Could not upload this image to the cloud. Try a smaller photo.");
+                    alert(error.message || "Could not upload this image. Please try again.");
                     if (plusIcon) plusIcon.innerText = "+"; 
                 } finally {
                     e.target.value = ''; 
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
-                    payBtn.innerText = "Pay Now (₹99)";
+                    payBtn.innerText = "Pay Now (₹49)";
                     payBtn.disabled = false;
                 });
                 rzp.open();
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Error: " + error.message); 
-                payBtn.innerText = "Pay Now (₹99)";
+                payBtn.innerText = "Pay Now (₹49)";
                 payBtn.disabled = false;
             }
         });
