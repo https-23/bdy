@@ -956,3 +956,37 @@ function activatePostPayState(link) {
         }, 1000);
     }
 }
+// ==========================================
+// 🚀 PHASE 2: MEMORY MAGIC BUTTON & MODAL LOGIC
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Check if the user is the receiver (has a ?gift= ID in the URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    const giftId = urlParams.get('gift');
+    
+    const memoryMagicBtn = document.getElementById('memory-magic-btn');
+    const magicModal = document.getElementById('magic-story-modal');
+    const closeMagicBtn = document.getElementById('close-magic-modal');
+
+    // 2. Only reveal the button if it's the receiver viewing the gift
+    if (giftId && memoryMagicBtn) {
+        memoryMagicBtn.style.display = 'block';
+    }
+
+    // 3. Open the Modal when the Magic Button is clicked
+    if (memoryMagicBtn && magicModal) {
+        memoryMagicBtn.addEventListener('click', () => {
+            magicModal.style.display = 'flex'; // Show the Instagram popup
+            
+            // NOTE: We will trigger the Phase 4/5 Canvas Drawing Function here later!
+            console.log("Memory Magic Modal Opened! ✨");
+        });
+    }
+
+    // 4. Safely Close the Modal
+    if (closeMagicBtn && magicModal) {
+        closeMagicBtn.addEventListener('click', () => {
+            magicModal.style.display = 'none';
+        });
+    }
+});
