@@ -1006,7 +1006,7 @@ window.magicQRCode.onerror = () => {
     console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
 };
 // ==========================================
-// 🚀 PHASE 1: FAILSAFE STORY ENGINE & BIRTHDAY CANVAS
+// 🚀 THE ULTIMATE INSTA-VIBE STORY ENGINE (BUG-FREE & LAG-FREE)
 // ==========================================
 async function generateMagicStoryImage() {
     const loadingText = document.getElementById('magic-loading-text');
@@ -1032,27 +1032,25 @@ async function generateMagicStoryImage() {
         
         // 1. ROMANTIC BIRTHDAY BACKGROUND
         const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        gradient.addColorStop(0, '#fff0f5'); // Soft pink
-        gradient.addColorStop(1, '#ffe4e1'); // Deeper romantic pink
+        gradient.addColorStop(0, '#fff0f5'); 
+        gradient.addColorStop(1, '#ffe4e1'); 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Add subtle floating birthday/romantic elements in the background
-        ctx.globalAlpha = 0.4; // Make them soft and watermarked
+        // Subtle floating birthday emojis in the background
+        ctx.globalAlpha = 0.4; 
         ctx.font = "60px sans-serif";
         ctx.fillText("✨", 150, 200);
         ctx.fillText("💖", 900, 300);
-        ctx.fillText("🎂", 200, 1700);
+        ctx.fillText("🎂", 200, 1750);
         ctx.fillText("✨", 850, 1600);
-        ctx.globalAlpha = 1.0; // Reset transparency for the main card
+        ctx.globalAlpha = 1.0;
 
-        // 2. THE FAILSAFE IMAGE LOADER (Fixes the blank image bug)
+        // 2. FAILSAFE IMAGE LOADER
         const loadCanvasImage = (sourceUrl) => {
             return new Promise((resolve) => {
-                // BUG FIX: Completely ignore 1x1 transparent GIFs and SVG placeholders
                 if (!sourceUrl || sourceUrl.includes('data:image/svg+xml') || sourceUrl.includes('R0lGODlh')) {
-                    resolve(null);
-                    return;
+                    resolve(null); return;
                 }
                 const img = new Image();
                 img.crossOrigin = "Anonymous"; 
@@ -1072,29 +1070,57 @@ async function generateMagicStoryImage() {
 
         const loadedImages = await Promise.all(sourceUrls.map(loadCanvasImage));
 
-        // 3. THE UNCROPPABLE POLAROID CARD SETUP
+        // 3. THE WHITE INSTAGRAM POST CARD SETUP
         const gridPadding = 80;
         const cellSize = 440; 
         const gap = 40;
-        const startX = gridPadding;
-        const startY = 250; 
+        const startX = gridPadding + 10;
+        const startY = 320; // Pushed down to make room for Insta Header
 
-        // Taller card width/height to trap the marketing safely inside
+        // Calculate exact White Card dimensions
         const cardWidth = (cellSize * 2) + gap + 60;
-        const cardHeight = (cellSize * 2) + gap + 350; // Extra room at the bottom!
+        const cardHeight = (cellSize * 2) + gap + 340; // Fits Header, Grid, Icons, and Text
         const cardX = (CANVAS_WIDTH - cardWidth) / 2;
-        const cardY = startY - 30;
+        const cardY = startY - 120; // Card starts higher up for header
 
-        // Draw the crisp white card with a beautiful shadow
+        // Draw White Card
         ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(192, 57, 43, 0.15)';
-        ctx.shadowBlur = 60;
-        ctx.shadowOffsetY = 25;
+        ctx.shadowColor = 'rgba(192, 57, 43, 0.12)';
+        ctx.shadowBlur = 50;
+        ctx.shadowOffsetY = 15;
         ctx.beginPath();
         ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 35);
         ctx.fill();
         ctx.shadowColor = 'transparent'; 
 
+        // 4. FANTASTIC INSTAGRAM TOUCH: THE NATIVE UI
+        const partnerName = window.magicalState.partnerName || "Someone Special";
+        
+        // --- Insta Header ---
+        // Gradient Profile Ring
+        const igGrad = ctx.createLinearGradient(cardX + 30, cardY + 30, cardX + 100, cardY + 100);
+        igGrad.addColorStop(0, '#f09433'); igGrad.addColorStop(0.3, '#dc2743'); igGrad.addColorStop(1, '#bc1888');
+        ctx.strokeStyle = igGrad;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cardX + 65, cardY + 60, 26, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Grey Profile Pic inside Ring
+        ctx.fillStyle = '#efefef';
+        ctx.beginPath();
+        ctx.arc(cardX + 65, cardY + 60, 20, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Username & Menu Dots
+        ctx.font = "bold 32px 'Segoe UI', Roboto, sans-serif";
+        ctx.fillStyle = "#262626";
+        ctx.textAlign = "left";
+        ctx.fillText(partnerName.toLowerCase() + "_memories", cardX + 110, cardY + 70);
+        ctx.font = "bold 40px 'Segoe UI', Roboto, sans-serif";
+        ctx.fillText("⋮", cardX + cardWidth - 50, cardY + 70);
+
+        // 5. DRAW THE PHOTOS (2x2 Grid)
         const positions = [
             { x: cardX + 30, y: startY },
             { x: cardX + 30 + cellSize + gap, y: startY },
@@ -1102,11 +1128,9 @@ async function generateMagicStoryImage() {
             { x: cardX + 30 + cellSize + gap, y: startY + cellSize + gap }
         ];
 
-        // Draw photos cleanly
         loadedImages.forEach((img, index) => {
             const posX = positions[index].x;
             const posY = positions[index].y;
-
             if (img) {
                 const scale = Math.max(cellSize / img.width, cellSize / img.height);
                 const drawW = img.width * scale;
@@ -1116,55 +1140,66 @@ async function generateMagicStoryImage() {
 
                 ctx.save();
                 ctx.beginPath();
-                ctx.roundRect(posX, posY, cellSize, cellSize, 20);
+                ctx.roundRect(posX, posY, cellSize, cellSize, 16); // Slightly rounded inner photos
                 ctx.clip();
                 ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
                 ctx.restore();
             } else {
                 ctx.fillStyle = '#fce4ec';
                 ctx.beginPath();
-                ctx.roundRect(posX, posY, cellSize, cellSize, 20);
+                ctx.roundRect(posX, posY, cellSize, cellSize, 16);
                 ctx.fill();
             }
         });
 
-        // ==========================================
-        // 🛑 PHASE 2 WILL BE PASTED DIRECTLY BELOW THIS LINE
-        // ==========================================
-        // ==========================================
-        // 🚀 PHASE 2: THE UNCROPPABLE MARKETING TRAP & EXPORT
-        // ==========================================
+        // --- Insta Footer (Action Buttons & Greeting) ---
+        const footerY = startY + (cellSize * 2) + gap + 60;
         
-        // 4. EMOTIONAL TYPOGRAPHY ("For Sana 💖")
-        const textStartY = startY + (cellSize * 2) + gap + 100;
-        const partnerName = window.magicalState.partnerName || "Someone Special";
+        // Action Icons (Heart, Chat, Share)
+        ctx.font = "45px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("❤️  💬  ⌲", cardX + 30, footerY);
         
+        // Bookmark Icon on right
+        ctx.textAlign = "right";
+        ctx.fillText("🔖", cardX + cardWidth - 30, footerY);
+
+        // Greeting Text inside Card
         ctx.textAlign = "center";
         ctx.fillStyle = "#880e4f";
-        ctx.font = "700 90px 'Caveat', cursive";
-        ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, textStartY);
+        ctx.font = "700 85px 'Caveat', cursive";
+        ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, footerY + 110);
 
-        // 5. THE MARKETING TRAP (Inside the white card, impossible to crop without ruining the photo)
-        const qrSize = 100; // Perfect medium size. Not an eyesore, but scannable.
-        const qrX = (CANVAS_WIDTH / 2) - (qrSize / 2);
-        const qrY = textStartY + 35;
+        // ==========================================
+        // 🎯 6. MARKETING PLACEMENT (Directly BELOW the white card)
+        // ==========================================
+        const marketingStartY = cardY + cardHeight + 40; // Starts right under the card
 
         // Draw QR Code
+        const qrSize = 130; 
+        const qrX = (CANVAS_WIDTH / 2) - (qrSize / 2);
+        
         if (window.magicQRCode && window.magicQRCode.complete && window.magicQRCode.naturalWidth !== 0) {
-            ctx.drawImage(window.magicQRCode, qrX, qrY, qrSize, qrSize);
+            // Cute white background behind QR
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.roundRect(qrX - 10, marketingStartY, qrSize + 20, qrSize + 20, 15);
+            ctx.fill();
+            ctx.drawImage(window.magicQRCode, qrX, marketingStartY + 10, qrSize, qrSize);
         }
 
-        // Clean link directly below the QR code (Still inside the white card!)
-        ctx.font = "bold 35px 'Fredoka', sans-serif";
+        // Links and Text below QR
+        ctx.font = "bold 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "#c0392b";
-        ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, qrY + qrSize + 45);
+        ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60);
 
-        // Subtle tagline to trigger curiosity from her friends
         ctx.font = "500 24px 'Fredoka', sans-serif";
-        ctx.fillStyle = "rgba(136, 14, 79, 0.6)";
-        ctx.fillText("Create your own surprise ✨", CANVAS_WIDTH / 2, qrY + qrSize + 85);
+        ctx.fillStyle = "rgba(136, 14, 79, 0.7)";
+        ctx.fillText("Create your own surprise ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 95);
 
-        // 6. EXPORT ENGINE (Optimized JPEG = Zero Lag / Fast Load)
+        // ==========================================
+        // 📥 7. EXPORT ENGINE (Zero Lag)
+        // ==========================================
         const finalDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
         if (loadingText) loadingText.style.display = 'none';
@@ -1175,8 +1210,6 @@ async function generateMagicStoryImage() {
 
         if (downloadBtn) {
             downloadBtn.style.display = 'block';
-            
-            // Clone button to prevent memory leak crashes if clicked multiple times
             const newDownloadBtn = downloadBtn.cloneNode(true);
             downloadBtn.parentNode.replaceChild(newDownloadBtn, downloadBtn);
 
@@ -1188,14 +1221,13 @@ async function generateMagicStoryImage() {
                 link.click();
                 document.body.removeChild(link);
 
-                // Cute UI Feedback without lagging the page
                 newDownloadBtn.innerHTML = '<span class="btn-text">Saved to Gallery! 💖</span>';
                 setTimeout(() => {
                     newDownloadBtn.innerHTML = '<span class="btn-text">📥 Download for Insta Story</span>';
                 }, 2500);
             });
         }
-        
+
     } catch (error) {
         console.error("Story Engine Error:", error);
         if (loadingText) loadingText.innerText = "Could not render story image. Please try again.";
