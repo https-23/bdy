@@ -978,8 +978,8 @@ document.addEventListener("DOMContentLoaded", () => {
         memoryMagicBtn.addEventListener('click', () => {
             magicModal.style.display = 'flex'; // Show the Instagram popup
             
-            // NOTE: We will trigger the Phase 4/5 Canvas Drawing Function here later!
-            console.log("Memory Magic Modal Opened! ✨");
+            // Safely trigger the heavy lifting in the background
+            generateMagicStoryImage();
         });
     }
 
@@ -1005,3 +1005,46 @@ window.magicQRCode.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x2
 window.magicQRCode.onerror = () => {
     console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
 };
+// ==========================================
+// 🚀 PHASE 4: OFF-SCREEN CANVAS ENGINE
+// ==========================================
+async function generateMagicStoryImage() {
+    const loadingText = document.getElementById('magic-loading-text');
+    const finalImg = document.getElementById('final-magic-img');
+    const downloadBtn = document.getElementById('download-magic-btn');
+    
+    // 1. Reset the UI state safely
+    if (loadingText) {
+        loadingText.style.display = 'block';
+        loadingText.innerText = "Generating Magic... ⏳";
+    }
+    if (finalImg) finalImg.style.display = 'none';
+    if (downloadBtn) downloadBtn.style.display = 'none';
+
+    try {
+        // 2. Create the invisible drawing board (Off-DOM = Zero UI Lag)
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 3. Optimized Resolution (900x1600) for zero crashes on cheap phones
+        const CANVAS_WIDTH = 900;
+        const CANVAS_HEIGHT = 1600;
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+        
+        // 4. Draw the base background (Matching your premium gradient)
+        const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        gradient.addColorStop(0, '#ffe6ea'); 
+        gradient.addColorStop(1, '#fdfbfb'); 
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // --- NOTE: PHASE 5 (Photos) & PHASE 6 (QR & Text) WILL GO HERE ---
+
+        console.log("Phase 4: Invisible Canvas prepared successfully! ✨");
+        
+    } catch (error) {
+        console.error("Canvas Generation Failed:", error);
+        if (loadingText) loadingText.innerText = "System Error: Could not generate magic.";
+    }
+}
