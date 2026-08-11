@@ -1006,17 +1006,16 @@ window.magicQRCode.onerror = () => {
     console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
 };
 // ==========================================
-// 🚀 PHASE 4, 5, 6 & 7: FULL CANVAS ENGINE & EXPORT
+// 🚀 REVISED STORY GENERATOR ENGINE (CUSTOMER-FIRST DESIGN)
 // ==========================================
 async function generateMagicStoryImage() {
     const loadingText = document.getElementById('magic-loading-text');
     const finalImg = document.getElementById('final-magic-img');
     const downloadBtn = document.getElementById('download-magic-btn');
     
-    // 1. Reset the UI state safely
     if (loadingText) {
         loadingText.style.display = 'block';
-        loadingText.innerText = "Generating Magic... ⏳";
+        loadingText.innerText = "Crafting Your Story... ✨";
     }
     if (finalImg) finalImg.style.display = 'none';
     if (downloadBtn) downloadBtn.style.display = 'none';
@@ -1025,154 +1024,172 @@ async function generateMagicStoryImage() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Optimized Resolution (900x1600) for zero crashes
-        const CANVAS_WIDTH = 900;
-        const CANVAS_HEIGHT = 1600;
+        // Exact 9:16 Instagram Story Canvas Ratio
+        const CANVAS_WIDTH = 1080;
+        const CANVAS_HEIGHT = 1920;
         canvas.width = CANVAS_WIDTH;
         canvas.height = CANVAS_HEIGHT;
         
-        // Draw the base gradient background
+        // 1. Soft Warm Aesthetic Background
         const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        gradient.addColorStop(0, '#ffe6ea'); 
-        gradient.addColorStop(1, '#fdfbfb'); 
+        gradient.addColorStop(0, '#fff5f7'); 
+        gradient.addColorStop(1, '#ffebee'); 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // ==========================================
-        // 📸 PHASE 5: THE INSTAGRAM GRID
-        // ==========================================
-        const loadCanvasImage = (url) => {
+        // Helper function to resolve dynamic image sources robustly
+        const loadCanvasImage = (sourceUrl) => {
             return new Promise((resolve) => {
-                if (!url || url.includes('data:image/svg+xml')) { resolve(null); return; }
+                if (!sourceUrl || sourceUrl.includes('data:image/svg+xml')) {
+                    resolve(null);
+                    return;
+                }
                 const img = new Image();
                 img.crossOrigin = "Anonymous"; 
                 img.onload = () => resolve(img);
-                img.onerror = () => { resolve(null); };
-                img.src = url;
+                img.onerror = () => resolve(null);
+                img.src = sourceUrl;
             });
         };
 
-        const imgUrls = [
-            window.magicalState.images[0], window.magicalState.images[1],
-            window.magicalState.images[2], window.magicalState.images[3]
+        // Pull images directly from receiver state OR DOM gallery elements as fallback
+        const galleryElements = document.querySelectorAll('.gallery-img');
+        const sourceUrls = [
+            window.magicalState.images[0] || galleryElements[0]?.src || galleryElements[0]?.getAttribute('data-lazy-src'),
+            window.magicalState.images[1] || galleryElements[1]?.src || galleryElements[1]?.getAttribute('data-lazy-src'),
+            window.magicalState.images[2] || galleryElements[2]?.src || galleryElements[2]?.getAttribute('data-lazy-src'),
+            window.magicalState.images[3] || galleryElements[3]?.src || galleryElements[3]?.getAttribute('data-lazy-src')
         ];
-        const loadedImages = await Promise.all(imgUrls.map(loadCanvasImage));
 
-        // Grid Math
-        const startX = 60; 
-        const startY = 180; 
-        const cellSize = 380; 
-        const gap = 20;
+        const loadedImages = await Promise.all(sourceUrls.map(loadCanvasImage));
 
-        // Draw Polaroid-style White Background 
+        // 2. HERO GRID SETUP (Maximizing Photo Scale)
+        const gridPadding = 80;
+        const cellSize = 440; // Massive high-res photo cells
+        const gap = 40;
+        const startX = gridPadding;
+        const startY = 220; // Top aligned for aesthetic breathing room
+
+        // Draw Polaroid-Style Card Frame
+        const cardWidth = (cellSize * 2) + gap + 60;
+        const cardHeight = (cellSize * 2) + gap + 180;
+        const cardX = (CANVAS_WIDTH - cardWidth) / 2;
+        const cardY = startY - 30;
+
         ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(233, 64, 87, 0.15)'; 
-        ctx.shadowBlur = 40;
-        ctx.shadowOffsetY = 15;
-        ctx.fillRect(startX - 35, startY - 35, (cellSize * 2) + gap + 70, (cellSize * 2) + gap + 380);
-        ctx.shadowColor = 'transparent'; 
+        ctx.shadowColor = 'rgba(192, 57, 43, 0.12)';
+        ctx.shadowBlur = 50;
+        ctx.shadowOffsetY = 20;
+        
+        // Rounded soft card container
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 30);
+        ctx.fill();
+        ctx.shadowColor = 'transparent'; // Reset shadow
 
         const positions = [
-            { x: startX, y: startY }, { x: startX + cellSize + gap, y: startY },
-            { x: startX, y: startY + cellSize + gap }, { x: startX + cellSize + gap, y: startY + cellSize + gap }
+            { x: cardX + 30, y: startY },
+            { x: cardX + 30 + cellSize + gap, y: startY },
+            { x: cardX + 30, y: startY + cellSize + gap },
+            { x: cardX + 30 + cellSize + gap, y: startY + cellSize + gap }
         ];
 
+        // Draw photos into rounded cells with object-fit: cover
         loadedImages.forEach((img, index) => {
+            const posX = positions[index].x;
+            const posY = positions[index].y;
+
             if (img) {
                 const scale = Math.max(cellSize / img.width, cellSize / img.height);
                 const drawW = img.width * scale;
                 const drawH = img.height * scale;
-                const offsetX = positions[index].x + (cellSize - drawW) / 2;
-                const offsetY = positions[index].y + (cellSize - drawH) / 2;
+                const offsetX = posX + (cellSize - drawW) / 2;
+                const offsetY = posY + (cellSize - drawH) / 2;
 
                 ctx.save();
                 ctx.beginPath();
-                ctx.rect(positions[index].x, positions[index].y, cellSize, cellSize); 
-                ctx.clip(); 
+                ctx.roundRect(posX, posY, cellSize, cellSize, 16);
+                ctx.clip();
                 ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
                 ctx.restore();
             } else {
-                ctx.fillStyle = '#f8f9fa';
-                ctx.fillRect(positions[index].x, positions[index].y, cellSize, cellSize);
+                // Elegant fallback state if no image exists
+                ctx.fillStyle = '#fce4ec';
+                ctx.beginPath();
+                ctx.roundRect(posX, posY, cellSize, cellSize, 16);
+                ctx.fill();
+                ctx.fillStyle = '#f48fb1';
+                ctx.font = "bold 50px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("🌸", posX + cellSize / 2, posY + cellSize / 2 + 15);
             }
         });
 
-        // ==========================================
-        // 🎨 PHASE 6: BRANDING, TEXT & QR CODE
-        // ==========================================
-        const polaroidBottomY = startY + (cellSize * 2) + gap;
-
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#2c3e50"; 
-        ctx.font = "bold 80px 'Caveat', cursive"; 
+        // 3. EMOTIONAL TYPOGRAPHY (The Main Highlight)
+        const polaroidTextY = cardY + cardHeight - 65;
         const partnerName = window.magicalState.partnerName || "Someone Special";
-        ctx.fillText(`For ${partnerName}`, CANVAS_WIDTH / 2, polaroidBottomY + 110);
+        
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#880e4f";
+        ctx.font = "700 85px 'Caveat', cursive";
+        ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, polaroidTextY);
 
+        // 4. SUBTLE & ELEGANT MARKETING FOOTER (Non-Intrusive)
+        const footerCenterY = 1680;
+
+        // Micro QR Code
         if (window.magicQRCode && window.magicQRCode.complete && window.magicQRCode.naturalWidth !== 0) {
-            const qrSize = 140;
+            const qrSize = 90; // Compact, clean, non-distracting
             const qrX = (CANVAS_WIDTH / 2) - (qrSize / 2);
-            const qrY = polaroidBottomY + 160;
-            
+            const qrY = footerCenterY - 40;
+
             ctx.fillStyle = "#ffffff";
             ctx.beginPath();
-            ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 15);
+            ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
             ctx.fill();
-            
             ctx.drawImage(window.magicQRCode, qrX, qrY, qrSize, qrSize);
         }
 
-        ctx.font = "600 32px 'Fredoka', sans-serif";
-        ctx.fillStyle = "rgba(233, 64, 87, 0.7)"; 
-        ctx.fillText("Made with love on", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 100);
-        
-        ctx.font = "bold 38px 'Fredoka', sans-serif";
-        ctx.fillStyle = "#e94057";
-        ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, CANVAS_HEIGHT - 50);
+        // Clean Branding Text Below QR
+        ctx.font = "500 28px 'Fredoka', sans-serif";
+        ctx.fillStyle = "rgba(136, 14, 79, 0.6)";
+        ctx.fillText("Create your surprise at", CANVAS_WIDTH / 2, footerCenterY + 80);
 
-        // ==========================================
-        // 📥 PHASE 7: EXPORT & DOWNLOAD LOGIC
-        // ==========================================
-        
-        // 1. Extract as an optimized JPEG (85% quality to prevent lagging)
-        const finalDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        ctx.font = "bold 32px 'Fredoka', sans-serif";
+        ctx.fillStyle = "#c0392b";
+        ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, footerCenterY + 120);
 
-        // 2. Hide the loading text and reveal the image
+        // 5. EXPORT ENGINE
+        const finalDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
         if (loadingText) loadingText.style.display = 'none';
         if (finalImg) {
             finalImg.src = finalDataUrl;
             finalImg.style.display = 'block';
         }
-        
-        // 3. Safely map the download button
+
         if (downloadBtn) {
             downloadBtn.style.display = 'block';
-            
-            // Architecture Hack: Clone the button to wipe out old event listeners.
-            // This prevents the browser from downloading the file 5 times if she clicks it multiple times.
             const newDownloadBtn = downloadBtn.cloneNode(true);
             downloadBtn.parentNode.replaceChild(newDownloadBtn, downloadBtn);
-            
+
             newDownloadBtn.addEventListener('click', () => {
                 const link = document.createElement('a');
-                // Naming it dynamically so she sees her name in her downloads folder
-                link.download = `Memories_For_${partnerName}.jpg`;
+                link.download = `Memory_Magic_${partnerName}.jpg`;
                 link.href = finalDataUrl;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
-                // Cute UI Feedback
-                newDownloadBtn.innerHTML = '<span class="btn-text">Downloading... ✔️</span>';
+
+                newDownloadBtn.innerHTML = '<span class="btn-text">Saved to Gallery! 💖</span>';
                 setTimeout(() => {
                     newDownloadBtn.innerHTML = '<span class="btn-text">📥 Download for Insta Story</span>';
-                }, 2000);
+                }, 2500);
             });
         }
 
-        console.log("Phase 7: System Architecture Complete! The marketing loop is fully operational. ✨");
-        
     } catch (error) {
-        console.error("Canvas Generation Failed:", error);
-        if (loadingText) loadingText.innerText = "System Error: Could not generate magic.";
+        console.error("Story Engine Error:", error);
+        if (loadingText) loadingText.innerText = "Could not render story image. Please try again.";
     }
 }
