@@ -1048,3 +1048,126 @@ async function generateMagicStoryImage() {
         if (loadingText) loadingText.innerText = "System Error: Could not generate magic.";
     }
 }
+// ==========================================
+// 🚀 PHASE 4 & 5: OFF-SCREEN CANVAS ENGINE & GRID
+// ==========================================
+async function generateMagicStoryImage() {
+    const loadingText = document.getElementById('magic-loading-text');
+    const finalImg = document.getElementById('final-magic-img');
+    const downloadBtn = document.getElementById('download-magic-btn');
+    
+    // 1. Reset the UI state safely
+    if (loadingText) {
+        loadingText.style.display = 'block';
+        loadingText.innerText = "Generating Magic... ⏳";
+    }
+    if (finalImg) finalImg.style.display = 'none';
+    if (downloadBtn) downloadBtn.style.display = 'none';
+
+    try {
+        // 2. Create the invisible drawing board (Off-DOM = Zero UI Lag)
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 3. Optimized Resolution (900x1600) for zero crashes on cheap phones
+        const CANVAS_WIDTH = 900;
+        const CANVAS_HEIGHT = 1600;
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+        
+        // 4. Draw the base background (Matching your premium gradient)
+        const gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        gradient.addColorStop(0, '#ffe6ea'); 
+        gradient.addColorStop(1, '#fdfbfb'); 
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // ==========================================
+        // 📸 PHASE 5: THE INSTAGRAM GRID RENDERING
+        // ==========================================
+
+        // Helper function to load images securely and prevent CORS crashing
+        const loadCanvasImage = (url) => {
+            return new Promise((resolve) => {
+                if (!url || url.includes('data:image/svg+xml')) {
+                    resolve(null); // Skip empty placeholders
+                    return;
+                }
+                const img = new Image();
+                img.crossOrigin = "Anonymous"; // CRITICAL: Prevents Tainted Canvas security crashes
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn("⚠️ Image failed to load on canvas:", url);
+                    resolve(null); // Silent fail to prevent site freeze
+                };
+                img.src = url;
+            });
+        };
+
+        // Fetch the 4 images from the receiver's loaded state
+        const imgUrls = [
+            window.magicalState.images[0],
+            window.magicalState.images[1],
+            window.magicalState.images[2],
+            window.magicalState.images[3]
+        ];
+
+        // Load all 4 images in parallel (Super fast)
+        const loadedImages = await Promise.all(imgUrls.map(loadCanvasImage));
+
+        // Grid Configuration & Mathematics
+        const startX = 60; 
+        const startY = 280; 
+        const cellSize = 380; 
+        const gap = 20;
+
+        // Draw Polaroid-style White Background for Grid to make it pop
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(233, 64, 87, 0.15)'; // Soft pink shadow
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 15;
+        // Padding around the grid
+        ctx.fillRect(startX - 25, startY - 25, (cellSize * 2) + gap + 50, (cellSize * 2) + gap + 50);
+        ctx.shadowColor = 'transparent'; // Reset shadow so photos don't glow
+
+        // Define exact X, Y coordinates for the 4 grid blocks
+        const positions = [
+            { x: startX, y: startY },                                      // Top Left
+            { x: startX + cellSize + gap, y: startY },                     // Top Right
+            { x: startX, y: startY + cellSize + gap },                     // Bottom Left
+            { x: startX + cellSize + gap, y: startY + cellSize + gap }     // Bottom Right
+        ];
+
+        // Draw the photos cleanly
+        loadedImages.forEach((img, index) => {
+            if (img) {
+                // NATIVE OBJECT-FIT: COVER MATHEMATICS
+                // This ensures non-square photos don't look stretched or squeezed
+                const scale = Math.max(cellSize / img.width, cellSize / img.height);
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+                const offsetX = positions[index].x + (cellSize - drawW) / 2;
+                const offsetY = positions[index].y + (cellSize - drawH) / 2;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(positions[index].x, positions[index].y, cellSize, cellSize); // Restrict drawing to exact grid cell
+                ctx.clip(); 
+                ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                ctx.restore();
+            } else {
+                // Safe Fallback if a photo slot was empty
+                ctx.fillStyle = '#f8f9fa';
+                ctx.fillRect(positions[index].x, positions[index].y, cellSize, cellSize);
+            }
+        });
+
+        // --- NOTE: PHASE 6 (Branding, Text & QR) & PHASE 7 (Export) WILL GO HERE ---
+
+        console.log("Phase 5: Instagram Grid rendered beautifully! ✨");
+        
+    } catch (error) {
+        console.error("Canvas Generation Failed:", error);
+        if (loadingText) loadingText.innerText = "System Error: Could not generate magic.";
+    }
+}
