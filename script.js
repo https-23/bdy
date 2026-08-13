@@ -79,24 +79,10 @@ function extractYouTubeId(url) {
 // API Key removed for security! Backend handles it now.
 
 async function uploadToImgBB(base64Data) {
-    try {
-        // Remove the data:image/jpeg;base64, prefix
-        const base64String = base64Data.split(',')[1];
-        
-        const response = await fetch('/api/upload-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: base64String })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            return data.url; // Returns the live image link securely
-        } else {
-            // This catches rate-limit errors (429) gracefully
-            throw new Error(data.error || 'Server rejected the image.');
-        }
+    // 🚀 PHASE 3 MAGIC: Bypassing ImgBB entirely!
+    // We return the highly compressed Base64 image directly.
+    // It will be saved securely into your free Cloudflare R2 bucket.
+    return base64Data;
     } catch (error) {
         console.error("Secure Upload Error:", error);
         throw error;
