@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Make Her Surprise ✨</title>
+    <script>
+        // If the URL contains a gift ID, instantly inject CSS to hide the form and pay button
+        if (window.location.search.includes('gift=')) {
+            document.write('<style>#order-form-container, #pay-now-btn { display: none !important; }</style>');
+        }
+    </script>
     
     <meta property="og:title" content="A Special Surprise for You ✨">
     <meta property="og:description" content="I made something unique to bring a big smile to your face today. Tap to open your surprise! 🌸">
@@ -13,7 +19,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
+    
     
     <!-- Razorpay API -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -410,6 +417,7 @@
     <audio id="pop-sound" src="pop.mp3" preload="auto"></audio>
     <audio id="scratch-sound" src="scratch.mp3" preload="auto"></audio>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
+    
 </body>
 </html>
