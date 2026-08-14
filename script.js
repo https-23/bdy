@@ -83,11 +83,8 @@ async function uploadToImgBB(base64Data) {
     // We return the highly compressed Base64 image directly.
     // It will be saved securely into your free Cloudflare R2 bucket.
     return base64Data;
-    } catch (error) {
-        console.error("Secure Upload Error:", error);
-        throw error;
-    }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- PHOTO UPLOAD LOGIC (UPDATED FOR CLOUD STORAGE) ---
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
@@ -212,14 +209,14 @@ document.addEventListener('DOMContentLoaded', () => {
             payBtn.disabled = true;
 
             try {
-                const configRes = await fetch('/api/config');
+                const configRes = await fetch('https://magical-api.finnrobby23.workers.dev/api/config');
                 const configData = await configRes.json();
                 if (!configData.razorpay_key_id) {
                     throw new Error("Razorpay Key ID missing from server configuration.");
                 }
 
                 payBtn.innerText = "Initializing Payment...";
-                const orderRes = await fetch('/api/create-order', { 
+                const orderRes = await fetch('https://magical-api.finnrobby23.workers.dev/api/create-order', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -244,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "handler": async function (payment_response) {
                         payBtn.innerText = "Verifying Magic..."; 
                         try {
-                            const verifyRes = await fetch('/api/verify-and-generate-link', {
+                            const verifyRes = await fetch('https://magical-api.finnrobby23.workers.dev/api/verify-and-generate-link', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -761,7 +758,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (preloader) { preloader.style.opacity = '1'; preloader.style.visibility = 'visible'; }
         
         try {
-            const response = await fetch(`/api/get-gift/${giftId}`);
+            const response = await fetch(`https://magical-api.finnrobby23.workers.dev/api/get-gift/${giftId}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
             
