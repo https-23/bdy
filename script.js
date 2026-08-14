@@ -737,7 +737,6 @@ if (archeryScreen) {
         }, 350); 
     });
 }
-
 // ==========================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
 // ==========================================
@@ -795,11 +794,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
             } else {
-                alert("Oops! This magical link seems broken or has expired.");
+                // 🛑 NEW HARD STOP: Wipe the screen if link is broken
+                document.body.innerHTML = `
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #ffe6ea; font-family: sans-serif; text-align: center; padding: 20px;">
+                        <h1 style="color: #c0392b; font-size: 3rem; margin-bottom: 10px;">Oops! 🥀</h1>
+                        <p style="color: #5d4037; font-size: 1.2rem;">This magical link is broken, expired, or the payment was not completed.</p>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error("Failed to load gift data:", error);
-            alert("Error loading the surprise. Please refresh the page.");
+            // 🛑 NEW HARD STOP FOR NETWORK ERRORS
+            document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #ffe6ea; font-family: sans-serif; text-align: center; padding: 20px;">
+                    <h1 style="color: #c0392b; font-size: 3rem; margin-bottom: 10px;">Connection Error 🔌</h1>
+                    <p style="color: #5d4037; font-size: 1.2rem;">We couldn't connect to the magic servers. Please refresh the page.</p>
+                </div>
+            `;
         } finally {
             if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
         }
