@@ -21,6 +21,7 @@ window.magicalState = {
     partnerName: "",
     userName: "",
     envelopeMsg: "",
+    envelopeQuestion: "", // 🚀 NEW: Tracks the selected envelope question
     mainWish: "",
     audioLink: "",
     images: { 0: null, 1: null, 2: null, 3: null },
@@ -86,6 +87,28 @@ async function uploadToImgBB(base64Data) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+        // --- 🚀 NEW: RADIO PILL UI LOGIC ---
+    const radioInputs = document.querySelectorAll('input[name="envelope_question"]');
+    const customBox = document.getElementById('custom-question-box');
+    
+    radioInputs.forEach(input => {
+        input.addEventListener('change', (e) => {
+            // Remove active class from all pills
+            document.querySelectorAll('.radio-pill').forEach(pill => pill.classList.remove('active'));
+            
+            // Add active class to the selected parent label
+            e.target.closest('.radio-pill').classList.add('active');
+            
+            // Show/Hide custom input box with 0-lag CSS display toggle
+            if (e.target.value === 'custom') {
+                customBox.style.display = 'flex';
+                // Small trick to ensure focus
+                setTimeout(() => document.getElementById('envelope-msg').focus(), 50);
+            } else {
+                customBox.style.display = 'none';
+            }
+        });
+    });
     // --- PHOTO UPLOAD LOGIC (UPDATED FOR CLOUD STORAGE) ---
     const photoInputs = document.querySelectorAll('.photo-upload-box input[type="file"]');
     photoInputs.forEach((input, index) => {
