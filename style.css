@@ -372,7 +372,7 @@ button.heartNext {
     position: absolute;
     bottom: 10px;
     width: 90%;
-    height: 160px;
+    height: 170px; /* Slightly taller for the new formatting */
     background: #fdf5c9;
     padding: 15px;
     box-sizing: border-box;
@@ -381,6 +381,11 @@ button.heartNext {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 2; 
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+    display: flex;             /* 🚀 NEW: Flexbox for centering */
+    flex-direction: column;    /* 🚀 NEW */
+    justify-content: center;   /* 🚀 NEW */
+    align-items: center;       /* 🚀 NEW */
+    text-align: center;        /* 🚀 NEW */
 }
 .letter p { 
     font-family: var(--font-heading); 
