@@ -107,12 +107,40 @@
     </label>
 </div>
 
+    <!-- =========================================
+         PICK YOUR QUESTION (4-OPTION SELECTOR)
+         ========================================= -->
+    <p class="section-label">PICK YOUR QUESTION 💌</p>
+    <div class="question-selector-group">
+        <label class="radio-pill active">
+            <input type="radio" name="envelope_question" value="Will you be my girlfriend?" checked>
+            <span class="custom-radio"></span>
+            <span class="pill-text">Will you be my girlfriend?</span>
+        </label>
 
-    <!-- Envelope Message -->
-    <p class="section-label">ENVELOPE MESSAGE</p>
-    <div class="envelope-box">
-        <span class="rose-icon">🌹</span>
-        <input type="text" id="envelope-msg" placeholder="Short cute message for the cover...">
+        <label class="radio-pill">
+            <input type="radio" name="envelope_question" value="Will you forever be mine?">
+            <span class="custom-radio"></span>
+            <span class="pill-text">Will you forever be mine?</span>
+        </label>
+
+        <label class="radio-pill">
+            <input type="radio" name="envelope_question" value="Do you still Love me?">
+            <span class="custom-radio"></span>
+            <span class="pill-text">Do you still Love me?</span>
+        </label>
+
+        <label class="radio-pill" id="custom-option-pill">
+            <input type="radio" name="envelope_question" value="custom">
+            <span class="custom-radio"></span>
+            <span class="pill-text">Write your own...</span>
+        </label>
+    </div>
+
+    <!-- Dynamic Custom Question Input (Hidden by default) -->
+    <div id="custom-question-box" class="envelope-box" style="display: none; margin-top: 10px;">
+        <span class="rose-icon">✍️</span>
+        <input type="text" id="envelope-msg" placeholder="Type your custom question here...">
         <span class="rose-icon">🌹</span>
     </div>
 
@@ -251,24 +279,55 @@
                 <img class="cake" src="birthday.penguin.gif" alt="Cake" loading="lazy">
                 <button class="heartNext">❤️</button>
             </section>
+            
+        <!-- =========================================
+             SCREEN 4: THE INTERACTIVE QUESTION ARENA
+             ========================================= -->
+        <section class="screen" id="screen4">
+            <button class="backBtn" data-back="screen3">⬅️</button>
+            
+            <!-- Top Reaction Penguin Slot -->
+            <div class="reaction-penguin-wrapper">
+                <img id="envelope-reaction-gif" class="character reaction-penguin" src="celeb-penguin.gif" alt="Penguin Reaction" loading="lazy">
+            </div>
 
-            <section class="screen" id="screen4">
-                <button class="backBtn" data-back="screen3">⬅️</button>
-                <img class="character" src="celeb-penguin.gif" alt="Penguin celebration" loading="lazy" style="height: 110px; margin-top: 10px; margin-bottom: 5px;">
-                <h1>Open Me, One Surprise at a Time 💌</h1>
-                <div class="envelope-wrapper" id="envelope-wrapper">
-                    <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
-                    <div class="envelope">
-                        <div class="letter">
-                            <p>Happy Birthday! 🌸<br>I wanted to make something different that could bring a big smile to your face today. Hope you like this little surprise!</p>
-                        </div>
-                        <div class="envelope-front"></div>
+            <h1 id="screen4-title">Open Me, One Surprise at a Time 💌</h1>
+
+            <!-- Interactive Envelope -->
+            <div class="envelope-wrapper" id="envelope-wrapper">
+                <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
+                <div class="envelope">
+                    <div class="letter">
+                        <p id="envelope-letter-text">Will you be my girlfriend? 💖<br><br>Hope you like this little surprise!</p>
                     </div>
+                    <div class="envelope-front"></div>
                 </div>
-                <p class="click-hint">Tap on envelope to open 👆</p>
-                <button class="next" id="envelopeNextBtn" style="display: none;">Next →</button>
-            </section>
+            </div>
+            
+            <p class="click-hint">Tap on envelope to open 👆</p>
 
+            <!-- Evasive Decision Arena (Hidden until envelope opens) -->
+            <div id="evasion-arena" class="evasion-arena" style="display: none;">
+                <!-- Yes Button (Fixed Anchor) -->
+                <button id="envelopeYesBtn" class="magic-btn arena-yes-btn">
+                    <span class="btn-text">YES 💖</span>
+                </button>
+
+                <!-- No Button (Evasive Physics Target) -->
+                <button id="envelopeNoBtn" class="magic-btn arena-no-btn">
+                    <span class="btn-text">No 😏</span>
+                </button>
+            </div>
+
+            <!-- Playful Dynamic Dialogue Toast -->
+            <div id="evasion-toast" class="evasion-toast" style="display: none;">
+                <span id="evasion-toast-text">The button ran away because it knows you want to say yes! 😜</span>
+            </div>
+
+            <!-- Success Next Button (Hidden until YES is clicked) -->
+            <button class="next" id="envelopeNextBtn" style="display: none; margin-top: 15px;">Next →</button>
+        </section>
+            
             <section class="screen" id="screen5">
                 <button class="backBtn" data-back="screen4">⬅️</button>
                 <img class="character" src="penguin8.gif" alt="Penguin 8" loading="lazy" style="height: 110px; margin-top: 10px; margin-bottom: 5px;">
