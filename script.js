@@ -194,11 +194,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const secretNameEl = document.getElementById('secret-name');
             if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
             
-                        // 🚀 NEW: Update 3D Envelope text correctly
+                                    // 🚀 PHASE 4: Video-Aesthetic Envelope Formatting (Preview)
             const envelopeText = document.getElementById('envelope-letter-text');
-            const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
-            if (envelopeText && targetText) {
-                envelopeText.innerHTML = '`;
+            const targetText = window.magicalState.envelopeQuestion || "Will you be my forever? 💖";
+            
+            if (envelopeText) {
+                envelopeText.innerHTML = `
+                    <span style="font-size: 1.4rem; font-weight: bold; color: #d93838;">${targetText}</span><br><br>
+                    <span style="font-size: 1.2rem; color: #5a1829;">${window.magicalState.partnerName} ✨</span><br>
+                    <span style="font-size: 0.9rem; color: #888;">From: ${window.magicalState.userName} 💌</span>
+                `;
             }
 
             
@@ -912,11 +917,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const dummyUser = document.getElementById('dummy-username');
                 if (dummyUser) dummyUser.value = data.partner_name;
                 
-                            // 🚀 NEW: Update 3D Envelope text correctl
+                            // 🚀 PHASE 4: Cloud Hydration & Backward Compatibility
+                // Fallback: If it's an old link, use 'envelope_msg'. If it's a new link, use 'envelope_question'.
+                const finalQuestionText = data.envelope_question || data.envelope_msg || "Will you be my forever? 💖";
+                
                 const envelopeText = document.getElementById('envelope-letter-text');
-                const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
-                if (envelopeText && targetText) {
-                    envelopeText.innerHTML = ``;
+                if (envelopeText) {
+                    envelopeText.innerHTML = `
+                        <span style="font-size: 1.4rem; font-weight: bold; color: #d93838;">${finalQuestionText}</span><br><br>
+                        <span style="font-size: 1.2rem; color: #5a1829;">${data.partner_name} ✨</span><br>
+                        <span style="font-size: 0.9rem; color: #888;">From: ${data.user_name} 💌</span>`;
                 }
             
 
