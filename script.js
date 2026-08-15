@@ -231,6 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const order = await orderRes.json();
                 if(order.error) throw new Error(order.error);
+                // NEW: Save the anonymous stamp in case the customer drops offline!
+                localStorage.setItem('magical_recovery_stamp', JSON.stringify({
+                    order_id: order.id,
+                    gift_id: order.gift_id
+                }));
+                
 
                 var options = {
                     "key": configData.razorpay_key_id, 
@@ -239,6 +245,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     "name": "Magical Surprises",
                     "order_id": order.id,
                     "handler": async function (payment_response) {
+                    // Payment finished normally, clear the recovery stamp
+                        localStorage.removeItem('magical_recovery_stamp'); 
                         payBtn.innerText = "Verifying Magic..."; 
                         try {
                             const verifyRes = await fetch('https://magical-api.10petalxmagic.workers.dev/api/verify-and-generate-link', {
@@ -817,6 +825,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         if (preloader) { preloader.style.opacity = '0'; setTimeout(() => { preloader.style.visibility = 'hidden'; }, 600); }
     }
+        // --- 🚀 NEW: ANONYMOUS RECOVERY SCANNER ---
+    const recoveryStamp = localStorage.getItem('magical_recovery_stamp');
+    if (recoveryStamp && !window.location.search.includes('gift=')) {
+        try {
+            const parsedStamp = JSON.parse(recoveryStamp);
+            const recoverRes = await fetch('https://magical-api.10petalxmagic.workers.dev/api/recover-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(parsedStamp)
+            });
+            const recoverData = await recoverRes.json();
+            
+            if (recoverData.status === 'success') {
+                // The Webhook saved the day!
+                localStorage.removeItem('magical_recovery_stamp');
+                
+                // Show the success modal directly
+                const successModal = document.getElementById('success-modal');
+                const linkInput = document.getElementById('generated-link-input');
+                if (successModal && linkInput) {
+                    linkInput.value = recoverData.link;
+                    successModal.style.display = 'flex';
+                }
+                
+                // Instantly activate the post-pay copy buttons
+                if (typeof activatePostPayState === 'function') {
+                    activatePostPayState(recoverData.link);
+                }
+            }
+        } catch (e) {
+            console.error("Recovery ping failed", e);
+        }
+    }
+    
 });
 // ==========================================
 // 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC (BUG-FREE)
