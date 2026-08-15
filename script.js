@@ -174,7 +174,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.magicalState.partnerName = partnerName;
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
-            window.magicalState.envelopeMsg = document.getElementById('envelope-msg')?.value.trim() || "";
+            
+            // 🚀 NEW: Capture the selected question from the Radio Pills
+            const selectedRadio = document.querySelector('input[name="envelope_question"]:checked');
+            if (selectedRadio && selectedRadio.value === 'custom') {
+                window.magicalState.envelopeQuestion = document.getElementById('envelope-msg')?.value.trim() || "Will you be my forever? 💖";
+            } else if (selectedRadio) {
+                window.magicalState.envelopeQuestion = selectedRadio.value;
+            }
+
             window.magicalState.mainWish = document.getElementById('main-wish-msg')?.value.trim() || "";
             window.magicalState.audioLink = document.getElementById('audio-link-input')?.value.trim() || "";
             
@@ -186,10 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const secretNameEl = document.getElementById('secret-name');
             if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
             
-            const envelopeText = document.querySelector('.letter p');
-            if (envelopeText && window.magicalState.envelopeMsg) {
-                envelopeText.innerHTML = `${window.magicalState.envelopeMsg}<br><br>Hope you like this little surprise!`;
+                        // 🚀 NEW: Update 3D Envelope text correctly
+            const envelopeText = document.getElementById('envelope-letter-text');
+            const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
+            if (envelopeText && targetText) {
+                envelopeText.innerHTML = '`;
             }
+
             
             const finalMsg = document.getElementById('final-message');
             if (finalMsg && window.magicalState.mainWish) {
@@ -245,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
-                        envelope_msg: window.magicalState.envelopeMsg,
+                        envelope_question: window.magicalState.envelopeQuestion,
                         main_wish: window.magicalState.mainWish,
                         audio_link: window.magicalState.audioLink,
                         scratch_msgs: window.magicalState.scratchMsgs,
@@ -282,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     gift_id: order.gift_id, // Passed from backend!
                                     partner_name: window.magicalState.partnerName,
                                     user_name: window.magicalState.userName,
-                                    envelope_msg: window.magicalState.envelopeMsg,
+                                    envelope_question: window.magicalState.envelopeQuestion,
                                     main_wish: window.magicalState.mainWish,
                                     audio_link: window.magicalState.audioLink,
                                     images: window.magicalState.images, 
@@ -493,22 +504,123 @@ document.querySelectorAll(".backBtn").forEach(btn => {
         e.stopPropagation(); playPopSound(); showScreen(btn.getAttribute("data-back"));
     });
 });
-// ENVELOPE LOGIC
-const envelopeWrapper = document.getElementById("envelope-wrapper");
-if (envelopeWrapper) {
-    envelopeWrapper.addEventListener("click", () => {
-        if (!envelopeWrapper.classList.contains("open")) { playPopSound(); fireConfetti(); }
-        envelopeWrapper.classList.add("open");
+// ==========================================
+// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE
+// ==========================================
+const evasionArena = document.getElementById("evasion-arena");
+const envelopeYesBtn = document.getElementById("envelopeYesBtn");
+const envelopeNoBtn = document.getElementById("envelopeNoBtn");
+const evasionToast = document.getElementById("evasion-toast");
+const evasionToastText = document.getElementById("evasion-toast-text");
+const envelopeReactionGif = document.getElementById("envelope-reaction-gif");
+const screen4Title = document.getElementById("screen4-title");
+const envelopeNextBtn = document.getElementById("envelopeNextBtn");
+
+// Playful Dialogues exactly from the video!
+const evasionMessages = [
+    "Try again... it's not gonna bite 😅",
+    "Bro the No button is literally scared of you 😂",
+    "Okay but what if you just... said yes? 👀",
+    "NO?? In this economy?? 😱",
+    "The audacity... but okay... try again bestie 💅",
+    "Sir/Ma'am this is a yes-only zone 🚫",
+    "Error 404: No button not found 😂",
+    "That's so funny haha. Now say yes. 🫠",
+    "The No button files a restraining order 🏃‍♂️",
+    "Come on, just say yes na 🥺"
+];
+let dodgeCount = 0;
+
+// 1. Reveal Arena when Envelope Opens
+const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
+if (envelopeWrapperPhase3) {
+    envelopeWrapperPhase3.addEventListener("click", () => {
+        if (!envelopeWrapperPhase3.classList.contains("open")) { 
+            playPopSound(); 
+            // 🛑 NO CONFETTI YET! Wait for them to click YES.
+        }
+        envelopeWrapperPhase3.classList.add("open");
         const clickHint = document.querySelector(".click-hint");
         if (clickHint) clickHint.style.display = "none"; 
+        
+        // Show Arena, Toast, and Teasing Penguin after envelope opens
         setTimeout(() => {
-            const btn = document.getElementById("envelopeNextBtn");
-            if(btn) btn.style.display = "inline-block";
+            if (evasionArena) evasionArena.style.display = "flex";
+            if (evasionToast) evasionToast.style.display = "block";
+            if (envelopeReactionGif) envelopeReactionGif.src = "penguinTT3.gif"; // Teasing penguin
         }, 1000);
     });
 }
-document.getElementById("envelopeNextBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
 
+// 2. High-Performance Dodge Physics
+function dodgeButton() {
+    if (!envelopeNoBtn || !evasionArena) return;
+    
+    const arenaRect = evasionArena.getBoundingClientRect();
+    const btnRect = envelopeNoBtn.getBoundingClientRect();
+    
+    // Calculate safe boundaries so it doesn't fly off the screen
+    const maxX = arenaRect.width - btnRect.width;
+    const maxY = 180; // Vertical roaming space
+    
+    // Randomize coordinates within bounds
+    const randomX = Math.random() * maxX;
+    const randomY = (Math.random() * maxY) - (maxY / 2); 
+    
+    // Apply zero-lag GPU-accelerated transform
+    envelopeNoBtn.style.transform = `translate(${randomX - (maxX/2)}px, ${randomY}px)`;
+    
+    // Update Toast text based on array
+    if (evasionToastText) {
+        evasionToastText.innerText = evasionMessages[dodgeCount % evasionMessages.length];
+    }
+    
+    // Trigger quick CSS Glitch animation
+    envelopeNoBtn.classList.remove("blink-glitch");
+    void envelopeNoBtn.offsetWidth; // Trigger reflow instantly
+    envelopeNoBtn.classList.add("blink-glitch");
+    
+    dodgeCount++;
+    playPopSound();
+}
+
+// Bind Dodge Events (Hover for Desktop, Touch for Mobile)
+if (envelopeNoBtn) {
+    envelopeNoBtn.addEventListener("mouseover", dodgeButton);
+    envelopeNoBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault(); // Force stop the click from registering
+        dodgeButton();
+    }, {passive: false});
+}
+
+// 3. The YES Button Victory! 🎉
+if (envelopeYesBtn) {
+    envelopeYesBtn.addEventListener("click", () => {
+        playPopSound();
+        fireConfetti();
+        
+        // Hide Evasion Elements
+        if (envelopeNoBtn) envelopeNoBtn.style.display = "none";
+        if (evasionToast) evasionToast.style.display = "none";
+        
+        // Update Title & Show Celebration GIF
+        if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
+        if (envelopeReactionGif) envelopeReactionGif.src = "PenguinTT2.gif";
+        
+        // Bonus: Update the side penguin
+        const sidePenguin = document.querySelector(".side-penguin");
+        if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
+        
+        // Reveal Next Button
+        if (envelopeNextBtn) {
+            envelopeNextBtn.style.display = "inline-block";
+        }
+    });
+}
+
+if (envelopeNextBtn) {
+    envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
+}
 // BACKGROUND PARTICLES
 const pCanvas = document.getElementById("particle-canvas");
 if (pCanvas) {
@@ -800,9 +912,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const dummyUser = document.getElementById('dummy-username');
                 if (dummyUser) dummyUser.value = data.partner_name;
                 
-                const envelopeText = document.querySelector('.letter p');
-                if (envelopeText && data.envelope_msg) envelopeText.innerHTML = `${data.envelope_msg}<br><br>Hope you like this little surprise!`;
-                
+                            // 🚀 NEW: Update 3D Envelope text correctl
+                const envelopeText = document.getElementById('envelope-letter-text');
+                const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
+                if (envelopeText && targetText) {
+                    envelopeText.innerHTML = ``;
+                }
+            
+
                 const finalMsg = document.getElementById('final-message');
                 if (finalMsg && data.main_wish) finalMsg.innerHTML = data.main_wish.replace(/\n/g, '<br>'); 
                 
