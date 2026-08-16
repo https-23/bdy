@@ -1394,3 +1394,49 @@ h1, h2 {
     margin-bottom: 15px;
     flex-shrink: 0;
 }
+/* =========================================
+   PHASE 2: NO BUTTON SHAPE & SCRATCH CARDS
+   ========================================= */
+
+/* 1. Strictly lock the NO Button Shape so it NEVER becomes a square */
+.arena-no-btn {
+    border-radius: 100px !important; /* Forces the perfect pill shape forever */
+    white-space: nowrap !important;  /* Stops text from stacking and stretching the height */
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+/* 2. Rebuild Scratch Cards Grid to perfectly match your 2x2 reference */
+.mini-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Creates a perfect 2-column grid */
+    gap: 15px;
+    width: 100%;
+    max-width: 340px; /* Safe width for all mobile phones */
+    margin: 20px auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+/* 3. Style the individual Scratch Card buttons to look like 219735.jpg */
+.mini-card {
+    background: #ffb6c1; /* Soft aesthetic pink */
+    color: #5a1829;
+    font-family: var(--font-body), sans-serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 15px 10px;
+    border-radius: 12px; /* Smooth, rounded rectangle shape */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Add a slight pressing effect when tapped */
+.mini-card:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
