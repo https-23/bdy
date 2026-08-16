@@ -645,14 +645,18 @@ if (envelopeYesBtn) {
         playPopSound();
         fireConfetti();
         
+        // 🚀 FIX 4: Instantly reset YES button size so it doesn't cover the screen!
+        yesButtonScale = 1;
+        envelopeYesBtn.style.transform = "scale(1)";
+        
         if (envelopeNoBtn) envelopeNoBtn.style.display = "none";
         if (evasionToast) evasionToast.style.display = "none";
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
         
-        // Show celebration penguins & reset their position
+        // 🚀 FIX 2: Case Sensitivity fixed (lowercase 'p' in penguinTT2.gif)
         if (envelopeReactionGif) {
-            envelopeReactionGif.src = "PenguinTT2.gif";
+            envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.style.position = "relative";
             envelopeReactionGif.style.top = "auto";
             envelopeReactionGif.style.left = "auto";
@@ -663,16 +667,19 @@ if (envelopeYesBtn) {
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
+        // 🚀 FIX 3: Ensure Next Button appears and screen scrolls to it
         if (envelopeNextBtn) {
             envelopeNextBtn.style.display = "inline-block";
+            envelopeNextBtn.style.marginTop = "25px";
+            envelopeNextBtn.style.zIndex = "100";
+            
+            // Smoothly scroll down so she instantly sees the next button
+            setTimeout(() => {
+                envelopeNextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 150);
         }
     });
 }
-
-if (envelopeNextBtn) {
-    envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
-}
-
 // 4. RESET ENVELOPE ON BACK BUTTON (Full state reset)
 function resetEnvelopeScreen() {
     if (envelopeWrapperPhase3) envelopeWrapperPhase3.classList.remove("open");
