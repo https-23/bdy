@@ -99,13 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add active class to the selected parent label
             e.target.closest('.radio-pill').classList.add('active');
             
-            // Show/Hide custom input box with 0-lag CSS display toggle
+                        // Show/Hide custom input box with 0-lag CSS display toggle
             if (e.target.value === 'custom') {
                 customBox.style.display = 'flex';
                 // Small trick to ensure focus
                 setTimeout(() => document.getElementById('envelope-msg').focus(), 50);
             } else {
                 customBox.style.display = 'none';
+                // 🐛 FIX: Clear the custom input so it doesn't conflict during preview/payment
+                const customMsgInput = document.getElementById('envelope-msg');
+                if(customMsgInput) customMsgInput.value = '';
             }
         });
     });
@@ -176,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
             
             // 🚀 NEW: Capture the selected question from the Radio Pills
+            // Capture the selected question from the Radio Pills
             const selectedRadio = document.querySelector('input[name="envelope_question"]:checked');
             if (selectedRadio && selectedRadio.value === 'custom') {
                 window.magicalState.envelopeQuestion = document.getElementById('envelope-msg')?.value.trim() || "Will you be my forever? 💖";
@@ -194,11 +198,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const secretNameEl = document.getElementById('secret-name');
             if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
             
-                        // 🚀 NEW: Update 3D Envelope text correctly
+                                    // 🚀 PHASE 4: Video-Aesthetic Envelope Formatting (Preview)
             const envelopeText = document.getElementById('envelope-letter-text');
-            const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
-            if (envelopeText && targetText) {
-                envelopeText.innerHTML = '`;
+            const targetText = window.magicalState.envelopeQuestion || "Will you be my forever? 💖";
+            
+            if (envelopeText) {
+                envelopeText.innerHTML = `
+                    <span style="font-size: 1.4rem; font-weight: bold; color: #d93838;">${targetText}</span><br><br>
+                    <span style="font-size: 1.2rem; color: #5a1829;">${window.magicalState.partnerName} ✨</span><br>
+                    <span style="font-size: 0.9rem; color: #888;">From: ${window.magicalState.userName} 💌</span>
+                `;
             }
 
             
@@ -257,10 +266,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
                         envelope_question: window.magicalState.envelopeQuestion,
+                        envelope_msg: window.magicalState.envelopeQuestion, // 🚀 FIX: Dual-payload guarantees capture
                         main_wish: window.magicalState.mainWish,
                         audio_link: window.magicalState.audioLink,
                         scratch_msgs: window.magicalState.scratchMsgs,
-                        images: window.magicalState.images // 🚀 Passing Base64 directly!
+                        images: window.magicalState.images 
                     })
                 });
                 const order = await orderRes.json();
@@ -290,10 +300,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     order_id: payment_response.razorpay_order_id,
                                     payment_id: payment_response.razorpay_payment_id,
                                     signature: payment_response.razorpay_signature,
-                                    gift_id: order.gift_id, // Passed from backend!
+                                    gift_id: order.gift_id, 
                                     partner_name: window.magicalState.partnerName,
                                     user_name: window.magicalState.userName,
                                     envelope_question: window.magicalState.envelopeQuestion,
+                                    envelope_msg: window.magicalState.envelopeQuestion, // 🚀 FIX: Dual-payload ensures DB save
                                     main_wish: window.magicalState.mainWish,
                                     audio_link: window.magicalState.audioLink,
                                     images: window.magicalState.images, 
@@ -399,7 +410,6 @@ function showScreen(screenId) {
         typeWriterTriggered = true;
     }
 }
-
 // Login Screen Physics
 const loginScreen = document.getElementById('login-screen');
 const tiltCard = document.getElementById('tilt-card');
@@ -505,7 +515,7 @@ document.querySelectorAll(".backBtn").forEach(btn => {
     });
 });
 // ==========================================
-// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE
+// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE (BUG-FREE)
 // ==========================================
 const evasionArena = document.getElementById("evasion-arena");
 const envelopeYesBtn = document.getElementById("envelopeYesBtn");
@@ -515,9 +525,11 @@ const evasionToastText = document.getElementById("evasion-toast-text");
 const envelopeReactionGif = document.getElementById("envelope-reaction-gif");
 const screen4Title = document.getElementById("screen4-title");
 const envelopeNextBtn = document.getElementById("envelopeNextBtn");
+const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
+const screen4 = document.getElementById("screen4"); // The safe container
 
-// Playful Dialogues exactly from the video!
 const evasionMessages = [
+    "The button ran away because it knows you want to say yes! 😜",
     "Try again... it's not gonna bite 😅",
     "Bro the No button is literally scared of you 😂",
     "Okay but what if you just... said yes? 👀",
@@ -526,94 +538,148 @@ const evasionMessages = [
     "Sir/Ma'am this is a yes-only zone 🚫",
     "Error 404: No button not found 😂",
     "That's so funny haha. Now say yes. 🫠",
-    "The No button files a restraining order 🏃‍♂️",
-    "Come on, just say yes na 🥺"
+    "The No button files a restraining order 🏃‍♂️"
 ];
-let dodgeCount = 0;
 
-// 1. Reveal Arena when Envelope Opens
-const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
+const evasionPenguins = [
+    "penguinJ1.gif", "penguinJ2.gif", "penguinJ3.gif", "penguinJ4.gif", "penguinJ5.gif",
+    "penguinJ6.gif", "penguinJ7.gif", "penguinJ8.gif", "penguinJ9.gif", "penguinJ10.gif"
+];
+
+// 🚀 10 Specific Safe-Zone Positions for Roaming Penguins
+const penguinConfigs = [
+    { top: "10%", left: "10%", size: "90px", rot: "-12deg" },
+    { top: "50%", left: "65%", size: "100px", rot: "15deg" },
+    { top: "25%", left: "60%", size: "95px", rot: "10deg" },
+    { top: "60%", left: "10%", size: "110px", rot: "-15deg" },
+    { top: "15%", left: "35%", size: "90px", rot: "5deg" },
+    { top: "65%", left: "40%", size: "85px", rot: "-10deg" },
+    { top: "45%", left: "60%", size: "105px", rot: "20deg" },
+    { top: "35%", left: "15%", size: "80px", rot: "-20deg" },
+    { top: "70%", left: "20%", size: "100px", rot: "12deg" },
+    { top: "20%", left: "70%", size: "115px", rot: "-20deg" }
+];
+
+let dodgeCount = 0;
+let yesButtonScale = 1;
+
+// 1. Envelope Open Logic
 if (envelopeWrapperPhase3) {
     envelopeWrapperPhase3.addEventListener("click", () => {
         if (!envelopeWrapperPhase3.classList.contains("open")) { 
             playPopSound(); 
-            // 🛑 NO CONFETTI YET! Wait for them to click YES.
         }
         envelopeWrapperPhase3.classList.add("open");
         const clickHint = document.querySelector(".click-hint");
         if (clickHint) clickHint.style.display = "none"; 
         
-        // Show Arena, Toast, and Teasing Penguin after envelope opens
         setTimeout(() => {
             if (evasionArena) evasionArena.style.display = "flex";
-            if (evasionToast) evasionToast.style.display = "block";
-            if (envelopeReactionGif) envelopeReactionGif.src = "penguinTT3.gif"; // Teasing penguin
-        }, 1000);
+        }, 600); 
     });
 }
 
-// 2. High-Performance Dodge Physics
-function dodgeButton() {
-    if (!envelopeNoBtn || !evasionArena) return;
+// 2. Strict Roaming Click Logic (NO Out-of-Bounds Bugs)
+function handleNoButtonClick(e) {
+    if (!envelopeNoBtn || !screen4) return;
+    if (e) e.preventDefault(); 
+
+    // A. JAILBREAK BUTTON: Move to screen4 so it escapes the envelope
+    if (envelopeNoBtn.parentElement !== screen4) {
+        screen4.appendChild(envelopeNoBtn);
+    }
+
+    envelopeNoBtn.style.position = 'absolute'; // ABSOLUTE keeps it inside screen4
+    envelopeNoBtn.style.zIndex = '99999';
     
-    const arenaRect = evasionArena.getBoundingClientRect();
-    const btnRect = envelopeNoBtn.getBoundingClientRect();
+        // Calculate strict safe boundaries mathematically
+    const paddingX = 25;
+    const paddingY = 80;
     
-    // Calculate safe boundaries so it doesn't fly off the screen
-    const maxX = arenaRect.width - btnRect.width;
-    const maxY = 180; // Vertical roaming space
+    // 🐛 FIX: Calculate safe zones using the user's visible viewport, NOT the total scroll height
+    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
+    const visibleHeight = window.innerHeight;
+    const maxY = visibleHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
     
-    // Randomize coordinates within bounds
-    const randomX = Math.random() * maxX;
-    const randomY = (Math.random() * maxY) - (maxY / 2); 
+    // 🐛 FIX: Add the current scroll position so the button stays exactly where the user is looking
+    const currentScroll = screen4.scrollTop || 0;
     
-    // Apply zero-lag GPU-accelerated transform
-    envelopeNoBtn.style.transform = `translate(${randomX - (maxX/2)}px, ${randomY}px)`;
+    const randomX = paddingX + (Math.random() * Math.max(0, maxX));
+    const randomY = currentScroll + paddingY + (Math.random() * Math.max(0, maxY));
     
-    // Update Toast text based on array
-    if (evasionToastText) {
-        evasionToastText.innerText = evasionMessages[dodgeCount % evasionMessages.length];
+    envelopeNoBtn.style.left = `${randomX}px`;
+    envelopeNoBtn.style.top = `${randomY}px`;
+    envelopeNoBtn.style.transform = 'none';  
+    
+    if (evasionToast) evasionToast.style.display = "block";
+    
+    const index = dodgeCount % 10;
+    if (evasionToastText) evasionToastText.innerText = evasionMessages[index];
+    
+    // B. JAILBREAK PENGUIN: Move to screen4 so it roams freely
+    if (envelopeReactionGif) {
+        if (envelopeReactionGif.parentElement !== screen4) {
+            screen4.appendChild(envelopeReactionGif);
+        }
+        const config = penguinConfigs[index];
+        envelopeReactionGif.src = evasionPenguins[index];
+        envelopeReactionGif.style.position = "absolute";
+        envelopeReactionGif.style.top = config.top;
+        envelopeReactionGif.style.left = config.left;
+        envelopeReactionGif.style.height = config.size;
+        envelopeReactionGif.style.transform = `rotate(${config.rot})`;
+        envelopeReactionGif.style.zIndex = "999"; 
+        envelopeReactionGif.style.transition = "all 0.3s ease";
     }
     
-    // Trigger quick CSS Glitch animation
-    envelopeNoBtn.classList.remove("blink-glitch");
-    void envelopeNoBtn.offsetWidth; // Trigger reflow instantly
-    envelopeNoBtn.classList.add("blink-glitch");
-    
+    // C. Grow YES Button
+    yesButtonScale += 0.12; 
+    if (envelopeYesBtn) {
+        envelopeYesBtn.style.transform = `scale(${yesButtonScale})`;
+    }
+
     dodgeCount++;
     playPopSound();
 }
 
-// Bind Dodge Events (Hover for Desktop, Touch for Mobile)
 if (envelopeNoBtn) {
-    envelopeNoBtn.addEventListener("mouseover", dodgeButton);
-    envelopeNoBtn.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Force stop the click from registering
-        dodgeButton();
-    }, {passive: false});
+    envelopeNoBtn.addEventListener("click", handleNoButtonClick);
+    envelopeNoBtn.addEventListener("touchstart", handleNoButtonClick, {passive: false});
 }
 
-// 3. The YES Button Victory! 🎉
+// 3. Victory Click (Yes Button)
 if (envelopeYesBtn) {
     envelopeYesBtn.addEventListener("click", () => {
         playPopSound();
         fireConfetti();
         
-        // Hide Evasion Elements
+        yesButtonScale = 1;
+        envelopeYesBtn.style.transform = "scale(1)";
+        
         if (envelopeNoBtn) envelopeNoBtn.style.display = "none";
         if (evasionToast) evasionToast.style.display = "none";
         
-        // Update Title & Show Celebration GIF
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
-        if (envelopeReactionGif) envelopeReactionGif.src = "PenguinTT2.gif";
         
-        // Bonus: Update the side penguin
+        // Return top penguin to its normal wrapper and show TT2
+        const penguinWrapper = document.querySelector(".reaction-penguin-wrapper");
+        if (envelopeReactionGif && penguinWrapper) {
+            if (envelopeReactionGif.parentElement !== penguinWrapper) {
+                penguinWrapper.appendChild(envelopeReactionGif);
+            }
+            envelopeReactionGif.style = ""; // Wipes roaming CSS clean
+            envelopeReactionGif.src = "penguinTT2.gif";
+            envelopeReactionGif.className = "character reaction-penguin"; 
+        }
+        
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
-        // Reveal Next Button
         if (envelopeNextBtn) {
             envelopeNextBtn.style.display = "inline-block";
+            envelopeNextBtn.style.position = "relative";
+            envelopeNextBtn.style.margin = "15px auto 0 auto";
+            envelopeNextBtn.style.zIndex = "9999";
         }
     });
 }
@@ -621,6 +687,57 @@ if (envelopeYesBtn) {
 if (envelopeNextBtn) {
     envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
 }
+
+// 4. Complete Screen 4 Reset
+function resetEnvelopeScreen() {
+    if (envelopeWrapperPhase3) envelopeWrapperPhase3.classList.remove("open");
+    
+    const clickHint = document.querySelector(".click-hint");
+    if (clickHint) clickHint.style.display = "block"; 
+    
+    if (evasionArena) evasionArena.style.display = "none";
+    
+    // Return No Button to Arena
+    if (envelopeNoBtn) {
+        if (evasionArena && envelopeNoBtn.parentElement !== evasionArena) {
+            evasionArena.appendChild(envelopeNoBtn);
+        }
+        envelopeNoBtn.style.display = "inline-block";
+        envelopeNoBtn.style.position = "relative";
+        envelopeNoBtn.style.left = "auto";
+        envelopeNoBtn.style.top = "auto";
+        envelopeNoBtn.style.transform = "none"; 
+        envelopeNoBtn.style.zIndex = "20";
+    }
+    
+    yesButtonScale = 1;
+    if (envelopeYesBtn) envelopeYesBtn.style.transform = "scale(1)";
+    if (evasionToast) evasionToast.style.display = "none";
+    if (screen4Title) screen4Title.innerText = "Open Me, One Surprise at a Time 💌";
+    
+    // Return Top Penguin to Wrapper
+    const penguinWrapper = document.querySelector(".reaction-penguin-wrapper");
+    if (envelopeReactionGif && penguinWrapper) {
+        if (envelopeReactionGif.parentElement !== penguinWrapper) {
+            penguinWrapper.appendChild(envelopeReactionGif);
+        }
+        envelopeReactionGif.style = ""; 
+        envelopeReactionGif.src = "celeb-penguin.gif";
+        envelopeReactionGif.className = "character reaction-penguin"; 
+    }
+    
+    const sidePenguin = document.querySelector(".side-penguin");
+    if (sidePenguin) sidePenguin.src = "penguin5.gif";
+    
+    if (envelopeNextBtn) envelopeNextBtn.style.display = "none";
+    dodgeCount = 0; 
+}
+
+document.body.addEventListener("click", (e) => {
+    if (e.target.closest('.backBtn') || e.target.closest('.heartNext') || e.target.closest('#envelopeNextBtn')) {
+        setTimeout(resetEnvelopeScreen, 300);
+    }
+});
 // BACKGROUND PARTICLES
 const pCanvas = document.getElementById("particle-canvas");
 if (pCanvas) {
@@ -747,7 +864,6 @@ function initPopupScratchCard() {
                 lastAudioTime = now;
             }
         }
-
         scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
         scratchCanvas.addEventListener('mouseup', () => isDrawing = false);
         scratchCanvas.addEventListener('mousemove', scratch);
@@ -794,13 +910,17 @@ document.addEventListener("mousemove", throttle((e) => {
 function renderParallax() {
     currentX += (targetX - currentX) * 0.1; 
     currentY += (targetY - currentY) * 0.1;
-    document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
+    
+    // 🐛 FIX: Only animate elements that are currently inside an ".active" screen
+    document.querySelectorAll(".screen.active .character, .screen.active .glass, .screen.active .envelope-wrapper, .screen.active .cake, .screen.active .flowers").forEach(el => {
         const depth = el.classList.contains('glass') ? 0.4 : 1;
         el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
     });
+    
     requestAnimationFrame(renderParallax);
 }
 renderParallax(); 
+
 // INSTAGRAM DOUBLE TAP & LIGHTBOX
 const photoModal = document.getElementById('photo-modal');
 const modalImage = document.getElementById('modal-image');
@@ -911,11 +1031,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const dummyUser = document.getElementById('dummy-username');
                 if (dummyUser) dummyUser.value = data.partner_name;
                 
-                            // 🚀 NEW: Update 3D Envelope text correctl
+                            // 🚀 PHASE 4: Cloud Hydration & Backward Compatibility
+                // Fallback: If it's an old link, use 'envelope_msg'. If it's a new link, use 'envelope_question'.
+                const finalQuestionText = data.envelope_question || data.envelope_msg || "Will you be my forever? 💖";
+                
                 const envelopeText = document.getElementById('envelope-letter-text');
-                const targetText = window.magicalState.envelopeQuestion || (typeof data !== 'undefined' ? data.envelope_question : null);
-                if (envelopeText && targetText) {
-                    envelopeText.innerHTML = ``;
+                if (envelopeText) {
+                    envelopeText.innerHTML = `
+                        <span style="font-size: 1.4rem; font-weight: bold; color: #d93838;">${finalQuestionText}</span><br><br>
+                        <span style="font-size: 1.2rem; color: #5a1829;">${data.partner_name} ✨</span><br>
+                        <span style="font-size: 0.9rem; color: #888;">From: ${data.user_name} 💌</span>`;
                 }
             
 
