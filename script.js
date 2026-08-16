@@ -176,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
             
             // 🚀 NEW: Capture the selected question from the Radio Pills
+            // Capture the selected question from the Radio Pills
             const selectedRadio = document.querySelector('input[name="envelope_question"]:checked');
             if (selectedRadio && selectedRadio.value === 'custom') {
                 window.magicalState.envelopeQuestion = document.getElementById('envelope-msg')?.value.trim() || "Will you be my forever? 💖";
@@ -510,7 +511,7 @@ document.querySelectorAll(".backBtn").forEach(btn => {
     });
 });
 // ==========================================
-// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE
+// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE (BUG-FREE VERSION)
 // ==========================================
 const evasionArena = document.getElementById("evasion-arena");
 const envelopeYesBtn = document.getElementById("envelopeYesBtn");
@@ -520,9 +521,11 @@ const evasionToastText = document.getElementById("evasion-toast-text");
 const envelopeReactionGif = document.getElementById("envelope-reaction-gif");
 const screen4Title = document.getElementById("screen4-title");
 const envelopeNextBtn = document.getElementById("envelopeNextBtn");
+const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
 
-// Playful Dialogues exactly from the video!
+// Playful Dialogues - The first one is exactly what you requested!
 const evasionMessages = [
+    "The button ran away because it knows you want to say yes! 😜",
     "Try again... it's not gonna bite 😅",
     "Bro the No button is literally scared of you 😂",
     "Okay but what if you just... said yes? 👀",
@@ -536,90 +539,119 @@ const evasionMessages = [
 ];
 let dodgeCount = 0;
 
-// 1. Reveal Arena when Envelope Opens
-const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
+// 1. Reveal Arena when Envelope Opens (FIXED BUG 3 & 4)
 if (envelopeWrapperPhase3) {
     envelopeWrapperPhase3.addEventListener("click", () => {
         if (!envelopeWrapperPhase3.classList.contains("open")) { 
             playPopSound(); 
-            // 🛑 NO CONFETTI YET! Wait for them to click YES.
         }
         envelopeWrapperPhase3.classList.add("open");
         const clickHint = document.querySelector(".click-hint");
         if (clickHint) clickHint.style.display = "none"; 
         
-        // Show Arena, Toast, and Teasing Penguin after envelope opens
+        // Show ONLY the Yes/No buttons. DO NOT show penguin3 or Toast yet!
         setTimeout(() => {
             if (evasionArena) evasionArena.style.display = "flex";
-            if (evasionToast) evasionToast.style.display = "block";
-            if (envelopeReactionGif) envelopeReactionGif.src = "penguinTT3.gif"; // Teasing penguin
-        }, 1000);
+        }, 800); // Waits for the letter to slide up smoothly
     });
 }
 
-// 2. High-Performance Dodge Physics
+// 2. High-Performance Dodge Physics (FIXED PENGUIN 3 BUG)
 function dodgeButton() {
     if (!envelopeNoBtn || !evasionArena) return;
     
     const arenaRect = evasionArena.getBoundingClientRect();
     const btnRect = envelopeNoBtn.getBoundingClientRect();
     
-    // Calculate safe boundaries so it doesn't fly off the screen
     const maxX = arenaRect.width - btnRect.width;
-    const maxY = 180; // Vertical roaming space
+    const maxY = 150; 
     
-    // Randomize coordinates within bounds
+    // Smooth randomization
     const randomX = Math.random() * maxX;
-    const randomY = (Math.random() * maxY) - (maxY / 2); 
+    const randomY = (Math.random() * maxY) - (maxY / 2) - 30; 
     
-    // Apply zero-lag GPU-accelerated transform
+    // Apply 0-lag GPU transform
     envelopeNoBtn.style.transform = `translate(${randomX - (maxX/2)}px, ${randomY}px)`;
     
-    // Update Toast text based on array
+    // 🚀 NEW: Show PenguinTT3 and the Toast ONLY when they dodge the No button!
+    if (evasionToast) evasionToast.style.display = "block";
+    if (envelopeReactionGif) envelopeReactionGif.src = "penguinTT3.gif"; 
+
     if (evasionToastText) {
         evasionToastText.innerText = evasionMessages[dodgeCount % evasionMessages.length];
     }
     
-    // Trigger quick CSS Glitch animation
     envelopeNoBtn.classList.remove("blink-glitch");
-    void envelopeNoBtn.offsetWidth; // Trigger reflow instantly
+    void envelopeNoBtn.offsetWidth; 
     envelopeNoBtn.classList.add("blink-glitch");
     
     dodgeCount++;
     playPopSound();
 }
 
-// Bind Dodge Events (Hover for Desktop, Touch for Mobile)
 if (envelopeNoBtn) {
     envelopeNoBtn.addEventListener("mouseover", dodgeButton);
     envelopeNoBtn.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Force stop the click from registering
+        e.preventDefault(); 
         dodgeButton();
     }, {passive: false});
 }
 
-// 3. The YES Button Victory! 🎉
+// 3. The YES Button Victory! 🎉 (FIXED PENGUIN 2 BUG)
 if (envelopeYesBtn) {
     envelopeYesBtn.addEventListener("click", () => {
         playPopSound();
         fireConfetti();
         
-        // Hide Evasion Elements
         if (envelopeNoBtn) envelopeNoBtn.style.display = "none";
         if (evasionToast) evasionToast.style.display = "none";
         
-        // Update Title & Show Celebration GIF
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
-        if (envelopeReactionGif) envelopeReactionGif.src = "PenguinTT2.gif";
         
-        // Bonus: Update the side penguin
+        // 🚀 NEW: Show PenguinTT2 and PenguinTT4 exactly when YES is clicked
+        if (envelopeReactionGif) envelopeReactionGif.src = "PenguinTT2.gif";
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
-        // Reveal Next Button
         if (envelopeNextBtn) {
             envelopeNextBtn.style.display = "inline-block";
         }
+    });
+}
+
+if (envelopeNextBtn) {
+    envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
+}
+
+// 4. RESET ENVELOPE ON BACK BUTTON (FIXED BUG 2)
+function resetEnvelopeScreen() {
+    if (envelopeWrapperPhase3) envelopeWrapperPhase3.classList.remove("open");
+    
+    const clickHint = document.querySelector(".click-hint");
+    if (clickHint) clickHint.style.display = "block"; 
+    
+    if (evasionArena) evasionArena.style.display = "none";
+    if (envelopeNoBtn) {
+        envelopeNoBtn.style.display = "inline-block";
+        envelopeNoBtn.style.transform = `translate(0px, 0px)`; // Put No button back
+    }
+    if (evasionToast) evasionToast.style.display = "none";
+    
+    if (screen4Title) screen4Title.innerText = "Open Me, One Surprise at a Time 💌";
+    if (envelopeReactionGif) envelopeReactionGif.src = "celeb-penguin.gif";
+    
+    const sidePenguin = document.querySelector(".side-penguin");
+    if (sidePenguin) sidePenguin.src = "penguin5.gif";
+    
+    if (envelopeNextBtn) envelopeNextBtn.style.display = "none";
+    dodgeCount = 0; // Reset funny message loop
+}
+
+// Bind to the back button of screen 4
+const screen4BackBtn = document.querySelector('#screen4 .backBtn');
+if (screen4BackBtn) {
+    screen4BackBtn.addEventListener("click", () => {
+        resetEnvelopeScreen();
     });
 }
 
