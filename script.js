@@ -99,13 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add active class to the selected parent label
             e.target.closest('.radio-pill').classList.add('active');
             
-            // Show/Hide custom input box with 0-lag CSS display toggle
+                        // Show/Hide custom input box with 0-lag CSS display toggle
             if (e.target.value === 'custom') {
                 customBox.style.display = 'flex';
                 // Small trick to ensure focus
                 setTimeout(() => document.getElementById('envelope-msg').focus(), 50);
             } else {
                 customBox.style.display = 'none';
+                // 🐛 FIX: Clear the custom input so it doesn't conflict during preview/payment
+                const customMsgInput = document.getElementById('envelope-msg');
+                if(customMsgInput) customMsgInput.value = '';
             }
         });
     });
@@ -590,18 +593,24 @@ function handleNoButtonClick(e) {
     envelopeNoBtn.style.position = 'absolute'; // ABSOLUTE keeps it inside screen4
     envelopeNoBtn.style.zIndex = '99999';
     
-    // Calculate strict safe boundaries mathematically
+        // Calculate strict safe boundaries mathematically
     const paddingX = 25;
-    const paddingY = 60;
-    const maxX = screen4.clientWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
-    const maxY = screen4.clientHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
+    const paddingY = 80;
+    
+    // 🐛 FIX: Calculate safe zones using the user's visible viewport, NOT the total scroll height
+    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
+    const visibleHeight = window.innerHeight;
+    const maxY = visibleHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
+    
+    // 🐛 FIX: Add the current scroll position so the button stays exactly where the user is looking
+    const currentScroll = screen4.scrollTop || 0;
     
     const randomX = paddingX + (Math.random() * Math.max(0, maxX));
-    const randomY = paddingY + (Math.random() * Math.max(0, maxY));
+    const randomY = currentScroll + paddingY + (Math.random() * Math.max(0, maxY));
     
     envelopeNoBtn.style.left = `${randomX}px`;
     envelopeNoBtn.style.top = `${randomY}px`;
-    envelopeNoBtn.style.transform = 'none'; 
+    envelopeNoBtn.style.transform = 'none';  
     
     if (evasionToast) evasionToast.style.display = "block";
     
@@ -903,10 +912,13 @@ document.addEventListener("mousemove", throttle((e) => {
 function renderParallax() {
     currentX += (targetX - currentX) * 0.1; 
     currentY += (targetY - currentY) * 0.1;
-    document.querySelectorAll(".character, .glass, .envelope-wrapper, .cake, .flowers").forEach(el => {
+    
+    // 🐛 FIX: Only animate elements that are currently inside an ".active" screen
+    document.querySelectorAll(".screen.active .character, .screen.active .glass, .screen.active .envelope-wrapper, .screen.active .cake, .screen.active .flowers").forEach(el => {
         const depth = el.classList.contains('glass') ? 0.4 : 1;
         el.style.transform = `translate(${currentX * depth}px, ${currentY * depth}px)`;
     });
+    
     requestAnimationFrame(renderParallax);
 }
 renderParallax(); 
