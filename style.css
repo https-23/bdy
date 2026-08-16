@@ -335,11 +335,11 @@ button.heartNext {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 100;
 }
-/* --- Grand Envelope Logic --- */
+/* --- Grand Envelope Logic (Responsive & Safe Fix) --- */
 .envelope-wrapper {
     position: relative;
-    width: 360px; /* 🚀 INCREASED from 320px to fit text */
-    height: 230px; /* 🚀 INCREASED height */
+    width: 320px; /* 🚀 Safe for all mobile screens */
+    height: 200px; 
     margin: 20px auto 10px auto;
     cursor: pointer;
     pointer-events: auto; 
@@ -360,9 +360,9 @@ button.heartNext {
     bottom: 0;
     width: 0;
     height: 0;
-    border-left: 180px solid transparent; /* Exactly half of 360px */
-    border-right: 180px solid transparent;
-    border-bottom: 140px solid #c0392b; /* Adjusted height */
+    border-left: 160px solid transparent; 
+    border-right: 160px solid transparent;
+    border-bottom: 130px solid #c0392b; 
     z-index: 3;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -372,7 +372,7 @@ button.heartNext {
     position: absolute;
     bottom: 10px;
     width: 92%;
-    height: 260px; /* 🚀 TALLER to fit question + buttons without clipping */
+    height: 240px; /* 🚀 Taller to fit question perfectly */
     background: #fdf5c9;
     padding: 15px 10px;
     box-sizing: border-box;
@@ -383,7 +383,7 @@ button.heartNext {
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 .envelope-wrapper.open .letter { 
-    transform: translateY(-180px); /* Higher slide to match new size */
+    transform: translateY(-160px); 
     z-index: 4; 
 }
 
