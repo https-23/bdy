@@ -263,10 +263,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
                         envelope_question: window.magicalState.envelopeQuestion,
+                        envelope_msg: window.magicalState.envelopeQuestion, // 🚀 FIX: Dual-payload guarantees capture
                         main_wish: window.magicalState.mainWish,
                         audio_link: window.magicalState.audioLink,
                         scratch_msgs: window.magicalState.scratchMsgs,
-                        images: window.magicalState.images // 🚀 Passing Base64 directly!
+                        images: window.magicalState.images 
                     })
                 });
                 const order = await orderRes.json();
@@ -296,10 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     order_id: payment_response.razorpay_order_id,
                                     payment_id: payment_response.razorpay_payment_id,
                                     signature: payment_response.razorpay_signature,
-                                    gift_id: order.gift_id, // Passed from backend!
+                                    gift_id: order.gift_id, 
                                     partner_name: window.magicalState.partnerName,
                                     user_name: window.magicalState.userName,
                                     envelope_question: window.magicalState.envelopeQuestion,
+                                    envelope_msg: window.magicalState.envelopeQuestion, // 🚀 FIX: Dual-payload ensures DB save
                                     main_wish: window.magicalState.mainWish,
                                     audio_link: window.magicalState.audioLink,
                                     images: window.magicalState.images, 
