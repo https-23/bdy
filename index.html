@@ -280,7 +280,7 @@
                 <button class="heartNext">❤️</button>
             </section>
             
-        <!-- =========================================
+                <!-- =========================================
              SCREEN 4: THE INTERACTIVE QUESTION ARENA
              ========================================= -->
         <section class="screen" id="screen4">
@@ -298,7 +298,20 @@
                 <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
                 <div class="envelope">
                     <div class="letter">
-                        <p id="envelope-letter-text">Will you be my girlfriend? 💖<br><br>Hope you like this little surprise!</p>
+                        <!-- 🚀 NEW: Wrapper to hide content until opened -->
+                        <div class="letter-content">
+                            <p id="envelope-letter-text"></p>
+                            
+                            <!-- 🚀 NEW: Buttons moved ONTO the letter -->
+                            <div id="evasion-arena" class="evasion-arena" style="display: none;">
+                                <button id="envelopeYesBtn" class="magic-btn arena-yes-btn">
+                                    <span class="btn-text">YES 💖</span>
+                                </button>
+                                <button id="envelopeNoBtn" class="magic-btn arena-no-btn">
+                                    <span class="btn-text">No 😏</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="envelope-front"></div>
                 </div>
@@ -306,22 +319,9 @@
             
             <p class="click-hint">Tap on envelope to open 👆</p>
 
-            <!-- Evasive Decision Arena (Hidden until envelope opens) -->
-            <div id="evasion-arena" class="evasion-arena" style="display: none;">
-                <!-- Yes Button (Fixed Anchor) -->
-                <button id="envelopeYesBtn" class="magic-btn arena-yes-btn">
-                    <span class="btn-text">YES 💖</span>
-                </button>
-
-                <!-- No Button (Evasive Physics Target) -->
-                <button id="envelopeNoBtn" class="magic-btn arena-no-btn">
-                    <span class="btn-text">No 😏</span>
-                </button>
-            </div>
-
-            <!-- Playful Dynamic Dialogue Toast -->
-            <div id="evasion-toast" class="evasion-toast" style="display: none;">
-                <span id="evasion-toast-text">The button ran away because it knows you want to say yes! 😜</span>
+            <!-- Playful Dynamic Dialogue Toast (Floating above everything) -->
+            <div id="evasion-toast" class="evasion-toast" style="display: none; position: relative; z-index: 100;">
+                <span id="evasion-toast-text"></span>
             </div>
 
             <!-- Success Next Button (Hidden until YES is clicked) -->
