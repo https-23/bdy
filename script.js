@@ -524,6 +524,7 @@ const envelopeReactionGif = document.getElementById("envelope-reaction-gif");
 const screen4Title = document.getElementById("screen4-title");
 const envelopeNextBtn = document.getElementById("envelopeNextBtn");
 const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
+const screen4 = document.getElementById("screen4"); // The safe container
 
 const evasionMessages = [
     "The button ran away because it knows you want to say yes! 😜",
@@ -543,18 +544,18 @@ const evasionPenguins = [
     "penguinJ6.gif", "penguinJ7.gif", "penguinJ8.gif", "penguinJ9.gif", "penguinJ10.gif"
 ];
 
-// 🚀 10 Screen-Safe Mobile Positions
+// 🚀 10 Specific Safe-Zone Positions for Roaming Penguins
 const penguinConfigs = [
-    { top: "8%", left: "8%", size: "85px", rot: "-12deg" },
-    { top: "55%", left: "65%", size: "95px", rot: "15deg" },
-    { top: "20%", left: "68%", size: "80px", rot: "10deg" },
-    { top: "60%", left: "6%", size: "90px", rot: "-15deg" },
-    { top: "10%", left: "40%", size: "85px", rot: "5deg" },
-    { top: "70%", left: "35%", size: "80px", rot: "-10deg" },
-    { top: "40%", left: "70%", size: "90px", rot: "20deg" },
-    { top: "35%", left: "6%", size: "75px", rot: "-20deg" },
-    { top: "72%", left: "10%", size: "85px", rot: "12deg" },
-    { top: "15%", left: "72%", size: "95px", rot: "-20deg" }
+    { top: "10%", left: "10%", size: "90px", rot: "-12deg" },
+    { top: "50%", left: "65%", size: "100px", rot: "15deg" },
+    { top: "25%", left: "60%", size: "95px", rot: "10deg" },
+    { top: "60%", left: "10%", size: "110px", rot: "-15deg" },
+    { top: "15%", left: "35%", size: "90px", rot: "5deg" },
+    { top: "65%", left: "40%", size: "85px", rot: "-10deg" },
+    { top: "45%", left: "60%", size: "105px", rot: "20deg" },
+    { top: "35%", left: "15%", size: "80px", rot: "-20deg" },
+    { top: "70%", left: "20%", size: "100px", rot: "12deg" },
+    { top: "20%", left: "70%", size: "115px", rot: "-20deg" }
 ];
 
 let dodgeCount = 0;
@@ -576,24 +577,24 @@ if (envelopeWrapperPhase3) {
     });
 }
 
-// 2. Strict Roaming Click Logic
+// 2. Strict Roaming Click Logic (NO Out-of-Bounds Bugs)
 function handleNoButtonClick(e) {
-    if (!envelopeNoBtn) return;
+    if (!envelopeNoBtn || !screen4) return;
     if (e) e.preventDefault(); 
 
-    // Move button to body so CSS transform doesn't distort it
-    if (envelopeNoBtn.parentElement !== document.body) {
-        document.body.appendChild(envelopeNoBtn);
+    // A. JAILBREAK BUTTON: Move to screen4 so it escapes the envelope
+    if (envelopeNoBtn.parentElement !== screen4) {
+        screen4.appendChild(envelopeNoBtn);
     }
 
-    envelopeNoBtn.style.position = 'fixed';
+    envelopeNoBtn.style.position = 'absolute'; // ABSOLUTE keeps it inside screen4
     envelopeNoBtn.style.zIndex = '99999';
     
-    // Strict mobile boundaries
+    // Calculate strict safe boundaries mathematically
     const paddingX = 25;
     const paddingY = 60;
-    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
-    const maxY = window.innerHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
+    const maxX = screen4.clientWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
+    const maxY = screen4.clientHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
     
     const randomX = paddingX + (Math.random() * Math.max(0, maxX));
     const randomY = paddingY + (Math.random() * Math.max(0, maxY));
@@ -607,10 +608,14 @@ function handleNoButtonClick(e) {
     const index = dodgeCount % 10;
     if (evasionToastText) evasionToastText.innerText = evasionMessages[index];
     
+    // B. JAILBREAK PENGUIN: Move to screen4 so it roams freely
     if (envelopeReactionGif) {
+        if (envelopeReactionGif.parentElement !== screen4) {
+            screen4.appendChild(envelopeReactionGif);
+        }
         const config = penguinConfigs[index];
         envelopeReactionGif.src = evasionPenguins[index];
-        envelopeReactionGif.style.position = "fixed";
+        envelopeReactionGif.style.position = "absolute";
         envelopeReactionGif.style.top = config.top;
         envelopeReactionGif.style.left = config.left;
         envelopeReactionGif.style.height = config.size;
@@ -619,6 +624,7 @@ function handleNoButtonClick(e) {
         envelopeReactionGif.style.transition = "all 0.3s ease";
     }
     
+    // C. Grow YES Button
     yesButtonScale += 0.12; 
     if (envelopeYesBtn) {
         envelopeYesBtn.style.transform = `scale(${yesButtonScale})`;
@@ -647,9 +653,13 @@ if (envelopeYesBtn) {
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
         
-        // Reset top penguin to celebration
-        if (envelopeReactionGif) {
-            envelopeReactionGif.style = ""; 
+        // Return top penguin to its normal wrapper and show TT2
+        const penguinWrapper = document.querySelector(".reaction-penguin-wrapper");
+        if (envelopeReactionGif && penguinWrapper) {
+            if (envelopeReactionGif.parentElement !== penguinWrapper) {
+                penguinWrapper.appendChild(envelopeReactionGif);
+            }
+            envelopeReactionGif.style = ""; // Wipes roaming CSS clean
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
         }
@@ -678,6 +688,8 @@ function resetEnvelopeScreen() {
     if (clickHint) clickHint.style.display = "block"; 
     
     if (evasionArena) evasionArena.style.display = "none";
+    
+    // Return No Button to Arena
     if (envelopeNoBtn) {
         if (evasionArena && envelopeNoBtn.parentElement !== evasionArena) {
             evasionArena.appendChild(envelopeNoBtn);
@@ -695,7 +707,12 @@ function resetEnvelopeScreen() {
     if (evasionToast) evasionToast.style.display = "none";
     if (screen4Title) screen4Title.innerText = "Open Me, One Surprise at a Time 💌";
     
-    if (envelopeReactionGif) {
+    // Return Top Penguin to Wrapper
+    const penguinWrapper = document.querySelector(".reaction-penguin-wrapper");
+    if (envelopeReactionGif && penguinWrapper) {
+        if (envelopeReactionGif.parentElement !== penguinWrapper) {
+            penguinWrapper.appendChild(envelopeReactionGif);
+        }
         envelopeReactionGif.style = ""; 
         envelopeReactionGif.src = "celeb-penguin.gif";
         envelopeReactionGif.className = "character reaction-penguin"; 
@@ -709,7 +726,7 @@ function resetEnvelopeScreen() {
 }
 
 document.body.addEventListener("click", (e) => {
-    if (e.target.closest('.backBtn') || e.target.closest('.heartNext')) {
+    if (e.target.closest('.backBtn') || e.target.closest('.heartNext') || e.target.closest('#envelopeNextBtn')) {
         setTimeout(resetEnvelopeScreen, 300);
     }
 });
