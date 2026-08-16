@@ -638,14 +638,13 @@ if (envelopeNoBtn) {
     envelopeNoBtn.addEventListener("click", handleNoButtonClick);
     envelopeNoBtn.addEventListener("touchstart", handleNoButtonClick, {passive: false});
 }
-
 // 3. The YES Button Victory! 🎉
 if (envelopeYesBtn) {
     envelopeYesBtn.addEventListener("click", () => {
         playPopSound();
         fireConfetti();
         
-        // 🚀 FIX 4: Instantly reset YES button size so it doesn't cover the screen!
+        // 🚀 INSTANT FIX: Shrink YES button back to normal
         yesButtonScale = 1;
         envelopeYesBtn.style.transform = "scale(1)";
         
@@ -654,29 +653,26 @@ if (envelopeYesBtn) {
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
         
-        // 🚀 FIX 2: Case Sensitivity fixed (lowercase 'p' in penguinTT2.gif)
+        // 🚀 INSTANT FIX: Wipe all roaming memory so PenguinTT2 appears safely at the top
         if (envelopeReactionGif) {
+            envelopeReactionGif.style = ""; // Wipes the 'fixed' roaming CSS clean!
             envelopeReactionGif.src = "penguinTT2.gif";
-            envelopeReactionGif.style.position = "relative";
-            envelopeReactionGif.style.top = "auto";
-            envelopeReactionGif.style.left = "auto";
-            envelopeReactionGif.style.height = "110px";
-            envelopeReactionGif.style.transform = "none";
+            envelopeReactionGif.className = "character reaction-penguin"; // Restores normal CSS
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
-        // 🚀 FIX 3: Ensure Next Button appears and screen scrolls to it
+        // 🚀 INSTANT FIX: Force Next button above everything & scroll to it
         if (envelopeNextBtn) {
-            envelopeNextBtn.style.display = "inline-block";
-            envelopeNextBtn.style.marginTop = "25px";
-            envelopeNextBtn.style.zIndex = "100";
+            envelopeNextBtn.style.display = "block";
+            envelopeNextBtn.style.position = "relative";
+            envelopeNextBtn.style.margin = "20px auto";
+            envelopeNextBtn.style.zIndex = "9999";
             
-            // Smoothly scroll down so she instantly sees the next button
             setTimeout(() => {
-                envelopeNextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 150);
+                envelopeNextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
         }
     });
 }
