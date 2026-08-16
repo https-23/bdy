@@ -335,34 +335,32 @@ button.heartNext {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 100;
 }
-/* --- Grand Envelope Logic (Responsive & Safe Fix) --- */
+/* --- Grand Envelope Logic (STRICT ALIGNMENT FIX) --- */
 .envelope-wrapper {
     position: relative;
-    width: 320px; /* 🚀 Safe for all mobile screens */
-    height: 200px; 
+    width: 300px; /* Safe width for all mobile phones */
+    height: 200px;
     margin: 20px auto 10px auto;
     cursor: pointer;
-    pointer-events: auto; 
+    pointer-events: auto;
 }
 .envelope {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #d93838; 
+    background: #d93838;
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
 }
 .envelope-front {
     position: absolute;
     bottom: 0;
+    left: 0; /* 🚀 Forces absolute alignment */
     width: 0;
     height: 0;
-    border-left: 160px solid transparent; 
-    border-right: 160px solid transparent;
-    border-bottom: 130px solid #c0392b; 
+    border-left: 150px solid transparent; /* 🚀 Exactly half of 300px */
+    border-right: 150px solid transparent;
+    border-bottom: 130px solid #c0392b;
     z-index: 3;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
@@ -371,22 +369,22 @@ button.heartNext {
 .letter {
     position: absolute;
     bottom: 10px;
-    width: 92%;
-    height: 240px; /* 🚀 Taller to fit question perfectly */
+    left: 5%; /* 🚀 Mathematically locks the 90% width dead center */
+    width: 90%;
+    height: 240px; 
     background: #fdf5c9;
     padding: 15px 10px;
     box-sizing: border-box;
     border: 1px dashed #d1c077;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 2; 
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 2;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.envelope-wrapper.open .letter { 
-    transform: translateY(-160px); 
-    z-index: 4; 
+.envelope-wrapper.open .letter {
+    transform: translateY(-160px);
+    z-index: 4;
 }
-
 /* --- Scratch Cards Layout --- */
 .mini-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; margin: 20px 0; }
 .mini-card {
