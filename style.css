@@ -1182,3 +1182,15 @@ h1, h2 {
     transition: transform 0.2s ease-out, opacity 0.15s ease;
     touch-action: none;
 }
+/* 🚀 PHASE 3: STRICT ENVELOPE SECRECY */
+#envelope-letter-text {
+    opacity: 0 !important;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+}
+
+.envelope-wrapper.open #envelope-letter-text {
+    opacity: 1 !important;
+    visibility: visible;
+    transition-delay: 0.7s; /* Mathematically waits for the letter to slide up first */
+}
