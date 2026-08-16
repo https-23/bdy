@@ -1386,8 +1386,3 @@ h1, h2 {
     margin-bottom: 15px;
     flex-shrink: 0;
 }
-/* Bade screens ko explicitly top se start hone do taaki scroll properly kaam kare */
-#screen4, #screen8 {
-    justify-content: flex-start !important;
-    padding-top: 10vh; /* Top se thodi breathing space */
-}
