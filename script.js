@@ -513,7 +513,7 @@ document.querySelectorAll(".backBtn").forEach(btn => {
     });
 });
 // ==========================================
-// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE (BUG-FREE VERSION)
+// 🏃‍♂️ PHASE 3: EVASION PHYSICS & REACTION ENGINE (BUG-FREE)
 // ==========================================
 const evasionArena = document.getElementById("evasion-arena");
 const envelopeYesBtn = document.getElementById("envelopeYesBtn");
@@ -525,7 +525,6 @@ const screen4Title = document.getElementById("screen4-title");
 const envelopeNextBtn = document.getElementById("envelopeNextBtn");
 const envelopeWrapperPhase3 = document.getElementById("envelope-wrapper");
 
-// 🚀 Exactly 10 Custom Messages
 const evasionMessages = [
     "The button ran away because it knows you want to say yes! 😜",
     "Try again... it's not gonna bite 😅",
@@ -539,30 +538,29 @@ const evasionMessages = [
     "The No button files a restraining order 🏃‍♂️"
 ];
 
-// 🚀 Exactly 10 Sequential Penguins
 const evasionPenguins = [
     "penguinJ1.gif", "penguinJ2.gif", "penguinJ3.gif", "penguinJ4.gif", "penguinJ5.gif",
     "penguinJ6.gif", "penguinJ7.gif", "penguinJ8.gif", "penguinJ9.gif", "penguinJ10.gif"
 ];
 
-// 🚀 10 Specific Mathematical Configurations for Penguins
+// 🚀 10 Screen-Safe Mobile Positions
 const penguinConfigs = [
-    { top: "10%", left: "10%", size: "130px", rot: "-15deg" }, // Top Left
-    { top: "60%", left: "65%", size: "160px", rot: "20deg" },  // Bottom Right
-    { top: "25%", left: "60%", size: "110px", rot: "10deg" },  // Mid Right
-    { top: "65%", left: "5%",  size: "140px", rot: "-20deg" }, // Bottom Left
-    { top: "15%", left: "40%", size: "125px", rot: "5deg" },   // Top Center
-    { top: "75%", left: "35%", size: "115px", rot: "-10deg" }, // Bottom Center
-    { top: "45%", left: "70%", size: "155px", rot: "25deg" },  // Mid Right (Lower)
-    { top: "35%", left: "5%",  size: "95px",  rot: "-25deg" }, // Mid Left
-    { top: "80%", left: "15%", size: "145px", rot: "15deg" },  // Far Bottom Left
-    { top: "20%", left: "75%", size: "175px", rot: "-30deg" }  // Top Right (Big)
+    { top: "8%", left: "8%", size: "85px", rot: "-12deg" },
+    { top: "55%", left: "65%", size: "95px", rot: "15deg" },
+    { top: "20%", left: "68%", size: "80px", rot: "10deg" },
+    { top: "60%", left: "6%", size: "90px", rot: "-15deg" },
+    { top: "10%", left: "40%", size: "85px", rot: "5deg" },
+    { top: "70%", left: "35%", size: "80px", rot: "-10deg" },
+    { top: "40%", left: "70%", size: "90px", rot: "20deg" },
+    { top: "35%", left: "6%", size: "75px", rot: "-20deg" },
+    { top: "72%", left: "10%", size: "85px", rot: "12deg" },
+    { top: "15%", left: "72%", size: "95px", rot: "-20deg" }
 ];
 
 let dodgeCount = 0;
 let yesButtonScale = 1;
 
-// 1. Reveal Arena when Envelope Opens
+// 1. Envelope Open Logic
 if (envelopeWrapperPhase3) {
     envelopeWrapperPhase3.addEventListener("click", () => {
         if (!envelopeWrapperPhase3.classList.contains("open")) { 
@@ -574,31 +572,29 @@ if (envelopeWrapperPhase3) {
         
         setTimeout(() => {
             if (evasionArena) evasionArena.style.display = "flex";
-        }, 800); 
+        }, 600); 
     });
 }
-// 2. High-Performance Roaming Physics & Strict Click Events
+
+// 2. Strict Roaming Click Logic
 function handleNoButtonClick(e) {
     if (!envelopeNoBtn) return;
     if (e) e.preventDefault(); 
 
-    // A. JAILBREAK: Move the button out of the letter so it doesn't get trapped by CSS
-    const screen4 = document.getElementById("screen4");
-    if (envelopeNoBtn.parentElement !== screen4) {
-        screen4.appendChild(envelopeNoBtn); // Moves it safely to the main screen
+    // Move button to body so CSS transform doesn't distort it
+    if (envelopeNoBtn.parentElement !== document.body) {
+        document.body.appendChild(envelopeNoBtn);
     }
 
     envelopeNoBtn.style.position = 'fixed';
-    envelopeNoBtn.style.zIndex = '99999'; // Float above everything
+    envelopeNoBtn.style.zIndex = '99999';
     
-    // B. STRICT BOUNDARIES: Guarantee it stays on the mobile screen
-    const paddingX = 35; // Safe distance from left/right walls
-    const paddingY = 80; // Safe distance from top/bottom walls
-    
+    // Strict mobile boundaries
+    const paddingX = 25;
+    const paddingY = 60;
     const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
     const maxY = window.innerHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
     
-    // Math.max(0, ...) ensures it never calculates a negative position on tiny screens
     const randomX = paddingX + (Math.random() * Math.max(0, maxX));
     const randomY = paddingY + (Math.random() * Math.max(0, maxY));
     
@@ -606,7 +602,6 @@ function handleNoButtonClick(e) {
     envelopeNoBtn.style.top = `${randomY}px`;
     envelopeNoBtn.style.transform = 'none'; 
     
-    // C. Trigger Messages & Penguins STRICTLY on click
     if (evasionToast) evasionToast.style.display = "block";
     
     const index = dodgeCount % 10;
@@ -621,35 +616,29 @@ function handleNoButtonClick(e) {
         envelopeReactionGif.style.height = config.size;
         envelopeReactionGif.style.transform = `rotate(${config.rot})`;
         envelopeReactionGif.style.zIndex = "999"; 
-        envelopeReactionGif.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+        envelopeReactionGif.style.transition = "all 0.3s ease";
     }
     
-    // D. Grow the YES Button
-    yesButtonScale += 0.15; 
+    yesButtonScale += 0.12; 
     if (envelopeYesBtn) {
         envelopeYesBtn.style.transform = `scale(${yesButtonScale})`;
     }
 
     dodgeCount++;
     playPopSound();
-    
-    envelopeNoBtn.classList.remove("blink-glitch");
-    void envelopeNoBtn.offsetWidth; 
-    envelopeNoBtn.classList.add("blink-glitch");
 }
 
-// Attach STRICT click listeners (No hovering allowed)
 if (envelopeNoBtn) {
     envelopeNoBtn.addEventListener("click", handleNoButtonClick);
     envelopeNoBtn.addEventListener("touchstart", handleNoButtonClick, {passive: false});
 }
-// 3. The YES Button Victory! 🎉
+
+// 3. Victory Click (Yes Button)
 if (envelopeYesBtn) {
     envelopeYesBtn.addEventListener("click", () => {
         playPopSound();
         fireConfetti();
         
-        // 🚀 INSTANT FIX: Shrink YES button back to normal
         yesButtonScale = 1;
         envelopeYesBtn.style.transform = "scale(1)";
         
@@ -658,30 +647,30 @@ if (envelopeYesBtn) {
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
         
-        // 🚀 INSTANT FIX: Wipe all roaming memory so PenguinTT2 appears safely at the top
+        // Reset top penguin to celebration
         if (envelopeReactionGif) {
-            envelopeReactionGif.style = ""; // Wipes the 'fixed' roaming CSS clean!
+            envelopeReactionGif.style = ""; 
             envelopeReactionGif.src = "penguinTT2.gif";
-            envelopeReactionGif.className = "character reaction-penguin"; // Restores normal CSS
+            envelopeReactionGif.className = "character reaction-penguin"; 
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
-        // 🚀 INSTANT FIX: Force Next button above everything & scroll to it
         if (envelopeNextBtn) {
-            envelopeNextBtn.style.display = "block";
+            envelopeNextBtn.style.display = "inline-block";
             envelopeNextBtn.style.position = "relative";
-            envelopeNextBtn.style.margin = "20px auto";
+            envelopeNextBtn.style.margin = "15px auto 0 auto";
             envelopeNextBtn.style.zIndex = "9999";
-            
-            setTimeout(() => {
-                envelopeNextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
         }
     });
 }
-// 4. RESET ENVELOPE ON BACK BUTTON (Full state reset)
+
+if (envelopeNextBtn) {
+    envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
+}
+
+// 4. Complete Screen 4 Reset
 function resetEnvelopeScreen() {
     if (envelopeWrapperPhase3) envelopeWrapperPhase3.classList.remove("open");
     
@@ -690,7 +679,6 @@ function resetEnvelopeScreen() {
     
     if (evasionArena) evasionArena.style.display = "none";
     if (envelopeNoBtn) {
-        // 🚀 Put the No Button back inside the envelope arena!
         if (evasionArena && envelopeNoBtn.parentElement !== evasionArena) {
             evasionArena.appendChild(envelopeNoBtn);
         }
@@ -704,7 +692,6 @@ function resetEnvelopeScreen() {
     
     yesButtonScale = 1;
     if (envelopeYesBtn) envelopeYesBtn.style.transform = "scale(1)";
-
     if (evasionToast) evasionToast.style.display = "none";
     if (screen4Title) screen4Title.innerText = "Open Me, One Surprise at a Time 💌";
     
@@ -721,10 +708,9 @@ function resetEnvelopeScreen() {
     dodgeCount = 0; 
 }
 
-// 5. GLOBAL INTERCEPTOR: Resets Screen 4 smoothly ANYTIME they navigate
 document.body.addEventListener("click", (e) => {
-    if (e.target.closest('.backBtn') || e.target.closest('.heartNext') || e.target.closest('#envelopeNextBtn')) {
-        setTimeout(resetEnvelopeScreen, 400); // 400ms waits for the screen transition to hide it safely
+    if (e.target.closest('.backBtn') || e.target.closest('.heartNext')) {
+        setTimeout(resetEnvelopeScreen, 300);
     }
 });
 // BACKGROUND PARTICLES
