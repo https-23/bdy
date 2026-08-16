@@ -494,12 +494,12 @@ button.heartNext {
     align-items: center;
     gap: 12px;
 }
-
+/* 1. Lock the YES button's pill shape perfectly during scale */
 .arena-yes-btn {
-    border-radius: 30px !important;
-    padding: 8px 22px !important;
-    font-size: 0.95rem !important;
-    z-index: 10;
+    border-radius: 100px !important; /* Extremely high value forces perfect roundness at any size */
+    overflow: hidden !important; 
+    /* The transition scales it smoothly without morphing the shape */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .arena-no-btn {
@@ -516,22 +516,29 @@ button.heartNext {
 }
 
 /* Toast Message */
+/* 2. Fix the Toast Message clipping issue */
 .evasion-toast {
-    position: fixed;
-    bottom: 75px;
+    position: absolute;
+    bottom: 80px; /* Keeps it right above the buttons */
     left: 50%;
-    transform: translateX(-50%);
-    width: 85%;
+    width: 90%;
     max-width: 320px;
+    text-align: center;
+    white-space: normal; /* Force long text to break into multiple lines safely */
+    word-wrap: break-word; /* Prevents overflow */
+    box-sizing: border-box;
+    
+    /* Retain your aesthetic */
     background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
     color: #ffffff;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 6px 18px rgba(255, 117, 140, 0.35);
+    padding: 12px 20px;
+    border-radius: 25px;
     border: 2px solid #ffffff;
-    z-index: 9999;
+    box-shadow: 0 6px 18px rgba(255, 117, 140, 0.35);
+    z-index: 100;
+    
+    /* Updated Animation to keep it perfectly centered */
+    animation: toastPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .click-hint {
@@ -1218,9 +1225,10 @@ h1, h2 {
     border: 2px solid #ffffff;
 }
 
+/* 3. Update the keyframes to include the centering X transform */
 @keyframes toastPop {
-    0% { transform: translateY(10px) scale(0.9); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% { transform: translateX(-50%) translateY(10px) scale(0.9); opacity: 0; }
+    100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
 }
 /* --- 🚀 Phase 1: Letter Content Fading & Button Placement --- */
 .letter-content {
