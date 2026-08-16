@@ -577,35 +577,41 @@ if (envelopeWrapperPhase3) {
         }, 800); 
     });
 }
-
 // 2. High-Performance Roaming Physics & Strict Click Events
 function handleNoButtonClick(e) {
     if (!envelopeNoBtn) return;
     if (e) e.preventDefault(); 
 
-    // A. Make the No Button roam the ENTIRE Screen safely
+    // A. JAILBREAK: Move the button out of the letter so it doesn't get trapped by CSS
+    const screen4 = document.getElementById("screen4");
+    if (envelopeNoBtn.parentElement !== screen4) {
+        screen4.appendChild(envelopeNoBtn); // Moves it safely to the main screen
+    }
+
     envelopeNoBtn.style.position = 'fixed';
+    envelopeNoBtn.style.zIndex = '99999'; // Float above everything
     
-    const padding = 30;
-    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - padding;
-    const maxY = window.innerHeight - envelopeNoBtn.offsetHeight - padding;
+    // B. STRICT BOUNDARIES: Guarantee it stays on the mobile screen
+    const paddingX = 35; // Safe distance from left/right walls
+    const paddingY = 80; // Safe distance from top/bottom walls
     
-    const randomX = Math.max(padding, Math.random() * maxX);
-    const randomY = Math.max(padding, Math.random() * maxY);
+    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
+    const maxY = window.innerHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
+    
+    // Math.max(0, ...) ensures it never calculates a negative position on tiny screens
+    const randomX = paddingX + (Math.random() * Math.max(0, maxX));
+    const randomY = paddingY + (Math.random() * Math.max(0, maxY));
     
     envelopeNoBtn.style.left = `${randomX}px`;
     envelopeNoBtn.style.top = `${randomY}px`;
     envelopeNoBtn.style.transform = 'none'; 
     
-    // B. Trigger Messages & Penguins STRICTLY on click
+    // C. Trigger Messages & Penguins STRICTLY on click
     if (evasionToast) evasionToast.style.display = "block";
     
-    // Mathematical modulo ensures it loops 0-9 safely forever
     const index = dodgeCount % 10;
-    
     if (evasionToastText) evasionToastText.innerText = evasionMessages[index];
     
-    // C. Roaming Penguin Logic
     if (envelopeReactionGif) {
         const config = penguinConfigs[index];
         envelopeReactionGif.src = evasionPenguins[index];
@@ -614,12 +620,12 @@ function handleNoButtonClick(e) {
         envelopeReactionGif.style.left = config.left;
         envelopeReactionGif.style.height = config.size;
         envelopeReactionGif.style.transform = `rotate(${config.rot})`;
-        envelopeReactionGif.style.zIndex = "999"; // Keeps penguin on top of text
+        envelopeReactionGif.style.zIndex = "999"; 
         envelopeReactionGif.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
     }
     
-    // D. Grow the YES Button smoothly
-    yesButtonScale += 0.15; // Grows by 15% per click
+    // D. Grow the YES Button
+    yesButtonScale += 0.15; 
     if (envelopeYesBtn) {
         envelopeYesBtn.style.transform = `scale(${yesButtonScale})`;
     }
@@ -627,7 +633,6 @@ function handleNoButtonClick(e) {
     dodgeCount++;
     playPopSound();
     
-    // Small visual glitch effect for the No button
     envelopeNoBtn.classList.remove("blink-glitch");
     void envelopeNoBtn.offsetWidth; 
     envelopeNoBtn.classList.add("blink-glitch");
@@ -685,28 +690,28 @@ function resetEnvelopeScreen() {
     
     if (evasionArena) evasionArena.style.display = "none";
     if (envelopeNoBtn) {
+        // 🚀 Put the No Button back inside the envelope arena!
+        if (evasionArena && envelopeNoBtn.parentElement !== evasionArena) {
+            evasionArena.appendChild(envelopeNoBtn);
+        }
         envelopeNoBtn.style.display = "inline-block";
         envelopeNoBtn.style.position = "relative";
         envelopeNoBtn.style.left = "auto";
         envelopeNoBtn.style.top = "auto";
         envelopeNoBtn.style.transform = "none"; 
+        envelopeNoBtn.style.zIndex = "20";
     }
     
     yesButtonScale = 1;
     if (envelopeYesBtn) envelopeYesBtn.style.transform = "scale(1)";
 
     if (evasionToast) evasionToast.style.display = "none";
-    
     if (screen4Title) screen4Title.innerText = "Open Me, One Surprise at a Time 💌";
     
-    // Reset the Roaming Penguin to the wrapper
     if (envelopeReactionGif) {
+        envelopeReactionGif.style = ""; 
         envelopeReactionGif.src = "celeb-penguin.gif";
-        envelopeReactionGif.style.position = "relative";
-        envelopeReactionGif.style.top = "auto";
-        envelopeReactionGif.style.left = "auto";
-        envelopeReactionGif.style.height = "110px";
-        envelopeReactionGif.style.transform = "none";
+        envelopeReactionGif.className = "character reaction-penguin"; 
     }
     
     const sidePenguin = document.querySelector(".side-penguin");
