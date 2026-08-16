@@ -232,9 +232,12 @@ body {
 .screen {
     display: none; 
     flex-direction: column;
-    justify-content: center;
+    
+    /* 👇 YAHI MAIN FIX HAI: flex-start ko hata kar center kiya hai 👇 */
+    justify-content: center; 
+    
     align-items: center;
-    height: 100%;
+    height: 100dvh; /* Mobile screens ke liye perfect height */
     padding: 20px;
     text-align: center;
     box-sizing: border-box;
@@ -242,7 +245,6 @@ body {
     position: absolute;
     width: 100%;
 }
-
 .screen.active {
     display: flex;
     animation: fadeIn 0.5s ease-out forwards;
@@ -1383,4 +1385,9 @@ h1, h2 {
     font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
     margin-bottom: 15px;
     flex-shrink: 0;
+}
+/* Bade screens ko explicitly top se start hone do taaki scroll properly kaam kare */
+#screen4, #screen8 {
+    justify-content: flex-start !important;
+    padding-top: 10vh; /* Top se thodi breathing space */
 }
