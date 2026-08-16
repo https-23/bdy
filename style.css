@@ -335,16 +335,31 @@ button.heartNext {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     z-index: 100;
 }
-/* --- Grand Envelope Logic (EXACT ORIGINAL SIZES) --- */
+/* =========================================
+   PHASE 1: ENVELOPE & PENGUIN STRUCTURAL FIX
+   ========================================= */
+/* 1. Strictly bind the penguin to absolute coordinates */
+.side-penguin {
+    position: absolute !important;
+    bottom: 20px;            
+    right: -25px;            
+    height: 110px !important; 
+    width: auto !important;
+    z-index: 5;              
+    pointer-events: none;    
+    transform: rotate(5deg); 
+}
+
+/* 2. Reinforce the Envelope Wrapper against flex-collapse */
 .envelope-wrapper {
     position: relative;
-    width: 320px; 
-    max-width: 100%; /* FIX: Ensures it never exceeds the screen width */
-    height: 200px; 
-    margin: 20px auto 10px auto;
+    width: 320px;
+    max-width: 90vw;         
+    height: 200px;
+    margin: 30px auto 10px auto; 
     cursor: pointer;
-    pointer-events: auto; 
-    transform-origin: bottom center; /* FIX: Keeps the envelope anchored when scaling */
+    pointer-events: auto;
+    transform-origin: bottom center; 
 }
 .envelope {
     position: relative;
@@ -1194,4 +1209,58 @@ h1, h2 {
 #screen4 {
     padding-top: 8vh;
     padding-bottom: 15vh;
+}
+/* =========================================
+   PHASE 2: INTERNAL LETTER & TOP PENGUIN RESTRAINT
+   ========================================= */
+
+/* 1. Restrain the Top Reaction Penguin so it doesn't push the layout down */
+.reaction-penguin-wrapper {
+    height: 110px; /* Mathematically lock the wrapper height */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: 5px;
+    flex-shrink: 0; /* Prevents the screen container from crushing it */
+}
+
+#envelope-reaction-gif {
+    height: 100px !important; /* Force strict maximum height */
+    width: auto !important;
+    object-fit: contain;
+}
+
+/* 2. Control the internal Letter layout so the new features fit perfectly */
+.letter-content {
+    position: relative;
+    width: 100%;
+    height: 100%; /* Fill the 220px letter perfectly, not a pixel more */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Keeps text anchored to the top */
+    padding-top: 5px; 
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent text from bleeding out of the letter */
+}
+
+#envelope-letter-text {
+    text-align: center;
+    line-height: 1.3;
+    margin-bottom: auto; /* Dynamically pushes the buttons to the absolute bottom */
+    width: 100%;
+}
+
+/* 3. Secure the New Evasion Buttons onto the letter */
+.evasion-arena {
+    position: absolute; /* Anchor directly to the bottom of the letter container */
+    bottom: 8px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px; 
+    z-index: 10; /* Ensure they stay clickable above the letter text */
 }
