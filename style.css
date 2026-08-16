@@ -1264,3 +1264,50 @@ h1, h2 {
     gap: 15px; 
     z-index: 10; /* Ensure they stay clickable above the letter text */
 }
+/* =========================================
+   PHASE 3: ENVELOPE GEOMETRY & VIEWPORT SAFE-ZONES
+   ========================================= */
+
+/* 1. Lock the exact sizing of the main envelope parts */
+.envelope {
+    position: relative;
+    width: 320px !important;
+    height: 200px !important;
+    background: #d93838;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; 
+    flex-shrink: 0 !important; /* Extremely important: stops flexbox from crushing the envelope */
+}
+
+/* 2. Lock the front flap dimensions (the triangle part) */
+.envelope-front {
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-left: 160px solid transparent !important;
+    border-right: 160px solid transparent !important;
+    border-bottom: 130px solid #c0392b !important;
+    z-index: 3;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    pointer-events: none;
+}
+
+/* 3. Ensure Screen 4 handles vertical space safely without breaking */
+#screen4 {
+    justify-content: center !important; /* Centers the envelope vertically */
+    padding-top: 5vh;
+    padding-bottom: 10vh;
+    min-height: 100dvh;
+}
+
+/* 4. Fix Title wrapping issue so it doesn't push the layout downwards */
+#screen4-title {
+    font-size: clamp(1.5rem, 6vw, 2.2rem) !important;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
