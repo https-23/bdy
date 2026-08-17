@@ -583,32 +583,35 @@ function handleNoButtonClick(e) {
     if (!envelopeNoBtn || !screen4) return;
     if (e) e.preventDefault(); 
     
-    // A. THE ULTIMATE JAILBREAK: Move to document.body so it escapes all screen animations!
-    if (envelopeNoBtn.parentElement !== document.body) {
-        document.body.appendChild(envelopeNoBtn);
+    // 🚀 ARCHITECT FIX 2.0: Body ke bajaye button ko wapas Screen 4 me lock karo
+    if (envelopeNoBtn.parentElement !== screen4) {
+        screen4.appendChild(envelopeNoBtn);
     }
 
-    envelopeNoBtn.style.position = 'fixed'; 
+    // 🚀 CRITICAL FIX: Purani CSS (margin/right/bottom) ko completely kill karo taaki math kharab na ho
+    envelopeNoBtn.style.position = 'absolute'; 
     envelopeNoBtn.style.zIndex = '999999';
+    envelopeNoBtn.style.margin = '0px';  
+    envelopeNoBtn.style.right = 'auto';  
+    envelopeNoBtn.style.bottom = 'auto'; 
+    envelopeNoBtn.style.transform = 'none';  
     
-    // 🚀 ARCHITECT FIX: Dynamically get actual button size to prevent clipping!
-    const btnRect = envelopeNoBtn.getBoundingClientRect();
-    const actualWidth = btnRect.width || 110;  // Fallback to strict CSS width
-    const actualHeight = btnRect.height || 42; // Fallback to strict CSS height
+    // 📏 Exact screen measurement dynamically nikalo
+    const box = screen4.getBoundingClientRect();
+    const btnWidth = 110;  // Tumhara locked CSS width
+    const btnHeight = 42;  // Tumhara locked CSS height
     
-    // 🚀 ARCHITECT FIX: Strict Math to lock button inside the screen minus 20px padding
-    const padding = 20;
-    const maxX = window.innerWidth - actualWidth - padding; 
-    const maxY = window.innerHeight - actualHeight - padding - 80; // 80px extra safety for bottom edges
+    // 🧮 STRICT MATH: Max Width me se Button ka size aur extra 30px safety buffer hata diya
+    const maxX = box.width - btnWidth - 30; 
+    const maxY = box.height - btnHeight - 120; // Neeche se 120px safe zone
     
-    // Generate random coordinates strictly within the visible safe zone
-    // Math.min aur Math.max use kiya hai taaki values kabhi negative ya off-screen na jayein
-    const randomX = Math.max(padding, Math.random() * maxX);
-    const randomY = Math.max(80, Math.random() * maxY); // Top se 80px neeche hi rahega
+    // 🎯 Position generate karo (Left se min 20px, Top se min 80px)
+    const randomX = Math.floor(Math.max(20, Math.random() * maxX));
+    const randomY = Math.floor(Math.max(80, Math.random() * maxY));
     
+    // Apply exact positions
     envelopeNoBtn.style.left = `${randomX}px`;
     envelopeNoBtn.style.top = `${randomY}px`;
-    envelopeNoBtn.style.transform = 'none';  
     
     if (evasionToast) evasionToast.style.display = "block";
     
