@@ -583,30 +583,30 @@ if (envelopeWrapperPhase3) {
 function handleNoButtonClick(e) {
     if (!envelopeNoBtn || !screen4) return;
     if (e) e.preventDefault(); 
-
-    // A. JAILBREAK BUTTON: Move to screen4 so it escapes the envelope
-    if (envelopeNoBtn.parentElement !== screen4) {
-        screen4.appendChild(envelopeNoBtn);
+    // A. THE ULTIMATE JAILBREAK: Move to document.body so it escapes all screen animations!
+    if (envelopeNoBtn.parentElement !== document.body) {
+        document.body.appendChild(envelopeNoBtn);
     }
-// 👇 1. THE ARCHITECT FIX: USE 'FIXED' INSTEAD OF 'ABSOLUTE' 👇
+
     envelopeNoBtn.style.position = 'fixed'; 
-    envelopeNoBtn.style.zIndex = '99999';
+    envelopeNoBtn.style.zIndex = '999999';
     
-    // 👇 2. BULLETPROOF VIEWPORT MATH (No scroll parameters needed) 👇
-    const safePaddingX = 25;
-    const safeTopPadding = 120;     // Keeps it safely below the back button
-    const safeBottomPadding = 180;  // Keeps it safely above the Toast Message
+    // BULLETPROOF VIEWPORT MATH
+    const buttonWidth = 110;
+    const buttonHeight = 42;
     
-    const maxX = window.innerWidth - 110 - (safePaddingX * 2); // 110 is the button width
-    const maxY = window.innerHeight - 42 - safeTopPadding - safeBottomPadding; // 42 is the button height
+    // Calculate safe boundaries (keeps it strictly inside the visible screen)
+    const maxX = window.innerWidth - buttonWidth - 20; 
+    const maxY = window.innerHeight - buttonHeight - 120; // 120 keeps it away from top/bottom edges
     
-    const randomX = safePaddingX + (Math.random() * Math.max(0, maxX));
-    const randomY = safeTopPadding + (Math.random() * Math.max(0, maxY));
+    // Generate random coordinates within the safe zone
+    const randomX = 10 + (Math.random() * Math.max(0, maxX));
+    const randomY = 80 + (Math.random() * Math.max(0, maxY));
     
     envelopeNoBtn.style.left = `${randomX}px`;
     envelopeNoBtn.style.top = `${randomY}px`;
-    envelopeNoBtn.style.transform = 'none';
-
+    envelopeNoBtn.style.transform = 'none';  
+    
     if (evasionToast) evasionToast.style.display = "block";
     
     const index = dodgeCount % 10;
