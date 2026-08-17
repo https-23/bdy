@@ -1491,3 +1491,16 @@ h1, h2 {
     /* Ensure it stays smooth when jumping */
     transition: top 0.2s ease-out, left 0.2s ease-out !important;
 }
+/* --- 1. Form Wrapper Styles (Keyboard & Scroll Safe) --- */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw !important;
+    max-width: 100vw !important; /* 🚀 Strict Lock for mobile */
+    height: auto !important; 
+    min-height: 100vh;
+    overflow-x: hidden !important; /* 🚀 Cuts off anything going out */
+    overflow-y: auto !important; 
+    background: var(--bg-gradient);
+    position: relative;
+}
