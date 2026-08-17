@@ -591,10 +591,6 @@ function handleNoButtonClick(e) {
     envelopeNoBtn.style.position = 'fixed'; 
     envelopeNoBtn.style.zIndex = '999999';
     
-    // BULLETPROOF VIEWPORT MATH
-    const buttonWidth = 110;
-    const buttonHeight = 42;
-    
     // Calculate safe boundaries (keeps it strictly inside the visible screen)
     const maxX = window.innerWidth - buttonWidth - 20; 
     const maxY = window.innerHeight - buttonHeight - 120; // 120 keeps it away from top/bottom edges
