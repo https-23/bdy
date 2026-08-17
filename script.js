@@ -580,15 +580,17 @@ if (envelopeWrapperPhase3) {
 }
 // 2. Strict Roaming Click Logic (NO Out-of-Bounds Bugs)
 function handleNoButtonClick(e) {
-    if (!envelopeNoBtn || !screen4) return;
+    if (!envelopeNoBtn) return;
     if (e) e.preventDefault(); 
     
-    // 🚀 ARCHITECT FIX 2.0: Body ke bajaye button ko wapas Screen 4 me lock karo
-    if (envelopeNoBtn.parentElement !== screen4) {
-        screen4.appendChild(envelopeNoBtn);
+    // 🚀 ARCHITECT FIX 3.0: Attach strictly to the main #app wrapper!
+    // #app has strict max-width 420px and overflow hidden.
+    const appContainer = document.getElementById('app');
+    if (envelopeNoBtn.parentElement !== appContainer) {
+        appContainer.appendChild(envelopeNoBtn);
     }
 
-    // 🚀 CRITICAL FIX: Purani CSS (margin/right/bottom) ko completely kill karo taaki math kharab na ho
+    // 🚀 CRITICAL FIX: Clean up any conflicting CSS from old positions
     envelopeNoBtn.style.position = 'absolute'; 
     envelopeNoBtn.style.zIndex = '999999';
     envelopeNoBtn.style.margin = '0px';  
@@ -596,18 +598,18 @@ function handleNoButtonClick(e) {
     envelopeNoBtn.style.bottom = 'auto'; 
     envelopeNoBtn.style.transform = 'none';  
     
-    // 📏 Exact screen measurement dynamically nikalo
-    const box = screen4.getBoundingClientRect();
-    const btnWidth = 110;  // Tumhara locked CSS width
-    const btnHeight = 42;  // Tumhara locked CSS height
+    // 📏 Exact App Container measurement
+    const box = appContainer.getBoundingClientRect();
+    const btnWidth = 110;  
+    const btnHeight = 42;  
     
-    // 🧮 STRICT MATH: Max Width me se Button ka size aur extra 30px safety buffer hata diya
-    const maxX = box.width - btnWidth - 30; 
-    const maxY = box.height - btnHeight - 120; // Neeche se 120px safe zone
+    // 🧮 Math based ONLY on the safe #app container width
+    const maxX = box.width - btnWidth - 20; 
+    const maxY = box.height - btnHeight - 120; // Bottom se safe zone
     
-    // 🎯 Position generate karo (Left se min 20px, Top se min 80px)
-    const randomX = Math.floor(Math.max(20, Math.random() * maxX));
-    const randomY = Math.floor(Math.max(80, Math.random() * maxY));
+    // 🎯 Generate absolutely safe position (Left/Top se andar hi rahega)
+    const randomX = Math.max(15, Math.floor(Math.random() * maxX));
+    const randomY = Math.max(80, Math.floor(Math.random() * maxY));
     
     // Apply exact positions
     envelopeNoBtn.style.left = `${randomX}px`;
@@ -619,7 +621,7 @@ function handleNoButtonClick(e) {
     if (evasionToastText) evasionToastText.innerText = evasionMessages[index];
     
     // B. JAILBREAK PENGUIN
-    if (envelopeReactionGif) {
+    if (envelopeReactionGif && screen4) {
         if (envelopeReactionGif.parentElement !== screen4) {
             screen4.appendChild(envelopeReactionGif);
         }
