@@ -546,18 +546,18 @@ const evasionPenguins = [
     "penguinJ6.gif", "penguinJ7.gif", "penguinJ8.gif", "penguinJ9.gif", "penguinJ10.gif"
 ];
 
-// 🚀 10 Specific Safe-Zone Positions for Roaming Penguins
+// 🚀 10 Specific Safe-Zone Positions for Roaming Penguins (Sizes Increased by ~10%)
 const penguinConfigs = [
-    { top: "10%", left: "10%", size: "90px", rot: "-12deg" },
-    { top: "50%", left: "65%", size: "100px", rot: "15deg" },
-    { top: "25%", left: "60%", size: "95px", rot: "10deg" },
-    { top: "60%", left: "10%", size: "110px", rot: "-15deg" },
-    { top: "15%", left: "35%", size: "90px", rot: "5deg" },
-    { top: "65%", left: "40%", size: "85px", rot: "-10deg" },
-    { top: "45%", left: "60%", size: "105px", rot: "20deg" },
-    { top: "35%", left: "15%", size: "80px", rot: "-20deg" },
-    { top: "70%", left: "20%", size: "100px", rot: "12deg" },
-    { top: "20%", left: "70%", size: "115px", rot: "-20deg" }
+    { top: "10%", left: "10%", size: "100px", rot: "-12deg" },
+    { top: "50%", left: "65%", size: "110px", rot: "15deg" },
+    { top: "25%", left: "60%", size: "105px", rot: "10deg" },
+    { top: "60%", left: "10%", size: "120px", rot: "-15deg" },
+    { top: "15%", left: "35%", size: "100px", rot: "5deg" },
+    { top: "65%", left: "40%", size: "95px", rot: "-10deg" },
+    { top: "45%", left: "60%", size: "115px", rot: "20deg" },
+    { top: "35%", left: "15%", size: "90px", rot: "-20deg" },
+    { top: "70%", left: "20%", size: "110px", rot: "12deg" },
+    { top: "20%", left: "70%", size: "125px", rot: "-20deg" }
 ];
 
 let dodgeCount = 0;
@@ -620,7 +620,7 @@ function handleNoButtonClick(e) {
     const index = dodgeCount % 10;
     if (evasionToastText) evasionToastText.innerText = evasionMessages[index];
     
-    // B. JAILBREAK PENGUIN
+        // B. JAILBREAK PENGUIN
     if (envelopeReactionGif && screen4) {
         if (envelopeReactionGif.parentElement !== screen4) {
             screen4.appendChild(envelopeReactionGif);
@@ -630,12 +630,15 @@ function handleNoButtonClick(e) {
         envelopeReactionGif.style.position = "absolute";
         envelopeReactionGif.style.top = config.top;
         envelopeReactionGif.style.left = config.left;
-        envelopeReactionGif.style.height = config.size;
+        
+        // 🚀 FIX: CSS me max-height 70px !important laga hai, isliye setProperty se bypass kiya
+        envelopeReactionGif.style.setProperty('height', config.size, 'important');
+        envelopeReactionGif.style.setProperty('max-height', config.size, 'important');
+        
         envelopeReactionGif.style.transform = `rotate(${config.rot})`;
         envelopeReactionGif.style.zIndex = "999"; 
         envelopeReactionGif.style.transition = "all 0.3s ease";
     }
-    
     // C. Grow YES Button
     yesButtonScale += 0.12; 
     if (envelopeYesBtn) {
