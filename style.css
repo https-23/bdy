@@ -1440,3 +1440,54 @@ h1, h2 {
     transform: scale(0.95);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
+/* =========================================
+   PHASE 1: YES & NO BUTTON SHAPE OVERRIDE
+   ========================================= */
+
+/* 1. Kill the 100% width from .magic-btn and lock the geometry */
+.arena-yes-btn, .arena-no-btn {
+    width: auto !important;          /* 🛑 OVERRIDES .magic-btn stretching */
+    min-width: 120px !important;     /* Keeps them a nice uniform size */
+    border-radius: 50px !important;  /* Perfect rounded pill shape */
+    padding: 10px 30px !important;   /* Balanced internal spacing */
+    white-space: nowrap !important;  /* Stops text from wrapping to a second line */
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;       /* Prevents Flexbox from crushing them */
+}
+
+/* 2. Specific smooth scaling for the YES button */
+.arena-yes-btn {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    transform-origin: center center !important;
+}
+
+/* 3. Specific smooth roaming for the NO button */
+.arena-no-btn {
+    position: relative !important; 
+    transition: transform 0.2s ease-out, top 0.2s ease-out, left 0.2s ease-out !important;
+}
+/* =========================================
+   PHASE 2: ABSOLUTE NO BUTTON SHAPE LOCK
+   ========================================= */
+
+#envelopeNoBtn {
+    width: 110px !important;       /* Hard-locked exact width */
+    max-width: 110px !important;   /* Never stretch beyond this */
+    height: 42px !important;       /* Hard-locked exact height */
+    max-height: 42px !important;   /* Never grow taller */
+    
+    border-radius: 50px !important; /* Permanent pill shape */
+    padding: 0 !important;         /* Remove padding since we locked the height/width */
+    
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    
+    /* Ensure it stays smooth when jumping */
+    transition: top 0.2s ease-out, left 0.2s ease-out !important;
+}
