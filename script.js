@@ -588,29 +588,25 @@ function handleNoButtonClick(e) {
     if (envelopeNoBtn.parentElement !== screen4) {
         screen4.appendChild(envelopeNoBtn);
     }
-
-    envelopeNoBtn.style.position = 'absolute'; // ABSOLUTE keeps it inside screen4
+// 👇 1. THE ARCHITECT FIX: USE 'FIXED' INSTEAD OF 'ABSOLUTE' 👇
+    envelopeNoBtn.style.position = 'fixed'; 
     envelopeNoBtn.style.zIndex = '99999';
     
-        // Calculate strict safe boundaries mathematically
-    const paddingX = 25;
-    const paddingY = 80;
+    // 👇 2. BULLETPROOF VIEWPORT MATH (No scroll parameters needed) 👇
+    const safePaddingX = 25;
+    const safeTopPadding = 120;     // Keeps it safely below the back button
+    const safeBottomPadding = 180;  // Keeps it safely above the Toast Message
     
-    // 🐛 FIX: Calculate safe zones using the user's visible viewport, NOT the total scroll height
-    const maxX = window.innerWidth - envelopeNoBtn.offsetWidth - (paddingX * 2);
-    const visibleHeight = window.innerHeight;
-    const maxY = visibleHeight - envelopeNoBtn.offsetHeight - (paddingY * 2);
+    const maxX = window.innerWidth - 110 - (safePaddingX * 2); // 110 is the button width
+    const maxY = window.innerHeight - 42 - safeTopPadding - safeBottomPadding; // 42 is the button height
     
-    // 🐛 FIX: Add the current scroll position so the button stays exactly where the user is looking
-    const currentScroll = screen4.scrollTop || 0;
-    
-    const randomX = paddingX + (Math.random() * Math.max(0, maxX));
-    const randomY = currentScroll + paddingY + (Math.random() * Math.max(0, maxY));
+    const randomX = safePaddingX + (Math.random() * Math.max(0, maxX));
+    const randomY = safeTopPadding + (Math.random() * Math.max(0, maxY));
     
     envelopeNoBtn.style.left = `${randomX}px`;
     envelopeNoBtn.style.top = `${randomY}px`;
-    envelopeNoBtn.style.transform = 'none';  
-    
+    envelopeNoBtn.style.transform = 'none';
+
     if (evasionToast) evasionToast.style.display = "block";
     
     const index = dodgeCount % 10;
