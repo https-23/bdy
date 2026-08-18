@@ -663,7 +663,10 @@ if (envelopeYesBtn) {
         yesButtonScale = 1;
         envelopeYesBtn.style.transform = "scale(1)";
         
-        if (envelopeNoBtn) envelopeNoBtn.style.display = "none";
+        // 🚀 ARCHITECT FIX: setProperty use karke CSS ke !important ko bypass kiya
+        if (envelopeNoBtn) {
+            envelopeNoBtn.style.setProperty('display', 'none', 'important');
+        }
         if (evasionToast) evasionToast.style.display = "none";
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
@@ -709,7 +712,8 @@ function resetEnvelopeScreen() {
         if (evasionArena && envelopeNoBtn.parentElement !== evasionArena) {
             evasionArena.appendChild(envelopeNoBtn);
         }
-        envelopeNoBtn.style.display = "inline-block";
+        // 🚀 ARCHITECT FIX: Wapas laate waqt bhi !important lagana zaroori hai
+        envelopeNoBtn.style.setProperty('display', 'flex', 'important');
         envelopeNoBtn.style.position = "relative";
         envelopeNoBtn.style.left = "auto";
         envelopeNoBtn.style.top = "auto";
