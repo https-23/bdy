@@ -672,7 +672,6 @@ if (envelopeYesBtn) {
         // 🚀 ARCHITECT FIX: DOM Teleportation - Penguin ko direct Letter se jod do!
         const letterBox = document.querySelector(".letter");
         if (envelopeReactionGif && letterBox) {
-            // Penguin ko purane wrapper se nikal kar yellow letter box me daal do
             if (envelopeReactionGif.parentElement !== letterBox) {
                 letterBox.appendChild(envelopeReactionGif);
             }
@@ -684,19 +683,23 @@ if (envelopeYesBtn) {
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK: Absolute use karke Letter ke exactly top-center me set karo
+            // 🚀 MAGIC TRICK 4.0: 'bottom: 100%' lagao.
+            // Isse penguin ke pair hamesha letter ke ekdum TOP border par touch karenge,
+            // Wo text ko overlap nahi karega aur envelope layout 100% safe rahega!
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            
-            // Height 100px ki hai, aur top -85px kiya hai.
-            // Iska matlab uske pair theek letter ke top border par chipke rahenge!
-            envelopeReactionGif.style.setProperty('top', '-85px', 'important'); 
+            envelopeReactionGif.style.setProperty('bottom', '100%', 'important'); 
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
+            
+            // Center me lane ke liye
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             
-            // Size thodi badi ki bina design tode
-            envelopeReactionGif.style.setProperty('height', '100px', 'important'); 
+            // Size badi ki (110px mast bada dikhega aur screen se bahar bhi nahi katega)
+            envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); // Sabse front me
+            
+            // 5px ka minus margin taaki wo exactly border line par khada lage
+            envelopeReactionGif.style.setProperty('margin-bottom', '-5px', 'important'); 
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
