@@ -1036,6 +1036,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             
             if (result.status === 'success') {
                 const data = result.data;
+                
+                // 🚀 ARCHITECT FIX: Save fetched names into global memory so Canvas can use them!
+                window.magicalState.partnerName = data.partner_name;
+                window.magicalState.userName = data.user_name;
+                
                 const secretNameEl = document.getElementById('secret-name');
                 if (secretNameEl) secretNameEl.innerText = `For ${data.partner_name} 💖`;
                 
