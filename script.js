@@ -1410,7 +1410,7 @@ async function generateMagicStoryImage() {
         ctx.shadowColor = 'transparent'; 
 
         // 4. FANTASTIC INSTAGRAM TOUCH: THE NATIVE UI
-        const partnerName = window.magicalState.partnerName || "Someone Special";
+        const partnerName = window.magicalState.partnerName || "Someone";
         
         // --- Insta Header ---
         // Gradient Profile Ring
@@ -1484,7 +1484,7 @@ async function generateMagicStoryImage() {
         ctx.textAlign = "center";
         ctx.fillStyle = "#880e4f";
         ctx.font = "700 85px 'Caveat', cursive";
-        ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, footerY + 110);
+        ctx.fillText(`For ${partnerName} Special 💖`, CANVAS_WIDTH / 2, footerY + 110);
 
         // ==========================================
         // 🎯 6. MARKETING PLACEMENT & NEW TEXT
