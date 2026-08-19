@@ -1310,9 +1310,8 @@ window.magicQRCode = new Image();
 window.magicQRCode.crossOrigin = "Anonymous"; 
 
 // 3. We use a lightning-fast, library-free cloud API to generate the QR image.
-// Pointing exactly to your marketing strategy link: 10petalx.vercel.app
-window.magicQRCode.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://10petalx.vercel.app&margin=1";
-
+// Pointing exactly to your new Cloudflare Worker link
+window.magicQRCode.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://bdy.10petalxmagic.workers.dev&margin=1";
 // 4. Silent Error Handling: If the network drops, it won't crash the site.
 window.magicQRCode.onerror = () => {
     console.warn("⚠️ QR Code failed to preload, but the site will not crash.");
@@ -1481,11 +1480,20 @@ async function generateMagicStoryImage() {
         ctx.fillStyle = "#880e4f";
         ctx.font = "700 85px 'Caveat', cursive";
         ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, footerY + 110);
+        
+        // ==========================================
+        // 🎯 6. NEW TEXT & MARKETING PLACEMENT
+        // ==========================================
+        
+        // --- 1. Added "She Say Yesss" Text ---
+        const yesssTextY = cardY + cardHeight + 70; // Card ke theek neeche
+        ctx.font = "bold 65px 'Caveat', cursive"; // Beautiful cursive font
+        ctx.fillStyle = "#d93838"; // Romantic red color
+        ctx.textAlign = "center";
+        ctx.fillText("She Say Yesss 🥳😍", CANVAS_WIDTH / 2, yesssTextY);
 
-        // ==========================================
-        // 🎯 6. MARKETING PLACEMENT (Directly BELOW the white card)
-        // ==========================================
-        const marketingStartY = cardY + cardHeight + 40; // Starts right under the card
+        // --- 2. Marketing Placement shifted below the text ---
+        const marketingStartY = yesssTextY + 50; 
 
         // Draw QR Code
         const qrSize = 130; 
@@ -1500,15 +1508,15 @@ async function generateMagicStoryImage() {
             ctx.drawImage(window.magicQRCode, qrX, marketingStartY + 10, qrSize, qrSize);
         }
 
-        // Links and Text below QR
+        // Links and Text below QR (Cloudflare Link Updated)
         ctx.font = "bold 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "#c0392b";
-        ctx.fillText("10petalx.vercel.app", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60);
+        ctx.fillText("bdy.10petalxmagic.workers.dev", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60);
 
         ctx.font = "500 24px 'Fredoka', sans-serif";
         ctx.fillStyle = "rgba(136, 14, 79, 0.7)";
         ctx.fillText("Create your own surprise ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 95);
-
+        
         // ==========================================
         // 📥 7. EXPORT ENGINE (Zero Lag)
         // ==========================================
