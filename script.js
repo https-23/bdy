@@ -669,32 +669,34 @@ if (envelopeYesBtn) {
         
         if (screen4Title) screen4Title.innerText = "Yay! I knew you'd say YES! ❤️";
         
-        // Return top penguin to its normal wrapper and show TT2
-        const penguinWrapper = document.querySelector(".reaction-penguin-wrapper");
-        if (envelopeReactionGif && penguinWrapper) {
-            if (envelopeReactionGif.parentElement !== penguinWrapper) {
-                penguinWrapper.appendChild(envelopeReactionGif);
+        // 🚀 ARCHITECT FIX: DOM Teleportation - Penguin ko direct Letter se jod do!
+        const letterBox = document.querySelector(".letter");
+        if (envelopeReactionGif && letterBox) {
+            // Penguin ko purane wrapper se nikal kar yellow letter box me daal do
+            if (envelopeReactionGif.parentElement !== letterBox) {
+                letterBox.appendChild(envelopeReactionGif);
             }
             
-            // 🚀 ARCHITECT FIX: Saari purani positions aur limits ko uda do
+            // Saari purani CSS limits clear karo
             envelopeReactionGif.removeAttribute("style"); 
             
-            // Original penguinTT2.gif set karo
+            // Naya penguin image set karo
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK 3.0: Size bada karo aur hawa me envelope ke upar shift karo!
-            envelopeReactionGif.style.setProperty('position', 'relative', 'important');
-            envelopeReactionGif.style.setProperty('height', '100px', 'important'); // Base height thodi badi ki
+            // 🚀 MAGIC TRICK: Absolute use karke Letter ke exactly top-center me set karo
+            envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
+            
+            // Height 100px ki hai, aur top -85px kiya hai.
+            // Iska matlab uske pair theek letter ke top border par chipke rahenge!
+            envelopeReactionGif.style.setProperty('top', '-85px', 'important'); 
+            envelopeReactionGif.style.setProperty('left', '50%', 'important');
+            envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
+            
+            // Size thodi badi ki bina design tode
+            envelopeReactionGif.style.setProperty('height', '100px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); // Sabse front me dikhega
-            
-            // Transform-origin usko neeche ki jagah upar ki taraf grow karne me help karega
-            envelopeReactionGif.style.setProperty('transform-origin', 'bottom center', 'important');
-            
-            // Scale(1.9) usko almost double size ka kar dega
-            // translateY(-65px) uske pairon ko exactly envelope ke top border par bitha dega
-            envelopeReactionGif.style.setProperty('transform', 'scale(1.9) translateY(-65px)', 'important');
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); // Sabse front me
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
