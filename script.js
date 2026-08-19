@@ -653,7 +653,6 @@ if (envelopeNoBtn) {
     envelopeNoBtn.addEventListener("click", handleNoButtonClick);
     envelopeNoBtn.addEventListener("touchstart", handleNoButtonClick, {passive: false});
 }
-
 // 3. Victory Click (Yes Button)
 if (envelopeYesBtn) {
     envelopeYesBtn.addEventListener("click", () => {
@@ -663,7 +662,6 @@ if (envelopeYesBtn) {
         yesButtonScale = 1;
         envelopeYesBtn.style.transform = "scale(1)";
         
-        // 🚀 ARCHITECT FIX: setProperty use karke CSS ke !important ko bypass kiya
         if (envelopeNoBtn) {
             envelopeNoBtn.style.setProperty('display', 'none', 'important');
         }
@@ -677,9 +675,21 @@ if (envelopeYesBtn) {
             if (envelopeReactionGif.parentElement !== penguinWrapper) {
                 penguinWrapper.appendChild(envelopeReactionGif);
             }
-            envelopeReactionGif.style = ""; // Wipes roaming CSS clean
+            
+            // 🚀 ARCHITECT FIX: Saari purani positions aur limits ko uda do
+            envelopeReactionGif.removeAttribute("style"); 
+            
+            // Original penguinTT2.gif set karo
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
+            
+            // 🚀 MAGIC TRICK: Absolute deke usko envelope ke center-top par bithao
+            // z-index: 999 ensures it stays IN FRONT of the letter.
+            envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
+            envelopeReactionGif.style.setProperty('bottom', '170px', 'important'); // Envelope ke upar set hoga
+            envelopeReactionGif.style.setProperty('height', '120px', 'important'); // Bada dikhega
+            envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
+            envelopeReactionGif.style.setProperty('z-index', '999', 'important');
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
@@ -693,7 +703,6 @@ if (envelopeYesBtn) {
         }
     });
 }
-
 if (envelopeNextBtn) {
     envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
 }
