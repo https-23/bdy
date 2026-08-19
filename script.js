@@ -676,20 +676,22 @@ if (envelopeYesBtn) {
                 penguinWrapper.appendChild(envelopeReactionGif);
             }
             
-            // 🚀 ARCHITECT FIX: Saari purani positions aur limits ko uda do
+            // 🚀 ARCHITECT FIX: Purane absolute styles uda do taaki wo niche na gire
             envelopeReactionGif.removeAttribute("style"); 
             
             // Original penguinTT2.gif set karo
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK: Absolute deke usko envelope ke center-top par bithao
-            // z-index: 999 ensures it stays IN FRONT of the letter.
-            envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            envelopeReactionGif.style.setProperty('bottom', '170px', 'important'); // Envelope ke upar set hoga
-            envelopeReactionGif.style.setProperty('height', '120px', 'important'); // Bada dikhega
+            // 🚀 MAGIC TRICK 2.0: Position relative rakho taaki top par hi rahe.
+            // Aur transform: scale() use karke usko bada aur upar shift kar do bina layout tode!
+            envelopeReactionGif.style.setProperty('position', 'relative', 'important');
+            envelopeReactionGif.style.setProperty('height', '90px', 'important'); // Base height normal rakhi
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
             envelopeReactionGif.style.setProperty('z-index', '999', 'important');
+            
+            // Scale(1.5) usko 1.5x bada kar dega, aur translateY usko thoda upar hawa me rakhega
+            envelopeReactionGif.style.setProperty('transform', 'scale(1.5) translateY(-10px)', 'important');
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
