@@ -676,22 +676,25 @@ if (envelopeYesBtn) {
                 penguinWrapper.appendChild(envelopeReactionGif);
             }
             
-            // 🚀 ARCHITECT FIX: Purane absolute styles uda do taaki wo niche na gire
+            // 🚀 ARCHITECT FIX: Saari purani positions aur limits ko uda do
             envelopeReactionGif.removeAttribute("style"); 
             
             // Original penguinTT2.gif set karo
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK 2.0: Position relative rakho taaki top par hi rahe.
-            // Aur transform: scale() use karke usko bada aur upar shift kar do bina layout tode!
+            // 🚀 MAGIC TRICK 3.0: Size bada karo aur hawa me envelope ke upar shift karo!
             envelopeReactionGif.style.setProperty('position', 'relative', 'important');
-            envelopeReactionGif.style.setProperty('height', '90px', 'important'); // Base height normal rakhi
+            envelopeReactionGif.style.setProperty('height', '100px', 'important'); // Base height thodi badi ki
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '999', 'important');
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); // Sabse front me dikhega
             
-            // Scale(1.5) usko 1.5x bada kar dega, aur translateY usko thoda upar hawa me rakhega
-            envelopeReactionGif.style.setProperty('transform', 'scale(1.5) translateY(-10px)', 'important');
+            // Transform-origin usko neeche ki jagah upar ki taraf grow karne me help karega
+            envelopeReactionGif.style.setProperty('transform-origin', 'bottom center', 'important');
+            
+            // Scale(1.9) usko almost double size ka kar dega
+            // translateY(-65px) uske pairon ko exactly envelope ke top border par bitha dega
+            envelopeReactionGif.style.setProperty('transform', 'scale(1.9) translateY(-65px)', 'important');
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
@@ -705,10 +708,6 @@ if (envelopeYesBtn) {
         }
     });
 }
-if (envelopeNextBtn) {
-    envelopeNextBtn.addEventListener("click", () => { playPopSound(); showScreen("screen5"); });
-}
-
 // 4. Complete Screen 4 Reset
 function resetEnvelopeScreen() {
     if (envelopeWrapperPhase3) envelopeWrapperPhase3.classList.remove("open");
