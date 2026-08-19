@@ -1480,20 +1480,11 @@ async function generateMagicStoryImage() {
         ctx.fillStyle = "#880e4f";
         ctx.font = "700 85px 'Caveat', cursive";
         ctx.fillText(`For ${partnerName} 💖`, CANVAS_WIDTH / 2, footerY + 110);
-        
-        // ==========================================
-        // 🎯 6. NEW TEXT & MARKETING PLACEMENT
-        // ==========================================
-        
-        // --- 1. Added "She Say Yesss" Text ---
-        const yesssTextY = cardY + cardHeight + 70; // Card ke theek neeche
-        ctx.font = "bold 65px 'Caveat', cursive"; // Beautiful cursive font
-        ctx.fillStyle = "#d93838"; // Romantic red color
-        ctx.textAlign = "center";
-        ctx.fillText("She Say Yesss 🥳😍", CANVAS_WIDTH / 2, yesssTextY);
 
-        // --- 2. Marketing Placement shifted below the text ---
-        const marketingStartY = yesssTextY + 50; 
+        // ==========================================
+        // 🎯 6. MARKETING PLACEMENT & NEW TEXT
+        // ==========================================
+        const marketingStartY = cardY + cardHeight + 40; // Starts right under the card
 
         // Draw QR Code
         const qrSize = 130; 
@@ -1508,7 +1499,7 @@ async function generateMagicStoryImage() {
             ctx.drawImage(window.magicQRCode, qrX, marketingStartY + 10, qrSize, qrSize);
         }
 
-        // Links and Text below QR (Cloudflare Link Updated)
+        // Links and Text below QR
         ctx.font = "bold 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "#c0392b";
         ctx.fillText("bdy.10petalxmagic.workers.dev", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60);
@@ -1516,6 +1507,13 @@ async function generateMagicStoryImage() {
         ctx.font = "500 24px 'Fredoka', sans-serif";
         ctx.fillStyle = "rgba(136, 14, 79, 0.7)";
         ctx.fillText("Create your own surprise ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 95);
+
+        // --- 1. "She Say Yesss" Text Moved to the VERY BOTTOM ---
+        const yesssTextY = marketingStartY + qrSize + 180; // "Create your own" ke ekdam niche
+        ctx.font = "bold 65px 'Caveat', cursive"; // Beautiful cursive font
+        ctx.fillStyle = "#d93838"; // Romantic red color
+        ctx.textAlign = "center";
+        ctx.fillText("She Say Yesss 🥳😍", CANVAS_WIDTH / 2, yesssTextY);
         
         // ==========================================
         // 📥 7. EXPORT ENGINE (Zero Lag)
