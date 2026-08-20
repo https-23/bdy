@@ -672,7 +672,6 @@ if (envelopeYesBtn) {
         // 🚀 ARCHITECT FIX: DOM Teleportation - Penguin ko direct Letter se jod do!
         const letterBox = document.querySelector(".letter");
         if (envelopeReactionGif && letterBox) {
-            // Penguin ko purane wrapper se nikal kar yellow letter box me daal do
             if (envelopeReactionGif.parentElement !== letterBox) {
                 letterBox.appendChild(envelopeReactionGif);
             }
@@ -684,19 +683,15 @@ if (envelopeYesBtn) {
             envelopeReactionGif.src = "penguinTT2.gif";
             envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK: Absolute use karke Letter ke exactly top-center me set karo
+            // 🚀 MAGIC TRICK 4.0: 'bottom: 100%' lagao.
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            
-            // Height 100px ki hai, aur top -85px kiya hai.
-            // Iska matlab uske pair theek letter ke top border par chipke rahenge!
-            envelopeReactionGif.style.setProperty('top', '-85px', 'important'); 
+            envelopeReactionGif.style.setProperty('bottom', '100%', 'important'); 
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
-            
-            // Size thodi badi ki bina design tode
-            envelopeReactionGif.style.setProperty('height', '100px', 'important'); 
+            envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); // Sabse front me
+            envelopeReactionGif.style.setProperty('margin-bottom', '-5px', 'important'); 
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
         }
         
         const sidePenguin = document.querySelector(".side-penguin");
@@ -707,6 +702,18 @@ if (envelopeYesBtn) {
             envelopeNextBtn.style.position = "relative";
             envelopeNextBtn.style.margin = "15px auto 0 auto";
             envelopeNextBtn.style.zIndex = "9999";
+            
+            // 🚀 MASTER ARCHITECT BUG-FIX: Force bind the click event directly!
+            envelopeNextBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Ye command background ke saare errors/clicks ko rok degi
+                
+                playPopSound();
+                showScreen("screen5"); // Forcefully agle screen par bhejega
+                
+                // Background me safely purani screen ko reset karega
+                setTimeout(resetEnvelopeScreen, 300);
+            };
         }
     });
 }
