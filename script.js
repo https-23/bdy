@@ -1,4 +1,4 @@
-// ==========================================
+// =====================================
 // 🛡️ PHASE 7: GLOBAL ERROR TRACKING
 // ==========================================
 window.addEventListener('error', function(event) {
@@ -490,7 +490,6 @@ if(unlockBtn) {
         }, 1500);
     });
 }
-
 // BASIC NAVIGATION
 document.getElementById("yesBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen2"); });
 document.getElementById("noBtn")?.addEventListener("click", () => { playPopSound(); showScreen("angry"); });
@@ -506,12 +505,21 @@ const nextMap = {
 };
 
 Object.keys(nextMap).forEach(selector => {
-    document.querySelector(selector)?.addEventListener("click", () => { playPopSound(); showScreen(nextMap[selector]); });
+    document.querySelector(selector)?.addEventListener("click", () => { 
+        playPopSound(); 
+        showScreen(nextMap[selector]); 
+        // 🚀 ARCHITECT FIX: Next jajate waqt purani chizein reset karo
+        if (typeof resetEnvelopeScreen === "function") setTimeout(resetEnvelopeScreen, 300);
+    });
 });
 
 document.querySelectorAll(".backBtn").forEach(btn => {
     btn.addEventListener("click", (e) => {
-        e.stopPropagation(); playPopSound(); showScreen(btn.getAttribute("data-back"));
+        e.stopPropagation(); 
+        playPopSound(); 
+        showScreen(btn.getAttribute("data-back"));
+        // 🚀 MASTER FIX: Back button dabate hi No button ko pakad ke wapas daalo!
+        if (typeof resetEnvelopeScreen === "function") setTimeout(resetEnvelopeScreen, 300);
     });
 });
 // ==========================================
