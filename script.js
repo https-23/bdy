@@ -351,9 +351,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // --- Magical Rules Modal Logic ---
+    const rulesModal = document.getElementById('magical-rules-modal');
+    const openRulesBtn = document.getElementById('open-rules-btn');
+    const closeRulesBtn = document.getElementById('close-rules-btn');
+
+    if (openRulesBtn && rulesModal && closeRulesBtn) {
+        // Open the rules
+        openRulesBtn.addEventListener('click', () => {
+            if (typeof playPopSound === 'function') playPopSound();
+            rulesModal.classList.add('show');
+        });
+
+        // Close via button
+        closeRulesBtn.addEventListener('click', () => {
+            if (typeof playPopSound === 'function') playPopSound();
+            rulesModal.classList.remove('show');
+        });
+        
+        // Close by clicking outside the box
+        rulesModal.addEventListener('click', (e) => {
+            if (e.target === rulesModal) {
+                rulesModal.classList.remove('show');
+            }
+        });
+    }
 }); // <--- THIS PROPERLY CLOSES THE DOMCONTENTLOADED EVENT LISTENER!
 
-// ==========================================
+// ==============================================================================================================================================================================================================================================
 // 🎩 4. ORIGINAL MAGICAL APP LOGIC
 // ==========================================
 let typeWriterTriggered = false;
