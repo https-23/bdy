@@ -1504,3 +1504,104 @@ html, body {
     background: var(--bg-gradient);
     position: relative;
 }
+/* =========================================
+   SAFE & MAGICAL CARE RULES UI
+   ========================================= */
+.magical-promise-text {
+    font-size: 0.8rem;
+    color: var(--text-color);
+    margin-top: 12px;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+#open-rules-btn {
+    color: var(--primary-color);
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: rgba(192, 57, 43, 0.3);
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+
+#open-rules-btn:active {
+    color: #ff758c;
+}
+
+/* Modal Styling using your existing glass theme */
+#magical-rules-modal {
+    z-index: 9999999; /* Keeps it above the confetti and background elements */
+}
+
+.rules-modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    width: 90%;
+    max-width: 360px;
+    padding: 25px 20px 20px 20px;
+    border-radius: 20px;
+    border: 3px solid #ffb6c1;
+    box-shadow: 0 15px 35px rgba(255, 117, 140, 0.2);
+    text-align: left;
+    position: relative;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.show .rules-modal-content {
+    transform: scale(1);
+}
+
+.close-rules {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.close-rules:active {
+    transform: scale(0.9);
+}
+
+.rules-scroll-area {
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Invisible/Aesthetic scrollbar */
+.rules-scroll-area::-webkit-scrollbar { width: 4px; }
+.rules-scroll-area::-webkit-scrollbar-track { background: transparent; }
+.rules-scroll-area::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 10px; }
+
+.rule-item {
+    margin-bottom: 15px;
+}
+
+.rule-item h4 {
+    color: var(--primary-color);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    margin: 0 0 5px 0;
+}
+
+.rule-item p {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.4;
+}
