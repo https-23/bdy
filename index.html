@@ -454,10 +454,17 @@
                     <span class="btn-text">✨ Create Memory Magic ✨</span>
                 </button>
                     
-                    <!-- NEW PAY BUTTON -->
-                    <button id="pay-now-btn" class="magic-btn" style="background: linear-gradient(to right, #28a745, #218838); margin-top: 25px; width: 100%;">
-                        <span class="btn-text">PAY ₹49 & GET LINK 🔗</span>
-                    </button>
+                    <!-- NEW I PHONE SLIDE TYPE PAY BUTTON -->
+                <!-- Hidden Trigger (Keeps Razorpay logic 100% safe & untouched) -->
+                <button id="pay-now-btn" style="display: none;">PAY</button>
+                <!-- iPhone Style Swipe Slider -->
+                <div id="swipe-pay-container" class="swipe-container">
+                    <div class="swipe-track" id="swipe-track"></div>
+                    <span class="swipe-text" id="swipe-text">Swipe to Seal the Magic ✨</span>
+                    <div class="swipe-thumb" id="swipe-thumb">
+                        <span class="thumb-icon" id="thumb-icon">➔</span>
+                    </div>
+                </div>
                 <!-- 🚀 PHASE 4/5: HIDDEN POST-PAY COPY BUTTON -->
                     <button id="post-pay-copy-btn" class="magic-btn" style="display: none; background: linear-gradient(to right, #17a2b8, #138496); margin-top: 25px; width: 100%;">
                         <span class="btn-text">COPY LINK 📋 (5:00)</span>
