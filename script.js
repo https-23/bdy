@@ -376,11 +376,109 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-}); // <--- THIS PROPERLY CLOSES THE DOMCONTENTLOADED EVENT LISTENER!
+    // --- iPhone Swipe to Pay Logic ---
+    const swipeContainer = document.getElementById('swipe-pay-container');
+    const swipeThumb = document.getElementById('swipe-thumb');
+    const swipeTrack = document.getElementById('swipe-track');
+    const swipeText = document.getElementById('swipe-text');
+    const thumbIcon = document.getElementById('thumb-icon');
+    const hiddenPayBtn = document.getElementById('pay-now-btn');
 
-// ==============================================================================================================================================================================================================================================
+    if (swipeContainer && swipeThumb) {
+        let isDragging = false;
+        let startX = 0;
+        let successTriggered = false;
+
+        const startSwipe = (e) => {
+            if (successTriggered) return;
+            isDragging = true;
+            startX = e.touches ? e.touches[0].clientX : e.clientX;
+            swipeThumb.style.transition = 'none';
+            swipeTrack.style.transition = 'none';
+        };
+
+        const moveSwipe = (e) => {
+            if (!isDragging || successTriggered) return;
+            const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+            let moveX = currentX - startX;
+            let maxSwipe = swipeContainer.offsetWidth - swipeThumb.offsetWidth - 8; 
+            
+            if (moveX < 0) moveX = 0;
+            if (moveX > maxSwipe) moveX = maxSwipe;
+
+            swipeThumb.style.left = `${moveX + 4}px`;
+            swipeTrack.style.width = `${(moveX / maxSwipe) * 100}%`;
+            
+            // Fade text playfully as they slide
+            swipeText.style.opacity = 1 - (moveX / maxSwipe);
+        };
+
+        const endSwipe = () => {
+            if (!isDragging || successTriggered) return;
+            isDragging = false;
+            let maxSwipe = swipeContainer.offsetWidth - swipeThumb.offsetWidth - 8; 
+            const currentLeft = parseInt(swipeThumb.style.left || 4);
+            
+            // If swiped past 90%, activate payment
+            if (currentLeft >= maxSwipe * 0.90) {
+                successTriggered = true;
+                if (typeof playPopSound === 'function') playPopSound();
+                
+                swipeThumb.style.transition = 'left 0.3s ease';
+                swipeTrack.style.transition = 'width 0.3s ease';
+                swipeThumb.style.left = `${maxSwipe + 4}px`;
+                swipeTrack.style.width = '100%';
+                
+                swipeText.innerText = "Securing Magic... ✨";
+                swipeText.style.opacity = '1';
+                swipeText.style.color = 'white';
+                thumbIcon.innerText = "✔";
+                
+                // Trigger Razorpay logic silently
+                if (hiddenPayBtn) hiddenPayBtn.click();
+            } else {
+                // Snap back physics
+                swipeThumb.style.transition = 'left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                swipeTrack.style.transition = 'width 0.4s ease';
+                swipeThumb.style.left = '4px';
+                swipeTrack.style.width = '0%';
+                swipeText.style.opacity = '1';
+            }
+        };
+
+        // Touch Events (Mobile)
+        swipeThumb.addEventListener('touchstart', startSwipe, {passive: true});
+        document.addEventListener('touchmove', moveSwipe, {passive: true});
+        document.addEventListener('touchend', endSwipe);
+        
+        // Mouse Events (Desktop Testing)
+        swipeThumb.addEventListener('mousedown', startSwipe);
+        document.addEventListener('mousemove', moveSwipe);
+        document.addEventListener('mouseup', endSwipe);
+
+        // Security Observer: If Razorpay gets closed or fails, reset the slider automatically
+        if (hiddenPayBtn) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === "disabled" && !hiddenPayBtn.disabled && successTriggered) {
+                        successTriggered = false;
+                        swipeThumb.style.transition = 'left 0.4s ease';
+                        swipeTrack.style.transition = 'width 0.4s ease';
+                        swipeThumb.style.left = '4px';
+                        swipeTrack.style.width = '0%';
+                        swipeText.innerText = "Swipe to Seal the Magic ✨";
+                        swipeText.style.color = '#666';
+                        thumbIcon.innerText = "➔";
+                    }
+                });
+            });
+            observer.observe(hiddenPayBtn, { attributes: true });
+        }
+    }
+}); // <--- THIS PROPERLY CLOSES THE DOMCONTENTLOADED EVENT LISTENER!
+// ======================================================================================================================================================================================================================================
 // 🎩 4. ORIGINAL MAGICAL APP LOGIC
-// ==========================================
+// ======================================================================================================================================================================================================================================
 let typeWriterTriggered = false;
 
 function playPopSound() {
@@ -1062,9 +1160,9 @@ if (archeryScreen) {
         }, 350); 
     });
 }
-// ==========================================
+// ==============================================================================================================================================================================================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
-// ==========================================
+// ==============================================================================================================================================================================================================
 document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const giftId = urlParams.get('gift');
@@ -1078,6 +1176,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (giftId) {
         if (orderForm) orderForm.remove(); 
         if (payBtn) payBtn.remove();
+        // 🚀 Add this line:
+            const swipeContainer = document.getElementById('swipe-pay-container');
+            if (swipeContainer) swipeContainer.remove();
         // 🚀 ADD THIS LINE TO DESTROY THE LEGAL TEXT ON THE GIFT LINK
             const promiseBox = document.getElementById('magical-promise-box');
             if (promiseBox) promiseBox.remove();
