@@ -334,6 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     },
                     "theme": { "color": "#c0392b" }
+                    // 🚀 NAYA FIX YAHAN HAI: Window close karne par reset hoga
+                    "modal": {
+                        "ondismiss": function() {
+                            payBtn.innerText = "Pay Now (₹49)";
+                            payBtn.disabled = false; // Yeh slider ko wapas bhej dega!
+                        }
+                }
                 };
                 
                 var rzp = new Razorpay(options);
