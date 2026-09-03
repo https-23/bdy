@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             payBtn.innerText = "Error (See Console)";
                         }
                     },
-                    "theme": { "color": "#c0392b" }
+                    "theme": { "color": "#c0392b" },
                     // 🚀 NAYA FIX YAHAN HAI: Window close karne par reset hoga
                     "modal": {
                         "ondismiss": function() {
