@@ -464,22 +464,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', endSwipe);
 
         // Security Observer: If Razorpay gets closed or fails, reset the slider automatically
+        // Security Observer: If Razorpay gets closed or fails, reset the slider automatically
         if (hiddenPayBtn) {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
+                    
+                    // 🚀 NAYA FIX: Sync loading text so user knows it's actively processing API calls!
+                    if (successTriggered && hiddenPayBtn.textContent) {
+                        const loadingText = hiddenPayBtn.textContent.trim();
+                        if(loadingText !== "PAY") {
+                            swipeText.innerText = loadingText + " ⏳";
+                        }
+                    }
+
+                    // Wapas aane par Reset Logic
                     if (mutation.attributeName === "disabled" && !hiddenPayBtn.disabled && successTriggered) {
                         successTriggered = false;
                         swipeThumb.style.transition = 'left 0.4s ease';
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = "Swipe to Seal the Magic ✨";
+                        swipeText.innerText = "✨PAY ₹49 & GET LINK 🔗";
                         swipeText.style.color = '#666';
-                        thumbIcon.innerText = "➔";
+                        thumbIcon.innerText = "Swipe ➔";
                     }
                 });
             });
-            observer.observe(hiddenPayBtn, { attributes: true });
+            // Watch for both text changes and disable state
+            observer.observe(hiddenPayBtn, { attributes: true, childList: true, subtree: true, characterData: true });
         }
     }
 }); // <--- THIS PROPERLY CLOSES THE DOMCONTENTLOADED EVENT LISTENER!
