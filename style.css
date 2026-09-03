@@ -1662,7 +1662,7 @@ html, body {
     align-items: center;
     z-index: 3;
     cursor: grab;
-    touch-action: none; /* Prevents vertical page scroll during swipe */
+    touch-action: none;
 }
 
 .swipe-thumb:active {
