@@ -1078,6 +1078,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (giftId) {
         if (orderForm) orderForm.remove(); 
         if (payBtn) payBtn.remove();
+        // 🚀 ADD THIS LINE TO DESTROY THE LEGAL TEXT ON THE GIFT LINK
+            const promiseBox = document.getElementById('magical-promise-box');
+            if (promiseBox) promiseBox.remove();
         
         if (preloader) { preloader.style.opacity = '1'; preloader.style.visibility = 'visible'; }
         
