@@ -1508,12 +1508,15 @@ html, body {
    SAFE & MAGICAL CARE RULES UI
    ========================================= */
 .magical-promise-text {
-    font-size: 0.8rem;
+    font-size: 0.65rem !important; /* Extremely small and subtle */
     color: var(--text-color);
-    margin-top: 12px;
+    opacity: 0.55; /* Lowered opacity to blend into the background */
+    margin-top: 15px;
     text-align: center;
     font-weight: 500;
     line-height: 1.3;
+    position: relative;
+    z-index: 50; /* Forces it above invisible elements blocking the click */
 }
 
 #open-rules-btn {
@@ -1521,15 +1524,16 @@ html, body {
     font-weight: bold;
     cursor: pointer;
     text-decoration: underline;
-    text-decoration-color: rgba(192, 57, 43, 0.3);
+    text-decoration-color: rgba(192, 57, 43, 0.4);
     text-underline-offset: 3px;
-    transition: color 0.2s;
+    transition: color 0.2s, opacity 0.2s;
+    pointer-events: auto; /* Ensures the click registers */
 }
 
 #open-rules-btn:active {
     color: #ff758c;
+    opacity: 0.8;
 }
-
 /* Modal Styling using your existing glass theme */
 #magical-rules-modal {
     z-index: 9999999; /* Keeps it above the confetti and background elements */
