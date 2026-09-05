@@ -620,14 +620,15 @@ if(unlockBtn) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
             iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
+            // 🚀 FIX: Hidden exactly like YouTube
             iframe.style.position = 'absolute';
-            iframe.style.top = '20px';
-            iframe.style.left = '50%';
-            iframe.style.transform = 'translateX(-50%)';
-            iframe.style.width = '300px';
-            iframe.style.height = '80px';
-            iframe.style.zIndex = '99999';
+            iframe.style.width = '1px';
+            iframe.style.height = '1px';
+            iframe.style.opacity = '0.01';
+            iframe.style.pointerEvents = 'none';
+            iframe.style.zIndex = '-9999';
             iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            
             document.body.appendChild(iframe);
         } else {
             const bgMusic = document.getElementById("bg-music");
