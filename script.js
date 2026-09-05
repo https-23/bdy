@@ -74,6 +74,12 @@ function extractYouTubeId(url) {
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
 }
+// PASTE THE NEW FUNCTION HERE:
+function extractSpotifyId(url) {
+    if (!url) return null;
+    const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
+    return match ? { type: match[1], id: match[2] } : null;
+}
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (BACKEND PROXY)
 // ==========================================
@@ -595,28 +601,41 @@ if(unlockBtn) {
 
         setTimeout(() => {
             const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
-            const videoId = extractYouTubeId(customAudioLink);
+        const ytVideoId = extractYouTubeId(customAudioLink);
+        const spotifyData = extractSpotifyId(customAudioLink);
 
-            if (videoId) {
-                const iframe = document.createElement('iframe');
-                iframe.id = 'magical-yt-iframe'; // 🐛 FIX: Unique ID so Razorpay doesn't intercept it
-                // ⚡ MOBILE AUDIO FIX: Strict policies met, hidden visually
-                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&playsinline=1&enablejsapi=1`;
-                iframe.style.position = 'absolute';
-                iframe.style.width = '1px';
-                iframe.style.height = '1px';
-                iframe.style.opacity = '0.01';
-                iframe.style.pointerEvents = 'none';
-                iframe.style.zIndex = '-9999';
-                iframe.allow = 'autoplay; encrypted-media';
-                document.body.appendChild(iframe);
-            } else {
-                const bgMusic = document.getElementById("bg-music");
-                if (bgMusic) { 
-                    bgMusic.volume = 0.5; 
-                    bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
-                }
+        if (ytVideoId) {
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-yt-iframe';
+            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1`;
+            iframe.style.position = 'absolute';
+            iframe.style.width = '1px';
+            iframe.style.height = '1px';
+            iframe.style.opacity = '0.01';
+            iframe.style.pointerEvents = 'none';
+            iframe.style.zIndex = '-9999';
+            iframe.allow = 'autoplay; encrypted-media';
+            document.body.appendChild(iframe);
+        } else if (spotifyData) {
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-spotify-iframe';
+            iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
+            iframe.style.position = 'absolute';
+            iframe.style.top = '20px';
+            iframe.style.left = '50%';
+            iframe.style.transform = 'translateX(-50%)';
+            iframe.style.width = '300px';
+            iframe.style.height = '80px';
+            iframe.style.zIndex = '99999';
+            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            document.body.appendChild(iframe);
+        } else {
+            const bgMusic = document.getElementById("bg-music");
+            if (bgMusic) { 
+                bgMusic.volume = 0.5; 
+                bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
             }
+        }
             showScreen("big-penguin-screen");
 
             setTimeout(() => {
