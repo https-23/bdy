@@ -216,7 +216,6 @@ body {
     pointer-events: none;
     z-index: 0;
 }
-
 /* Mobile App Container */
 #app {
     width: 100%;
@@ -226,8 +225,8 @@ body {
     background-color: transparent;
     z-index: 1;
     overflow-x: hidden;
+    margin: 0 auto; /* 🚀 FIX: Automatically centers the app perfectly on Desktop/Tablets */
 }
-
 /* --- Screens State Machine --- */
 .screen {
     display: none; 
