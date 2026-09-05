@@ -237,6 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
+            // 🚀 PHASE 2 FIX: Tell the mobile browser we entered preview mode
+            history.pushState({ inPreview: true }, '', '#preview');
 
             showScreen("login-screen");
             window.scrollTo(0, 0);
@@ -1751,3 +1753,32 @@ async function generateMagicStoryImage() {
         if (loadingText) loadingText.innerText = "Could not render story image. Please try again.";
     }
 }
+// ==========================================
+// 🚀 PHASE 2: MOBILE HARDWARE BACK BUTTON FIX
+// ==========================================
+window.addEventListener('popstate', (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGiftLink = urlParams.has('gift');
+    
+    // Only trigger this if we are the creator testing the preview (NOT the receiver)
+    if (!isGiftLink) {
+        const orderForm = document.getElementById('order-form-container');
+        const previewContainer = document.getElementById('preview-container');
+        
+        // If they pressed back and the preview state is gone, return to the form
+        if (!event.state || !event.state.inPreview) {
+            if (previewContainer) previewContainer.style.display = "none";
+            if (orderForm) orderForm.style.display = "block";
+            
+            // Instantly kill any music playing from the preview
+            const bgMusic = document.getElementById("bg-music");
+            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+            
+            const ytIframe = document.getElementById('magical-yt-iframe');
+            if (ytIframe) ytIframe.remove();
+            
+            const spIframe = document.getElementById('magical-spotify-iframe');
+            if (spIframe) spIframe.remove();
+        }
+    }
+});
