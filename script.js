@@ -1225,6 +1225,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     if (giftId) {
         // 🚀 PHASE 3 FIX: Anchor the browser history so the back button knows where to stop
+        history.pushState({ screenId: 'login-screen' }, '', window.location.href);
+                
+        // 🚀 PHASE 3 FIX: Anchor the browser history so the back button knows where to stop
         history.pushState({ atLogin: true }, '', window.location.href);
         if (orderForm) orderForm.remove(); 
         if (payBtn) payBtn.remove();
