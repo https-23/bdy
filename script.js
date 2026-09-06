@@ -239,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (previewContainer) previewContainer.style.display = "block"; 
             // 🚀 PHASE 2 FIX: Tell the mobile browser we entered preview mode
             history.pushState({ inPreview: true }, '', '#preview');
+            // 🚀 FIX: Tell the mobile browser we started the app
+            history.pushState({ screenId: 'login-screen' }, '', '#preview');
 
             showScreen("login-screen");
             window.scrollTo(0, 0);
@@ -524,8 +526,9 @@ function fireConfetti() {
         }());
     }
 }
-    
-function showScreen(screenId) {
+
+// 🚀 FIX: Added isBack parameter to track navigation
+function showScreen(screenId, isBack = false) {
     const allScreens = document.querySelectorAll(".screen");
     allScreens.forEach(screen => {
         screen.classList.remove("active");
@@ -542,6 +545,11 @@ function showScreen(screenId) {
 
         targetScreen.style.display = 'flex';
         targetScreen.classList.add("active");
+    }
+
+    // 🚀 FIX: Push new screens to the mobile back button history
+    if (!isBack && screenId !== 'login-screen') {
+        history.pushState({ screenId: screenId }, '', `#${screenId}`);
     }
 
     if (screenId === "screen3") fireConfetti();
@@ -622,13 +630,16 @@ if(unlockBtn) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
             iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
-            // 🚀 FIX: Hidden exactly like YouTube
-            iframe.style.position = 'absolute';
-            iframe.style.width = '1px';
-            iframe.style.height = '1px';
-            iframe.style.opacity = '0.01';
-            iframe.style.pointerEvents = 'none';
-            iframe.style.zIndex = '-9999';
+            // 🚀 FIX: Premium Floating Widget (Spotify must be visible to play)
+            iframe.style.position = 'fixed';
+            iframe.style.top = '15px';
+            iframe.style.left = '50%';
+            iframe.style.transform = 'translateX(-50%)';
+            iframe.style.width = '320px';
+            iframe.style.height = '80px';
+            iframe.style.zIndex = '999999';
+            iframe.style.borderRadius = '12px';
+            iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
             iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
             
             document.body.appendChild(iframe);
@@ -1375,11 +1386,10 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-
 // 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS
 const originalShowScreen = showScreen;
-window.showScreen = function(screenId) {
-    originalShowScreen(screenId);
+window.showScreen = function(screenId, isBack = false) {
+    originalShowScreen(screenId, isBack);
     const muteToggleBtn = document.getElementById('mute-toggle-btn');
     if (screenId === "big-penguin-screen" && muteToggleBtn) {
         muteToggleBtn.style.display = "flex";
@@ -1791,5 +1801,38 @@ window.addEventListener('popstate', (event) => {
         
         // Re-anchor the history state so they remain securely in the gift
         history.pushState({ atLogin: true }, '', window.location.href);
+    }
+});
+// ==========================================
+// 🚀 PHASE 2: TRUE SCREEN-BY-SCREEN BACK BUTTON
+// ==========================================
+window.addEventListener('popstate', (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isGiftLink = urlParams.has('gift');
+    
+    if (event.state && event.state.screenId) {
+        // User pressed back -> Show the previous screen naturally
+        showScreen(event.state.screenId, true);
+    } else {
+        // Reached the beginning of the app
+        if (!isGiftLink) {
+            // Exit Preview -> Back to Form
+            const previewContainer = document.getElementById('preview-container');
+            const orderForm = document.getElementById('order-form-container');
+            
+            if (previewContainer) previewContainer.style.display = "none";
+            if (orderForm) orderForm.style.display = "block";
+            
+            // Safely kill the music only when leaving the preview
+            const bgMusic = document.getElementById("bg-music");
+            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+            const ytIframe = document.getElementById('magical-yt-iframe');
+            if (ytIframe) ytIframe.remove();
+            const spIframe = document.getElementById('magical-spotify-iframe');
+            if (spIframe) spIframe.remove();
+        } else {
+            // Receiver viewing gift -> Lock them at the login screen
+            showScreen('login-screen', true);
+        }
     }
 });
