@@ -237,11 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
-            // 🚀 PHASE 2 FIX: Tell the mobile browser we entered preview mode
-            history.pushState({ inPreview: true }, '', '#preview');
-            // 🚀 FIX: Tell the mobile browser we started the app
-            history.pushState({ screenId: 'login-screen' }, '', '#preview');
-
+            
+            // 🚀 FIX: Unified history push for the preview mode
+            history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
             showScreen("login-screen");
             window.scrollTo(0, 0);
 
@@ -1766,45 +1764,7 @@ async function generateMagicStoryImage() {
     }
 }
 // ==========================================
-// 🚀 PHASE 2 & 3: MOBILE HARDWARE BACK BUTTON FIX
-// ==========================================
-window.addEventListener('popstate', (event) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isGiftLink = urlParams.has('gift');
-    
-    const bgMusic = document.getElementById("bg-music");
-    const ytIframe = document.getElementById('magical-yt-iframe');
-    const spIframe = document.getElementById('magical-spotify-iframe');
-
-    // Function to instantly kill any playing audio
-    const silenceAudio = () => {
-        if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
-        if (ytIframe) ytIframe.remove();
-        if (spIframe) spIframe.remove();
-    };
-
-    if (!isGiftLink) {
-        // PHASE 2: Creator Preview Mode
-        const orderForm = document.getElementById('order-form-container');
-        const previewContainer = document.getElementById('preview-container');
-        
-        if (!event.state || !event.state.inPreview) {
-            if (previewContainer) previewContainer.style.display = "none";
-            if (orderForm) orderForm.style.display = "block";
-            silenceAudio();
-        }
-    } else {
-        // PHASE 3: Receiver Generated Link Mode
-        // Drop them safely back at the login screen
-        showScreen('login-screen');
-        silenceAudio();
-        
-        // Re-anchor the history state so they remain securely in the gift
-        history.pushState({ atLogin: true }, '', window.location.href);
-    }
-});
-// ==========================================
-// 🚀 PHASE 2: TRUE SCREEN-BY-SCREEN BACK BUTTON
+// 🚀 UNIFIED MOBILE BACK BUTTON LOGIC
 // ==========================================
 window.addEventListener('popstate', (event) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -1823,7 +1783,7 @@ window.addEventListener('popstate', (event) => {
             if (previewContainer) previewContainer.style.display = "none";
             if (orderForm) orderForm.style.display = "block";
             
-            // Safely kill the music only when leaving the preview
+            // Safely kill the music ONLY when leaving the preview entirely
             const bgMusic = document.getElementById("bg-music");
             if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
             const ytIframe = document.getElementById('magical-yt-iframe');
@@ -1831,8 +1791,9 @@ window.addEventListener('popstate', (event) => {
             const spIframe = document.getElementById('magical-spotify-iframe');
             if (spIframe) spIframe.remove();
         } else {
-            // Receiver viewing gift -> Lock them at the login screen
+            // Receiver viewing gift -> Lock them at the login screen safely
             showScreen('login-screen', true);
+            history.pushState({ screenId: 'login-screen' }, '', window.location.href);
         }
     }
 });
