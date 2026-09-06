@@ -81,14 +81,12 @@ function extractSpotifyId(url) {
     return match ? { type: match[1], id: match[2] } : null;
 }
 // ==========================================
-// 🚀 PHASE 1: SECURE CLOUD STORAGE (BACKEND PROXY)
+// 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
-// API Key removed for security! Backend handles it now.
 
-async function uploadToImgBB(base64Data) {
-    // 🚀 PHASE 3 MAGIC: Bypassing ImgBB entirely!
-    // We return the highly compressed Base64 image directly.
-    // It will be saved securely into your free Cloudflare R2 bucket.
+async function prepareImageForCloudflare(base64Data) {
+    // ImgBB is completely removed.
+    // We pass the compressed base64 data directly to your Cloudflare Worker & R2 Bucket.
     return base64Data;
 }
 
@@ -132,14 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 parentLabel.style.pointerEvents = "none"; // Prevent form bugs from double-clicking
 
                 try {
-                    // 1. Compress image locally (Saves user data)
+                    // 1. Compress image locally to save user bandwidth
                     const base64Data = await compressImage(file);
                     
-                    // 2. Upload to Free Cloud Storage (ImgBB)
-                    const liveImageUrl = await uploadToImgBB(base64Data);
+                    // 2. Prepare the compressed image for Cloudflare R2 upload
+                    const processedImage = await prepareImageForCloudflare(base64Data);
                     
-                    // 3. Save the lightweight URL to the state, NOT the heavy base64
-                    window.magicalState.images[index] = liveImageUrl;
+                    // 3. Save the processed image to the state for the backend API
+                    window.magicalState.images[index] = processedImage;
                     
                     // 4. Update the UI to show the uploaded image
                     if (parentLabel) {
