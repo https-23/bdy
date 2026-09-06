@@ -524,8 +524,7 @@ function fireConfetti() {
         }());
     }
 }
-
-// 🚀 FIX: Added isBack parameter to track navigation
+// 🚀 FIX: Added isBack parameter to track navigation and RESET screens
 function showScreen(screenId, isBack = false) {
     const allScreens = document.querySelectorAll(".screen");
     allScreens.forEach(screen => {
@@ -545,9 +544,35 @@ function showScreen(screenId, isBack = false) {
         targetScreen.classList.add("active");
     }
 
-    // 🚀 FIX: Push new screens to the mobile back button history
+    // 🚀 Push new screens to the mobile back button history
     if (!isBack && screenId !== 'login-screen') {
         history.pushState({ screenId: screenId }, '', `#${screenId}`);
+    }
+
+    // 🎯 1. RESET ARCHERY SCREEN LOGIC
+    if (screenId === "archery-screen") {
+        window.hasShot = false; 
+        const tapText = document.querySelector('#archery-screen .swipe');
+        const bow = document.getElementById('the-bow');
+        const heart = document.getElementById('the-heart');
+        
+        if (tapText) tapText.style.opacity = '1';
+        if (bow) bow.classList.remove('fly', 'hidden');
+        if (heart) heart.classList.remove('burst');
+    }
+
+    // 🐧 2. RESET BIG PENGUIN SCREEN LOGIC
+    if (screenId === "big-penguin-screen") {
+        const giantPeng = document.getElementById('giant-penguin-img');
+        if (giantPeng) giantPeng.classList.remove('hide-shadow');
+        
+        // Auto-forward them again if they navigated back here so they don't get stuck!
+        if (isBack) {
+            setTimeout(() => {
+                if (giantPeng) giantPeng.classList.add('hide-shadow');
+                setTimeout(() => { showScreen("archery-screen"); }, 500);
+            }, 1500);
+        }
     }
 
     if (screenId === "screen3") fireConfetti();
@@ -1185,12 +1210,12 @@ if(closePhotoModalBtn) {
 const archeryScreen = document.getElementById('archery-screen');
 const theBow = document.getElementById('the-bow');
 const theHeart = document.getElementById('the-heart');
-let hasShot = false;
+window.hasShot = false; // 🚀 FIX: Using global variable so we can reset it!
 
 if (archeryScreen) {
     archeryScreen.addEventListener('click', () => {
-        if (hasShot) return; 
-        hasShot = true;
+        if (window.hasShot) return; 
+        window.hasShot = true;
 
         const tapText = archeryScreen.querySelector('.swipe');
         if(tapText) tapText.style.opacity = '0';
@@ -1210,6 +1235,7 @@ if (archeryScreen) {
         }, 350); 
     });
 }
+
 // ==============================================================================================================================================================================================================
 // 🔮 5. RECEIVER PAYLOAD HYDRATION (STRICT MODE)
 // ==============================================================================================================================================================================================================
