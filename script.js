@@ -1215,6 +1215,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const payBtn = document.getElementById('pay-now-btn');
     
     if (giftId) {
+        // 🚀 PHASE 3 FIX: Anchor the browser history so the back button knows where to stop
+        history.pushState({ atLogin: true }, '', window.location.href);
         if (orderForm) orderForm.remove(); 
         if (payBtn) payBtn.remove();
         // 🚀 Add this line:
@@ -1754,31 +1756,40 @@ async function generateMagicStoryImage() {
     }
 }
 // ==========================================
-// 🚀 PHASE 2: MOBILE HARDWARE BACK BUTTON FIX
+// 🚀 PHASE 2 & 3: MOBILE HARDWARE BACK BUTTON FIX
 // ==========================================
 window.addEventListener('popstate', (event) => {
     const urlParams = new URLSearchParams(window.location.search);
     const isGiftLink = urlParams.has('gift');
     
-    // Only trigger this if we are the creator testing the preview (NOT the receiver)
+    const bgMusic = document.getElementById("bg-music");
+    const ytIframe = document.getElementById('magical-yt-iframe');
+    const spIframe = document.getElementById('magical-spotify-iframe');
+
+    // Function to instantly kill any playing audio
+    const silenceAudio = () => {
+        if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+        if (ytIframe) ytIframe.remove();
+        if (spIframe) spIframe.remove();
+    };
+
     if (!isGiftLink) {
+        // PHASE 2: Creator Preview Mode
         const orderForm = document.getElementById('order-form-container');
         const previewContainer = document.getElementById('preview-container');
         
-        // If they pressed back and the preview state is gone, return to the form
         if (!event.state || !event.state.inPreview) {
             if (previewContainer) previewContainer.style.display = "none";
             if (orderForm) orderForm.style.display = "block";
-            
-            // Instantly kill any music playing from the preview
-            const bgMusic = document.getElementById("bg-music");
-            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
-            
-            const ytIframe = document.getElementById('magical-yt-iframe');
-            if (ytIframe) ytIframe.remove();
-            
-            const spIframe = document.getElementById('magical-spotify-iframe');
-            if (spIframe) spIframe.remove();
+            silenceAudio();
         }
+    } else {
+        // PHASE 3: Receiver Generated Link Mode
+        // Drop them safely back at the login screen
+        showScreen('login-screen');
+        silenceAudio();
+        
+        // Re-anchor the history state so they remain securely in the gift
+        history.pushState({ atLogin: true }, '', window.location.href);
     }
 });
