@@ -518,7 +518,7 @@ button.heartNext {
 /* 2. Fix the Toast Message clipping issue */
 .evasion-toast {
     position: absolute;
-    bottom: 80px; /* Keeps it right above the buttons */
+    bottom: 110px !important; /* 🚀 FIX: Pushed up from 80px */
     left: 50%;
     width: 90%;
     max-width: 320px;
