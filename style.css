@@ -1673,3 +1673,34 @@ html, body {
     color: #28a745;
     transition: transform 0.3s;
 }
+/* =========================================
+   🚀 FIX: SCREEN 1 ENLARGEMENT
+   ========================================= */
+#screen1 h1 {
+    font-size: clamp(2.4rem, 10vw, 3.2rem) !important;
+    line-height: 1.1;
+    margin-bottom: 5px !important;
+}
+
+#screen1 p {
+    font-size: 1.5rem !important;
+    margin-bottom: 25px !important;
+}
+
+.center-penguin { 
+    height: 22vh !important; 
+    max-height: 180px !important; /* Increased from 150px */
+    margin-bottom: 15px !important;
+}
+
+.above-btn-penguin { 
+    height: 15vh !important; 
+    max-height: 130px !important; /* Increased from 100px */
+    margin-bottom: 15px !important;
+}
+
+#screen1 .buttons button {
+    font-size: 1.5rem !important;
+    padding: 15px 35px !important;
+    border-radius: 40px !important;
+}
