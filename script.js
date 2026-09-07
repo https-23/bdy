@@ -894,11 +894,12 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.setProperty('mix-blend-mode', 'multiply', 'important');
             envelopeReactionGif.style.setProperty('pointer-events', 'none', 'important');
             
-            // 🚀 MAGIC TRICK 4.0: Perfect alignment without floating
+            // 🚀 MAGIC TRICK 4.0: Perfect alignment on the top line!
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
+            // 👇 FIX: Changed from -22px to +2px so it sits perfectly ON the border line
+            envelopeReactionGif.style.setProperty('bottom', 'calc(100% + 2px)', 'important'); 
             
             // calc() se directly 22px niche khinch liya without using margin hacks
-            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 22px)', 'important'); 
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             
