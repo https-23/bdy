@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka:wght@400;600&display=swap');
 
+/* =========================================
+   KILL MOBILE BLUE TAP HIGHLIGHT
+   ========================================= */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Prevent accidental text selection while frantically tapping buttons */
+button, .magic-btn, .mini-card, .ig-card, .envelope-wrapper, #envelopeNoBtn {
+    outline: none !important;
+    user-select: none !important;
+    touch-action: manipulation;
+}
+
+/* Allow typing in inputs as normal */
+input[type="text"], input[type="password"], textarea {
+    user-select: auto !important;
+}
+
 /* --- 1. Form Wrapper Styles (Keyboard & Scroll Safe) --- */
 html, body {
     margin: 0;
