@@ -886,19 +886,26 @@ if (envelopeYesBtn) {
             
             // Naya penguin image set karo
             envelopeReactionGif.src = "penguinTT2.gif";
-            envelopeReactionGif.className = "character reaction-penguin"; 
             
-            // 🚀 MAGIC TRICK 4.0: 'bottom: 100%' lagao.
+            // 🚀 FIX: 'character' class hata di taaki Parallax Engine isko override na kare!
+            envelopeReactionGif.className = "reaction-penguin"; 
+            
+            // Parallax hatane ke baad CSS design properties wapas add ki hain
+            envelopeReactionGif.style.setProperty('mix-blend-mode', 'multiply', 'important');
+            envelopeReactionGif.style.setProperty('pointer-events', 'none', 'important');
+            
+            // 🚀 MAGIC TRICK 4.0: Perfect alignment without floating
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            envelopeReactionGif.style.setProperty('bottom', '100%', 'important'); 
+            
+            // calc() se directly 22px niche khinch liya without using margin hacks
+            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 22px)', 'important'); 
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
+            
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('margin-bottom', '-10px', 'important'); 
             envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
         }
-        
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
         
