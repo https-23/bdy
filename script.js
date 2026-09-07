@@ -1739,7 +1739,7 @@ async function generateMagicStoryImage() {
         // Links and Text below QR
         ctx.font = "bold 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "#c0392b";
-        ctx.fillText("Made with 10 Petal X ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60); // 🚀 FIX: Clean Brand Name
+        ctx.fillText("Made with 10 petal x ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60); // 🚀 FIX: Clean Brand Name
 
         ctx.font = "500 24px 'Fredoka', sans-serif";
         ctx.fillStyle = "rgba(136, 14, 79, 0.7)";
