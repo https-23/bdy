@@ -671,17 +671,18 @@ if(unlockBtn) {
                 bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
             }
         }
-            showScreen("big-penguin-screen");
+                        showScreen("big-penguin-screen");
 
+            // 🚀 FIX: Reduced delay from 3800ms to 1800ms (2 seconds faster)
             setTimeout(() => {
                 const giantPeng = document.getElementById('giant-penguin-img');
                 if(giantPeng) giantPeng.classList.add('hide-shadow');
                 
                 setTimeout(() => {
                     showScreen("archery-screen");
-                }, 500);
+                }, 400); // Speeds up the fade-out slightly
                 
-            }, 3800); 
+            }, 1800); 
             
         }, 1500);
     });
