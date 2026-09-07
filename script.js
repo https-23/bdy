@@ -1736,22 +1736,21 @@ async function generateMagicStoryImage() {
             ctx.fill();
             ctx.drawImage(window.magicQRCode, qrX, marketingStartY + 10, qrSize, qrSize);
         }
-
         // Links and Text below QR
         ctx.font = "bold 32px 'Fredoka', sans-serif";
         ctx.fillStyle = "#c0392b";
-        ctx.fillText("bdy.10petalxmagic.workers.dev", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60);
+        ctx.fillText("Made with 10 Petal X ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 60); // 🚀 FIX: Clean Brand Name
 
         ctx.font = "500 24px 'Fredoka', sans-serif";
         ctx.fillStyle = "rgba(136, 14, 79, 0.7)";
         ctx.fillText("Create your own surprise ✨", CANVAS_WIDTH / 2, marketingStartY + qrSize + 95);
-
+        
         // --- 1. "She Say Yesss" Text Moved to the VERY BOTTOM ---
         const yesssTextY = marketingStartY + qrSize + 180; // "Create your own" ke ekdam niche
         ctx.font = "bold 65px 'Caveat', cursive"; // Beautiful cursive font
         ctx.fillStyle = "#d93838"; // Romantic red color
         ctx.textAlign = "center";
-        ctx.fillText("She Say Yesss 🥳😍", CANVAS_WIDTH / 2, yesssTextY);
+        ctx.fillText("She Said Yesss! 😍", CANVAS_WIDTH / 2, yesssTextY);
         
         // ==========================================
         // 📥 7. EXPORT ENGINE (Zero Lag)
