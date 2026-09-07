@@ -896,8 +896,8 @@ if (envelopeYesBtn) {
             
             // 🚀 MAGIC TRICK 4.0: Perfect alignment on the top line!
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            // 👇 FIX: Changed from -22px to +2px so it sits perfectly ON the border line
-            envelopeReactionGif.style.setProperty('bottom', 'calc(100% + 2px)', 'important'); 
+            // 👇 FIX: -12px eats up the transparent gap at the bottom of the GIF
+            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 12px)', 'important');
             
             // calc() se directly 22px niche khinch liya without using margin hacks
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
