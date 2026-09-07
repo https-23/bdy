@@ -895,7 +895,7 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('margin-bottom', '-25px', 'important'); 
+            envelopeReactionGif.style.setProperty('margin-bottom', '-10px', 'important'); 
             envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
         }
         
