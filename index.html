@@ -280,50 +280,53 @@
                 <button class="heartNext">❤️</button>
             </section>
             
-                <!-- =========================================
+          <!-- =========================================
              SCREEN 4: THE INTERACTIVE QUESTION ARENA
              ========================================= -->
-            <section class="screen" id="screen4">
-    <button class="backBtn" data-back="screen3">⬅️</button>
-    
-    <!-- 1. Title sabse upar rahega -->
-    <h1 id="screen4-title">Open Me, One Surprise at a Time 💌</h1>
+        <section class="screen" id="screen4">
+            <button class="backBtn" data-back="screen3">⬅️</button>
+            
+            <!-- Top Reaction Penguin Slot -->
+            <div class="reaction-penguin-wrapper">
+                <img id="envelope-reaction-gif" class="character reaction-penguin" src="celeb-penguin.gif" alt="Penguin Reaction" loading="lazy">
+            </div>
 
-    <!-- 2. Penguin Wrapper envelope ke bahar aur upar rahega -->
-    <div class="reaction-penguin-wrapper">
-        <img id="envelope-reaction-gif" class="character reaction-penguin" src="celeb-penguin.gif" alt="Penguin Reaction" loading="lazy">
-    </div>
+            <h1 id="screen4-title">Open Me, One Surprise at a Time 💌</h1>
 
-    <!-- 3. Envelope Container -->
-    <div class="envelope-wrapper" id="envelope-wrapper">
-        <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
-        <div class="envelope">
-            <div class="letter">
-                <div class="letter-content">
-                    <p id="envelope-letter-text"></p>
-                    
-                    <div id="evasion-arena" class="evasion-arena" style="display: none;">
-                        <button id="envelopeYesBtn" class="magic-btn arena-yes-btn">
-                            <span class="btn-text">YES 💖</span>
-                        </button>
-                        <button id="envelopeNoBtn" class="magic-btn arena-no-btn">
-                            <span class="btn-text">No 😏</span>
-                        </button>
+            <!-- Interactive Envelope -->
+            <div class="envelope-wrapper" id="envelope-wrapper">
+                <img class="character side-penguin" src="penguin5.gif" alt="Small Penguin">
+                <div class="envelope">
+                    <div class="letter">
+                        <!-- 🚀 NEW: Wrapper to hide content until opened -->
+                        <div class="letter-content">
+                            <p id="envelope-letter-text"></p>
+                            
+                            <!-- 🚀 NEW: Buttons moved ONTO the letter -->
+                            <div id="evasion-arena" class="evasion-arena" style="display: none;">
+                                <button id="envelopeYesBtn" class="magic-btn arena-yes-btn">
+                                    <span class="btn-text">YES 💖</span>
+                                </button>
+                                <button id="envelopeNoBtn" class="magic-btn arena-no-btn">
+                                    <span class="btn-text">No 😏</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    <div class="envelope-front"></div>
                 </div>
             </div>
-            <div class="envelope-front"></div>
-        </div>
-    </div>
-    
-    <p class="click-hint">Tap on envelope to open 👆</p>
+            
+            <p class="click-hint">Tap on envelope to open 👆</p>
 
-    <div id="evasion-toast" class="evasion-toast" style="display: none; position: relative; z-index: 100;">
-        <span id="evasion-toast-text"></span>
-    </div>
+            <!-- Playful Dynamic Dialogue Toast (Floating above everything) -->
+            <div id="evasion-toast" class="evasion-toast" style="display: none; position: relative; z-index: 100;">
+                <span id="evasion-toast-text"></span>
+            </div>
 
-    <button class="next" id="envelopeNextBtn" style="display: none; margin-top: 15px;">Next →</button>
-            </section>            
+            <!-- Success Next Button (Hidden until YES is clicked) -->
+            <button class="next" id="envelopeNextBtn" style="display: none; margin-top: 15px;">Next →</button>
+        </section>
             <section class="screen" id="screen5">
                 <button class="backBtn" data-back="screen4">⬅️</button>
                 <img class="character" src="penguin8.gif" alt="Penguin 8" loading="lazy" style="height: 110px; margin-top: 10px; margin-bottom: 5px;">
