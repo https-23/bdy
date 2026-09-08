@@ -1643,6 +1643,25 @@ html, body {
     overflow: hidden;
 }
 
+/* 🔥 Directional Watermark Arrows */
+.swipe-container::after {
+    content: '» » » » » » » » » » »'; 
+    position: absolute;
+    top: 0;
+    left: 55px; /* Thumb icon ke theek aage se start hoga */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: #28a745; /* Green track matching color */
+    opacity: 0.15; /* Perfect subtle watermark opacity */
+    font-size: 1.8rem;
+    letter-spacing: 8px;
+    z-index: 0; /* Text aur track ke niche rahega */
+    pointer-events: none; /* Swipe action ko block nahi karega */
+    white-space: nowrap;
+}
+
 .swipe-track {
     position: absolute;
     top: 0;
@@ -1651,7 +1670,7 @@ html, body {
     width: 0;
     background: linear-gradient(to right, #28a745, #218838);
     border-radius: 50px;
-    z-index: 1;
+    z-index: 1; /* Swipe karne par arrows ko cleanly cover karega */
 }
 
 .swipe-text {
@@ -1662,7 +1681,7 @@ html, body {
     font-size: 1.05rem;
     font-weight: 600;
     color: #666;
-    z-index: 2;
+    z-index: 2; /* Text hamesha upar visible rahega */
     pointer-events: none;
     transition: color 0.3s;
 }
