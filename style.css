@@ -1726,24 +1726,21 @@ html, body {
 /* =========================================
    🚀 PENGUIN TT2 EXACT LINE JUMP FIX
    ========================================= */
-/* Yeh sirf tabhi kaam karega jab penguin YES click hone ke baad Letter par jayega */
 .letter #envelope-reaction-gif {
-    transform-origin: bottom center !important;
-    animation: tt2Jump 1.2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
-    
-    /* Agar line se thoda upar ya niche karna ho, toh 19px ko adjust kar lena (jaise 17px ya 21px) */
+    left: 50% !important;
+    /* Agar penguin line ke thoda upar hawa mein lage, toh 19px ko badha kar 25px kar dena. Niche dab jaye, toh 15px kar dena */
     bottom: calc(100% - 19px) !important; 
+    transform-origin: bottom center !important;
+    animation: penguinJump 1.2s ease-in-out infinite !important;
 }
 
-/* Jump ki physics - translateX(-50%) rakhna zaroori hai taaki wo center me hi rahe */
-@keyframes tt2Jump {
-    0%, 100% { 
-        transform: translateX(-50%) translateY(0) scaleY(1); 
+@keyframes penguinJump {
+    0%, 100% {
+        /* Barabar line par khada rahega */
+        transform: translateX(-50%) translateY(0); 
     }
-    45%, 55% { 
-        transform: translateX(-50%) translateY(-12px) scaleY(1.02); 
-    }
-    90% { 
-        transform: translateX(-50%) translateY(0) scaleY(0.96); 
+    50% {
+        /* Hawa mein jump karega */
+        transform: translateX(-50%) translateY(-15px); 
     }
 }
