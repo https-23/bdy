@@ -894,18 +894,18 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.setProperty('mix-blend-mode', 'multiply', 'important');
             envelopeReactionGif.style.setProperty('pointer-events', 'none', 'important');
             
-            // 🚀 MAGIC TRICK 4.0: Perfect alignment on the top line!
+            // 🚀 MAGIC TRICK 4.2: Final Pixel-Perfect Alignment
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
-            // 👇 FIX: -12px eats up the transparent gap at the bottom of the GIF
-            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 12px)', 'important');
             
-            // calc() se directly 22px niche khinch liya without using margin hacks
+            // 👇 FIX: -17px perfectly bridges the final gap shown in the video
+            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 17px)', 'important'); 
+            
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important');
         }
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
