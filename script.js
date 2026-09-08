@@ -901,7 +901,6 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.removeProperty('top'); 
             
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
-            envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
