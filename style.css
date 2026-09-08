@@ -1723,3 +1723,38 @@ html, body {
     padding: 15px 35px !important;
     border-radius: 40px !important;
 }
+/* =========================================
+   🚀 MATHEMATICAL ENVELOPE TOP-LINE FIX
+   ========================================= */
+/* 1. Lock the wrapper strictly to the envelope's top edge (0px line) */
+.reaction-penguin-wrapper {
+    position: absolute !important;
+    bottom: 100% !important; /* Forces it to sit EXACTLY on the envelope's top line */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    height: 100px !important;
+    width: 100px !important;
+    display: flex !important;
+    align-items: flex-end !important; /* Anchors the GIF's feet to the bottom of this box */
+    justify-content: center !important;
+    margin: 0 !important;
+    z-index: 10 !important;
+    pointer-events: none !important;
+}
+
+/* 2. Apply precise jump physics ONLY when inside the wrapper */
+.reaction-penguin-wrapper #envelope-reaction-gif {
+    height: 100px !important;
+    max-height: 100px !important;
+    margin: 0 !important;
+    transform-origin: bottom center !important;
+    animation: preciseJump 1.2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite !important;
+}
+
+/* 3. System Architect jump animation */
+@keyframes preciseJump {
+    0%, 100% { transform: translateY(0) scaleY(1); }    /* Feet touching the line perfectly */
+    45% { transform: translateY(-15px) scaleY(1.05); }  /* Jump up */
+    55% { transform: translateY(-15px) scaleY(1.05); }  /* Hang time in air */
+    90% { transform: translateY(0) scaleY(0.95); }      /* Landing impact squash */
+}
