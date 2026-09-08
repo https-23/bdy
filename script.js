@@ -891,14 +891,14 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.setProperty('mix-blend-mode', 'multiply', 'important');
             envelopeReactionGif.style.setProperty('pointer-events', 'none', 'important');
             
-            // 🚀 THE ULTIMATE FIX: Anchor from the TOP to bypass mobile calculation bugs
+            // 🚀 THE FINAL PIXEL-PERFECT FIX
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
             
-            // 👇 Remove the buggy bottom command entirely
-            envelopeReactionGif.style.removeProperty('bottom'); 
+            // 👇 -19px is the exact mathematical center to rest on the dashed line
+            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 19px)', 'important'); 
             
-            // 👇 Hard-lock it from the top. 110px height minus 12px transparent gap = -98px
-            envelopeReactionGif.style.setProperty('top', '-98px', 'important'); 
+            // Clean up the buggy 'top' property from the previous test
+            envelopeReactionGif.style.removeProperty('top'); 
             
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
@@ -906,7 +906,6 @@ if (envelopeYesBtn) {
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
             envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
-
         }
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
