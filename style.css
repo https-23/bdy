@@ -1763,3 +1763,26 @@ html, body {
         transform: translateX(-50%) translateY(-15px); 
     }
 }
+/* =========================================
+   📸 DASHED BORDER PHOTO UPLOAD BOX FIX
+   ========================================= */
+
+/* 1. Box ko dashed border aur matching color dena */
+.ig-style {
+    background: #ffffff !important;
+    border: 2px dashed #c0392b !important; /* Matches the + icon color */
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.08) !important; /* Halka sa maroon shadow */
+}
+
+/* 2. Purana fake grey top-bar hide karna (Dashed design ke sath wo ajeeb lagta hai) */
+.ig-style::before {
+    display: none !important;
+}
+
+/* 3. + Icon ko perfectly center karna (purana margin hatakar) */
+.upload-icon {
+    color: #c0392b !important;
+    margin-top: 0 !important; 
+    font-weight: bold;
+}
