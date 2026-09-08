@@ -1724,25 +1724,12 @@ html, body {
     border-radius: 40px !important;
 }
 /* =========================================
-   🚀 PENGUIN TT2 STATIC POSITION FIX
-   ========================================= */
-.letter #envelope-reaction-gif {
-    left: 50% !important;
-    transform: translateX(-50%) !important; /* Yeh center mein lock rakhega */
-    /* Agar penguin line ke thoda upar hawa mein lage, toh 19px ko badha kar 25px kar dena. Niche dab jaye, toh 15px kar dena */
-    /* Line par set karne ka height (19px ko apne hisaab se adjust kar sakte ho) */
-    bottom: calc(100% - 19px) !important; 
-    
-    /* 🛑 Yeh line CSS jump ko hamesha ke liye cancel kar degi */
-    animation: none !important; 
-}
-/* =========================================
    🚀 PENGUIN TT2 EXACT LINE JUMP FIX
    ========================================= */
 .letter #envelope-reaction-gif {
     left: 50% !important;
     /* Agar penguin line ke thoda upar hawa mein lage, toh 19px ko badha kar 25px kar dena. Niche dab jaye, toh 15px kar dena */
-    bottom: calc(100% - 19px) !important; 
+    bottom: calc(100% - 5px) !important; 
     transform-origin: bottom center !important;
     animation: penguinJump 1.2s ease-in-out infinite !important;
 }
