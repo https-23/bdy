@@ -1729,7 +1729,7 @@ html, body {
 .letter #envelope-reaction-gif {
     left: 50% !important;
     /* Agar penguin line ke thoda upar hawa mein lage, toh 19px ko badha kar 25px kar dena. Niche dab jaye, toh 15px kar dena */
-    bottom: calc(100% - 5px) !important; 
+    bottom: calc(100% - 0px) !important; 
     transform-origin: bottom center !important;
     animation: penguinJump 1.2s ease-in-out infinite !important;
 }
