@@ -880,32 +880,33 @@ if (envelopeYesBtn) {
             if (envelopeReactionGif.parentElement !== letterBox) {
                 letterBox.appendChild(envelopeReactionGif);
             }
-            
-            // Saari purani CSS limits clear karo
+                        // Saari purani CSS limits clear karo
             envelopeReactionGif.removeAttribute("style"); 
             
             // Naya penguin image set karo
             envelopeReactionGif.src = "penguinTT2.gif";
-            
-            // 🚀 FIX: 'character' class hata di taaki Parallax Engine isko override na kare!
             envelopeReactionGif.className = "reaction-penguin"; 
             
             // Parallax hatane ke baad CSS design properties wapas add ki hain
             envelopeReactionGif.style.setProperty('mix-blend-mode', 'multiply', 'important');
             envelopeReactionGif.style.setProperty('pointer-events', 'none', 'important');
             
-            // 🚀 MAGIC TRICK 4.2: Final Pixel-Perfect Alignment
+            // 🚀 THE ULTIMATE FIX: Anchor from the TOP to bypass mobile calculation bugs
             envelopeReactionGif.style.setProperty('position', 'absolute', 'important');
             
-            // 👇 FIX: -17px perfectly bridges the final gap shown in the video
-            envelopeReactionGif.style.setProperty('bottom', 'calc(100% - 17px)', 'important'); 
+            // 👇 Remove the buggy bottom command entirely
+            envelopeReactionGif.style.removeProperty('bottom'); 
+            
+            // 👇 Hard-lock it from the top. 110px height minus 12px transparent gap = -98px
+            envelopeReactionGif.style.setProperty('top', '-98px', 'important'); 
             
             envelopeReactionGif.style.setProperty('left', '50%', 'important');
             envelopeReactionGif.style.setProperty('transform', 'translateX(-50%)', 'important');
             
             envelopeReactionGif.style.setProperty('height', '110px', 'important'); 
             envelopeReactionGif.style.setProperty('max-height', 'none', 'important'); 
-            envelopeReactionGif.style.setProperty('z-index', '9999', 'important');
+            envelopeReactionGif.style.setProperty('z-index', '9999', 'important'); 
+
         }
         const sidePenguin = document.querySelector(".side-penguin");
         if (sidePenguin) sidePenguin.src = "penguinTT4.gif";
