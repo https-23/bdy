@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 Petal X - Partner Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+          .animation-delay-2000 { animation-delay: 2s; }
+          .animation-delay-4000 { animation-delay: 4s; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-black flex items-center justify-center p-4 antialiased">
+    
+    <div class="w-full max-w-md relative">
+        <div class="absolute top-0 left-0 w-32 h-32 bg-purple-500 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob"></div>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-32 h-32 bg-indigo-500 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-4000"></div>
+
+        <div class="relative bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 z-10">
+            
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-white tracking-tight">
+                    10 Petal X <span class="text-purple-400">Partners</span>
+                </h1>
+                <p id="form-subtitle" class="text-gray-300 mt-2 text-sm">Welcome back to your dashboard</p>
+            </div>
+
+            <div id="alert-box" class="hidden p-3 rounded-lg mb-6 text-sm border"></div>
+
+            <form id="login-form" class="space-y-4 block">
+                <div>
+                    <input type="text" id="login-influencerId" placeholder="Influencer ID" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <div>
+                    <input type="password" id="login-password" placeholder="Password" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <button type="submit" id="login-btn"
+                    class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all mt-2 disabled:opacity-50">
+                    Sign In
+                </button>
+            </form>
+
+            <form id="signup-form" class="space-y-4 hidden">
+                <div>
+                    <input type="text" id="signup-name" placeholder="Full Name" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <div>
+                    <input type="email" id="signup-email" placeholder="Email Address" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <div>
+                    <input type="text" id="signup-requestedCode" placeholder="Desired Promo Code (e.g., SANA20)" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 uppercase focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <div>
+                    <input type="password" id="signup-password" placeholder="Password" required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
+                </div>
+                <button type="submit" id="signup-btn"
+                    class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all mt-2 disabled:opacity-50">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button type="button" id="toggle-view-btn" class="text-gray-300 hover:text-white text-sm transition-colors">
+                    Don't have an account? Sign up
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const toggleBtn = document.getElementById('toggle-view-btn');
+        const subtitle = document.getElementById('form-subtitle');
+        const alertBox = document.getElementById('alert-box');
+        
+        let isLoginView = true;
+
+        toggleBtn.addEventListener('click', () => {
+            isLoginView = !isLoginView;
+            alertBox.classList.add('hidden');
+            
+            if (isLoginView) {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                toggleBtn.innerText = "Don't have an account? Sign up";
+                subtitle.innerText = "Welcome back to your dashboard";
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                toggleBtn.innerText = "Already have an account? Sign in";
+                subtitle.innerText = "Join the affiliate program";
+            }
+        });
+
+        const showMessage = (message, isError = false) => {
+            alertBox.innerText = message;
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'text-red-200', 'border-red-500/50', 'bg-emerald-500/20', 'text-emerald-200', 'border-emerald-500/50');
+            
+            if (isError) {
+                alertBox.classList.add('bg-red-500/20', 'text-red-200', 'border-red-500/50');
+            } else {
+                alertBox.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border-emerald-500/50');
+            }
+        };
+
+        const handleAuth = async (e, endpoint, payload, btnId) => {
+            e.preventDefault();
+            const btn = document.getElementById(btnId);
+            const originalText = btn.innerText;
+            
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+            alertBox.classList.add('hidden');
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error || 'Authentication failed');
+
+                showMessage(isLoginView ? 'Login successful!' : 'Account created successfully!', false);
+                
+                localStorage.setItem('influencerId', data.influencerId);
+                
+                setTimeout(() => {
+                    window.location.href = '/dashboard/index.html';
+                }, 1000);
+
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        };
+
+        loginForm.addEventListener('submit', (e) => {
+            const payload = {
+                influencerId: document.getElementById('login-influencerId').value,
+                password: document.getElementById('login-password').value
+            };
+            handleAuth(e, 'https://magical-api.10petalxmagic.workers.dev/api/influencer/login', payload, 'login-btn');
+        });
+
+        signupForm.addEventListener('submit', (e) => {
+            const payload = {
+                name: document.getElementById('signup-name').value,
+                email: document.getElementById('signup-email').value,
+                requestedCode: document.getElementById('signup-requestedCode').value,
+                password: document.getElementById('signup-password').value
+            };
+            handleAuth(e, 'https://magical-api.10petalxmagic.workers.dev/api/influencer/signup', payload, 'signup-btn');
+        });
+    </script>
+</body>
+</html>
