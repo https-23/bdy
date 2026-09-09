@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 Petal X - Partner Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+          .animation-delay-2000 { animation-delay: 2s; }
+          .animation-delay-4000 { animation-delay: 4s; }
+          .glass-card { @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl rounded-2xl; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-black text-white antialiased relative overflow-x-hidden">
+    
+    <div class="fixed top-0 left-10 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none"></div>
+    <div class="fixed top-20 right-10 w-64 h-64 bg-pink-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none"></div>
+    <div class="fixed bottom-10 left-1/2 w-64 h-64 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000 pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        
+        <header class="flex justify-between items-center mb-10 glass-card p-4 px-6">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">10 Petal X <span class="text-purple-400">Partners</span></h1>
+                <p class="text-sm text-gray-300">Welcome back, <span id="user-name" class="font-semibold text-white">Loading...</span></p>
+            </div>
+            <button id="logout-btn" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-colors">
+                Sign Out
+            </button>
+        </header>
+
+        <section class="mb-10 glass-card p-6">
+            <h2 class="text-lg font-semibold mb-4">Your Unique Referral Link</h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="referral-link" readonly value="Loading..." 
+                    class="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-emerald-400 font-mono text-sm focus:outline-none" />
+                <button id="copy-btn" class="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Copy Link
+                </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-3">Share this link. Your audience gets ₹20 off, and you earn ₹25 per order.</p>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="glass-card p-6 border-t-4 border-t-emerald-400">
+                <p class="text-sm text-gray-400 mb-1">Unpaid Earnings</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-bold text-emerald-400">₹</span>
+                    <h3 id="metric-earnings" class="text-4xl font-bold">0</h3>
+                </div>
+                <p class="text-xs text-emerald-500 mt-2 bg-emerald-500/10 inline-block px-2 py-1 rounded-md">Payout every Monday</p>
+            </div>
+
+            <div class="glass-card p-6 border-t-4 border-t-purple-400">
+                <p class="text-sm text-gray-400 mb-1">Total Conversions</p>
+                <h3 id="metric-conversions" class="text-4xl font-bold">0</h3>
+                <p class="text-xs text-gray-400 mt-2">Completed orders this month</p>
+            </div>
+
+            <div class="glass-card p-6 border-t-4 border-t-blue-400">
+                <p class="text-sm text-gray-400 mb-1">Total Clicks</p>
+                <h3 id="metric-clicks" class="text-4xl font-bold">0</h3>
+                <p class="text-xs text-gray-400 mt-2">Link visits this month</p>
+            </div>
+
+            <div class="glass-card p-6 border-t-4 border-t-pink-400">
+                <p class="text-sm text-gray-400 mb-1">Conversion Rate</p>
+                <div class="flex items-baseline gap-1">
+                    <h3 id="metric-rate" class="text-4xl font-bold">0.00</h3>
+                    <span class="text-xl font-bold text-gray-400">%</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">Conversions per 100 clicks</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const influencerId = localStorage.getItem('influencerId');
+            
+            if (!influencerId) {
+                window.location.href = '/affiliate/index.html';
+                return;
+            }
+
+            const WORKER_URL = 'https://magical-api.10petalxmagic.workers.dev';
+            const copyBtn = document.getElementById('copy-btn');
+            const linkInput = document.getElementById('referral-link');
+
+            try {
+                const response = await fetch(`${WORKER_URL}/api/influencer/me?id=${influencerId}`);
+                if (!response.ok) throw new Error("Failed to load dashboard data");
+                
+                const data = await response.json();
+
+                document.getElementById('user-name').innerText = data.profile.name;
+                const primaryCode = data.profile.activeCodes[0];
+                const finalLink = `https://10petalx.com/?ref=${primaryCode}`;
+                linkInput.value = finalLink;
+
+                const pending = data.profile.financials.pendingBalance || 0;
+                document.getElementById('metric-earnings').innerText = pending.toLocaleString('en-IN');
+
+                const stats = data.stats || { totalClicks: 0, totalConversions: 0, conversionRate: 0 };
+                animateValue("metric-clicks", 0, stats.totalClicks, 1000);
+                animateValue("metric-conversions", 0, stats.totalConversions, 1000);
+                document.getElementById('metric-rate').innerText = parseFloat(stats.conversionRate).toFixed(2);
+
+            } catch (error) {
+                console.error("Dashboard Error:", error);
+                alert("Could not load dashboard data. Please try again later.");
+            }
+
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(linkInput.value).then(() => {
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Copied!
+                    `;
+                    copyBtn.classList.replace('bg-purple-600', 'bg-emerald-600');
+                    copyBtn.classList.replace('hover:bg-purple-500', 'hover:bg-emerald-500');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalHTML;
+                        copyBtn.classList.replace('bg-emerald-600', 'bg-purple-600');
+                        copyBtn.classList.replace('hover:bg-emerald-500', 'hover:bg-purple-500');
+                    }, 2000);
+                });
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('influencerId');
+                window.location.href = '/affiliate/index.html';
+            });
+        });
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) {
+                document.getElementById(id).innerText = end.toLocaleString('en-IN');
+                return;
+            }
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOut = progress * (2 - progress);
+                const currentVal = Math.floor(easeOut * (end - start) + start);
+                document.getElementById(id).innerText = currentVal.toLocaleString('en-IN');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    document.getElementById(id).innerText = end.toLocaleString('en-IN');
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
+
