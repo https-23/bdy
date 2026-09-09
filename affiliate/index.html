@@ -88,7 +88,7 @@
             </form>
 
             <div class="mt-6 text-center">
-                <button type="button" id="toggle-view-btn" class="text-gray-300 hover:text-white text-sm transition-colors">
+                <button type="button" id="toggle-view-btn" class="text-blue-400 hover:text-blue-300 underline font-medium text-sm transition-colors">
                     Don't have an account? Sign up
                 </button>
             </div>
@@ -103,9 +103,8 @@
         const alertBox = document.getElementById('alert-box');
         
         let isLoginView = true;
-
-        toggleBtn.addEventListener('click', () => {
-            isLoginView = !isLoginView;
+        const switchView = (showLogin, pushHistory = true) => {
+            isLoginView = showLogin;
             alertBox.classList.add('hidden');
             
             if (isLoginView) {
@@ -113,14 +112,21 @@
                 signupForm.classList.add('hidden');
                 toggleBtn.innerText = "Don't have an account? Sign up";
                 subtitle.innerText = "Welcome back to your dashboard";
+                if (pushHistory) history.pushState({ view: 'login' }, '', '');
             } else {
                 loginForm.classList.add('hidden');
                 signupForm.classList.remove('hidden');
                 toggleBtn.innerText = "Already have an account? Sign in";
                 subtitle.innerText = "Join the affiliate program";
+                if (pushHistory) history.pushState({ view: 'signup' }, '', '#signup');
             }
+        };
+        toggleBtn.addEventListener('click', () => switchView(!isLoginView));
+        
+        window.addEventListener('popstate', (event) => {
+            switchView(event.state ? event.state.view === 'login' : true, false);
         });
-
+        
         const showMessage = (message, isError = false) => {
             alertBox.innerText = message;
             alertBox.classList.remove('hidden', 'bg-red-500/20', 'text-red-200', 'border-red-500/50', 'bg-emerald-500/20', 'text-emerald-200', 'border-emerald-500/50');
@@ -157,7 +163,7 @@
                 localStorage.setItem('influencerId', data.influencerId);
                 
                 setTimeout(() => {
-                    window.location.href = '/dashboard/index.html';
+                    window.location.href = '/affiliate/dashboard.html';
                 }, 1000);
 
             } catch (error) {
