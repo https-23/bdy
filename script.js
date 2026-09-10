@@ -19,6 +19,7 @@ window.addEventListener('unhandledrejection', function(event) {
 // ==========================================
 window.magicalState = {
     partnerName: "",
+    appliedPromo: null,
     userName: "",
     envelopeMsg: "",
     envelopeQuestion: "", // 🚀 NEW: Tracks the selected envelope question
@@ -269,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        promoCode: window.magicalState.appliedPromo,
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
                         envelope_question: window.magicalState.envelopeQuestion,
@@ -386,6 +388,45 @@ document.addEventListener('DOMContentLoaded', () => {
         rulesModal.addEventListener('click', (e) => {
             if (e.target === rulesModal) {
                 rulesModal.classList.remove('show');
+            }
+        });
+    }
+    // --- Promo Code Apply Logic ---
+    const applyPromoBtn = document.getElementById('apply-promo-btn');
+    const promoInput = document.getElementById('promo-input');
+    const promoMessage = document.getElementById('promo-message');
+    const swipeTextEl = document.getElementById('swipe-text');
+
+    if (applyPromoBtn) {
+        applyPromoBtn.addEventListener('click', async () => {
+            const code = promoInput.value.trim().toUpperCase();
+            if (!code) return;
+
+            applyPromoBtn.innerText = "⏳";
+            try {
+                const res = await fetch('https://magical-api.10petalxmagic.workers.dev/api/checkout/validate-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ promoCode: code })
+                });
+                const data = await res.json();
+
+                if (data.valid) {
+                    window.magicalState.appliedPromo = data.promoCode;
+                    promoMessage.innerText = `${data.message} (₹${data.discountAmount} Off!)`;
+                    promoMessage.style.color = "#28a745"; // Green success text
+                    if (swipeTextEl) swipeTextEl.innerText = `✨PAY ₹${data.finalPrice} & GET LINK🔗`;
+                    applyPromoBtn.innerText = "✔";
+                    applyPromoBtn.disabled = true;
+                    promoInput.disabled = true;
+                } else {
+                    promoMessage.innerText = data.message;
+                    promoMessage.style.color = "#c0392b"; // Red error text
+                    applyPromoBtn.innerText = "APPLY";
+                }
+            } catch (err) {
+                promoMessage.innerText = "Network Error. Please try again.";
+                applyPromoBtn.innerText = "APPLY";
             }
         });
     }
