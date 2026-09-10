@@ -119,8 +119,10 @@
 
                 document.getElementById('user-name').innerText = data.profile.name;
                 const primaryCode = data.profile.activeCodes[0];
-                const finalLink = `https://10petalx.com/?ref=${primaryCode}`;
-                linkInput.value = finalLink;
+                // dashboard.html me linkInput.value change karo:
+                const trackingLink = `https://magical-api.10petalxmagic.workers.dev/api/track?ref=${primaryCode}`;
+                linkInput.value = trackingLink;
+
 
                 const pending = data.profile.financials.pendingBalance || 0;
                 document.getElementById('metric-earnings').innerText = pending.toLocaleString('en-IN');
