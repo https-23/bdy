@@ -48,14 +48,15 @@
             </div>
 
             <div id="alert-box" class="hidden p-3 rounded-lg mb-6 text-sm border"></div>
-
             <form id="login-form" class="space-y-4 block">
                 <div>
-                    <input type="text" id="login-influencerId" placeholder="Influencer ID" required
+                    <label class="text-xs text-gray-300 mb-1 block">Your Name or Promo Code</label>
+                    <input type="text" id="login-identifier" placeholder="e.g. Rahul or MMTT" required
                         class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
                 </div>
                 <div>
-                    <input type="password" id="login-password" placeholder="Password" required
+                    <label class="text-xs text-gray-300 mb-1 block">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required
                         class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all" />
                 </div>
                 <button type="submit" id="login-btn"
@@ -63,7 +64,7 @@
                     Sign In
                 </button>
             </form>
-
+            
             <form id="signup-form" class="space-y-4 hidden">
                 <div>
                     <input type="text" id="signup-name" placeholder="Full Name" required
