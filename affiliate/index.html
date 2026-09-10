@@ -174,10 +174,9 @@
                 btn.innerText = originalText;
             }
         };
-
         loginForm.addEventListener('submit', (e) => {
             const payload = {
-                influencerId: document.getElementById('login-influencerId').value,
+                identifier: document.getElementById('login-identifier').value,
                 password: document.getElementById('login-password').value
             };
             handleAuth(e, 'https://magical-api.10petalxmagic.workers.dev/api/influencer/login', payload, 'login-btn');
