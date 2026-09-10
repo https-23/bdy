@@ -456,17 +456,6 @@
                     <!-- NEW I PHONE SLIDE TYPE PAY BUTTON -->
                 <!-- Hidden Trigger (Keeps Razorpay logic 100% safe & untouched) -->
                 <button id="pay-now-btn" style="display: none;">PAY</button>
-                <!-- Promo Code UI -->
-<div id="promo-container" style="display: flex; gap: 8px; margin-top: 15px; position: relative; z-index: 1000;">
-    <input type="text" id="promo-input" placeholder="Referral Code (Optional)" 
-           class="premium-input" style="margin-top: 0; text-transform: uppercase;">
-    <button type="button" id="apply-promo-btn" class="magic-btn" 
-            style="width: 100px; padding: 10px; border-radius: 10px; font-size: 0.9rem;">
-        APPLY
-    </button>
-</div>
-<p id="promo-message" style="font-size: 0.85rem; margin-top: 5px; font-weight: 600; min-height: 20px;"></p>
-                
                 <!-- iPhone Style Swipe Slider -->
                 <div id="swipe-pay-container" class="swipe-container">
                     <div class="swipe-track" id="swipe-track"></div>
@@ -474,6 +463,16 @@
                     <div class="swipe-thumb" id="swipe-thumb">
                         <span class="thumb-icon" id="thumb-icon">Swipe ➔</span>
                     </div>
+                    <!-- Transparent Promo Code UI -->
+                <div id="promo-container" style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 15px; opacity: 0.7; transition: opacity 0.3s;">
+                    <input type="text" id="promo-input" placeholder="Have a code? Get 30% OFF" 
+                           style="background: transparent; border: 1px solid rgba(192, 57, 43, 0.4); border-radius: 20px; padding: 8px 15px; font-size: 0.8rem; color: #5a1829; text-transform: uppercase; width: 200px; outline: none; text-align: center; box-shadow: none;">
+                    <button type="button" id="apply-promo-btn" 
+                            style="background: rgba(192, 57, 43, 0.1); border: 1px solid rgba(192, 57, 43, 0.3); color: #c0392b; border-radius: 20px; padding: 8px 15px; font-size: 0.8rem; font-weight: bold; cursor: pointer; white-space: nowrap;">
+                        APPLY
+                    </button>
+                </div>
+                <p id="promo-message" style="font-size: 0.75rem; text-align: center; margin-top: 5px; min-height: 15px; font-weight: 600; opacity: 0.9;"></p>
                 </div>
                 <!-- 🚀 PHASE 4/5: HIDDEN POST-PAY COPY BUTTON -->
                     <button id="post-pay-copy-btn" class="magic-btn" style="display: none; background: linear-gradient(to right, #17a2b8, #138496); margin-top: 25px; width: 100%;">
