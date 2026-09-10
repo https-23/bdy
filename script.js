@@ -1305,6 +1305,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 🚀 Add this line:
             const swipeContainer = document.getElementById('swipe-pay-container');
             if (swipeContainer) swipeContainer.remove();
+        const promoContainer = document.getElementById('promo-container');
+            if (promoContainer) promoContainer.remove();
+            const promoMessage = document.getElementById('promo-message');
+            if (promoMessage) promoMessage.remove();
         // 🚀 ADD THIS LINE TO DESTROY THE LEGAL TEXT ON THE GIFT LINK
             const promiseBox = document.getElementById('magical-promise-box');
             if (promiseBox) promiseBox.remove();
