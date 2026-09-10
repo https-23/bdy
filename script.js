@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 var options = {
                     "key": configData.razorpay_key_id, 
-                    "amount": "4900",
+                    "amount": "9900",
                     "currency": "INR",
                     "name": "Magical Surprises",
                     "order_id": order.id,
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 🚀 NAYA FIX YAHAN HAI: Window close karne par reset hoga
                     "modal": {
                         "ondismiss": function() {
-                            payBtn.innerText = "Pay Now (₹49)";
+                            payBtn.innerText = "Pay Now (₹99)";
                             payBtn.disabled = false; // Yeh slider ko wapas bhej dega!
                         }
                 }
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
-                    payBtn.innerText = "Pay Now (₹49)";
+                    payBtn.innerText = "Pay Now (₹99)";
                     payBtn.disabled = false;
                 });
                 rzp.open();
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Error: " + error.message); 
-                payBtn.innerText = "Pay Now (₹49)";
+                payBtn.innerText = "Pay Now (₹99)";
                 payBtn.disabled = false;
             }
         });
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = "✨PAY ₹49 & GET LINK 🔗";
+                        swipeText.innerText = "✨PAY ₹99 & GET LINK 🔗";
                         swipeText.style.color = '#666';
                         thumbIcon.innerText = "Swipe ➔";
                     }
