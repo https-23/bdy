@@ -270,29 +270,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        promoCode: window.magicalState.appliedPromo,
                         partner_name: window.magicalState.partnerName,
                         user_name: window.magicalState.userName,
                         envelope_question: window.magicalState.envelopeQuestion,
-                        envelope_msg: window.magicalState.envelopeQuestion, // 🚀 FIX: Dual-payload guarantees capture
+                        envelope_msg: window.magicalState.envelopeQuestion, 
                         main_wish: window.magicalState.mainWish,
                         audio_link: window.magicalState.audioLink,
                         scratch_msgs: window.magicalState.scratchMsgs,
-                        images: window.magicalState.images 
+                        images: window.magicalState.images,
+                        promoCode: window.magicalState.appliedPromo || "" // 👈 UPDATE 1: Fallback empty string
                     })
                 });
                 const order = await orderRes.json();
                 if(order.error) throw new Error(order.error);
-                // NEW: Save the anonymous stamp in case the customer drops offline!
+                
                 localStorage.setItem('magical_recovery_stamp', JSON.stringify({
                     order_id: order.id,
                     gift_id: order.gift_id
                 }));
-                
 
                 var options = {
                     "key": configData.razorpay_key_id, 
-                    "amount": "9900",
+                    "amount": order.amount ? order.amount.toString() : "9900", // 👈 UPDATE 2: Backend ka real price catch karega
                     "currency": "INR",
                     "name": "Magical Surprises",
                     "order_id": order.id,
