@@ -776,7 +776,7 @@ const screen4 = document.getElementById("screen4"); // The safe container
 const evasionMessages = [
     "The button ran away because it knows you want to say yes! 😜",
     "Try again... it's not gonna bite 😅",
-    "Bro the No button is literally scared of you 😂",
+    "Honey the No button is literally scared of you 😂",
     "Okay but what if you just... said yes? 👀",
     "NO?? In this economy?? 😱",
     "The audacity... but okay... try again bestie 💅",
