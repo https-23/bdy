@@ -1027,7 +1027,7 @@ h1, h2 {
 /* --- OVERFLOW AND Z-INDEX LAYER FIXES --- */
 #order-form-container {
     box-sizing: border-box;
-    margin-bottom: 250px !important;
+    margin-bottom: 80px !important;
 }
 
 .screen {
