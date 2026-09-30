@@ -75,12 +75,15 @@ function extractYouTubeId(url) {
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
 }
-// PASTE THE NEW FUNCTION HERE:
-function extractSpotifyId(url) {
-    if (!url) return null;
-    const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
-    return match ? { type: match[1], id: match[2] } : null;
-}
+// 🚀 FIX: Instagram Browser Keyboard Scroll Issue
+    const audioInput = document.getElementById('audio-link-input');
+    if (audioInput) {
+        audioInput.addEventListener('focus', function() {
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 400); // 400ms wait taaki keyboard puri tarah open ho jaye
+        });
+    }
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
