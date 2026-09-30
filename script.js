@@ -691,14 +691,6 @@ if(unlockBtn) {
             
             iframe.allow = 'autoplay; encrypted-media';
             document.body.appendChild(iframe);
-
-            // 🚀 INSTAGRAM BYPASS: Forcefully send Play Command after mounting
-            setTimeout(() => {
-                if (iframe.contentWindow) {
-                     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                }
-            }, 1000);
-                    }
         } else if (spotifyData) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
