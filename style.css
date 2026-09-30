@@ -19,27 +19,28 @@ input[type="text"], input[type="password"], textarea {
     user-select: auto !important;
 }
 
-/* --- 1. Form Wrapper Styles (Keyboard & Scroll Safe) --- */
+/* --- 1. Form Wrapper Styles (Keyboard Safe) --- */
 html, body {
     margin: 0;
     padding: 0;
-    width: 100vw !important;
-    max-width: 100vw !important; 
-    height: auto !important; 
+    width: 100vw;
+    height: auto;
     min-height: 100vh;
-    overflow-x: hidden !important; 
-    overflow-y: auto !important; 
+    overflow-x: hidden;
+    /* 🚀 FIX: Removes all custom pointer/touch locks */
+    overflow-y: auto; 
     background: var(--bg-gradient);
 }
+
 #order-form-container {
-    position: relative !important; 
+    position: relative; 
     width: 92%;
     max-width: 400px;
-    /* Upar 30px, aur niche 120px ki margin di hai keyboard scroll ke liye */
-    margin: 30px auto 120px auto !important; 
-    z-index: 10000;
+    /* 🚀 THE REAL FIX: Extra 450px padding at the bottom gives the keyboard 
+       plenty of empty space to open without covering the inputs. */
+    margin: 30px auto 450px auto; 
+    z-index: 10;
 }
-
 
 /* Form Container */
 .form-card {
