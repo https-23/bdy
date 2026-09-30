@@ -30,9 +30,6 @@ html, body {
     overflow-x: hidden !important; 
     overflow-y: auto !important; 
     background: var(--bg-gradient);
-    position: relative;
-    /* 🚀 NEW FIX: Ensures body never blocks clicks */
-    pointer-events: auto !important; 
 }
 #order-form-container {
     position: relative !important; 
@@ -246,8 +243,8 @@ body {
     position: relative;
     background-color: transparent;
     z-index: 1;
-    /* 🚀 CHANGE THIS FROM hidden TO auto */
-    overflow-x: auto; 
+    /* 🚀 isko hidden hi rahne do warna clicks block hojayege */
+    overflow-x: hidden; 
     margin: 0 auto; 
 }
 /* --- Screens State Machine --- */
