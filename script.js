@@ -28,30 +28,6 @@ window.magicalState = {
     images: { 0: null, 1: null, 2: null, 3: null },
     scratchMsgs: { 1: "", 2: "", 3: "", 4: "" }
 };
-// 🚀 FIX: Instagram Browser Strict Keyboard Scroll Bypass
-    const audioInput = document.getElementById('audio-link-input');
-    if (audioInput) {
-        audioInput.addEventListener('focus', function() {
-            // Instagram often needs a forced layout recalculation
-            setTimeout(() => {
-                // 1. Force standard scroll attempt
-                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // 2. Aggressive WebView Fix: Manually scroll the window up 300px 
-                // to forcefully push the keyboard out of the way
-                window.scrollBy({ top: 300, behavior: 'smooth' });
-                
-                // 3. Optional: Add a temporary padding at the bottom of the body 
-                // so the screen doesn't "snap back"
-                document.body.style.paddingBottom = "400px";
-            }, 300);
-        });
-
-        audioInput.addEventListener('blur', function() {
-            // Remove the padding when they are done typing
-            document.body.style.paddingBottom = "0px";
-        });
-    }
 // ==========================================
 // 📸 1. PHOTO COMPRESSION & UPLOAD LOGIC
 // ==========================================
