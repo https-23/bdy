@@ -112,6 +112,23 @@ function extractSpotifyId(url) {
             }, 400); // 400ms wait taaki keyboard puri tarah open ho jaye
         });
     }
+    // 🚀 FIX 1: Instagram Browser Keyboard Overlap Fix
+    const audioInput = document.getElementById('audio-link-input');
+    const formContainer = document.getElementById('order-form-container');
+    
+    if (audioInput && formContainer) {
+        // Keyboard aane par form smoothly upar dhakel do
+        audioInput.addEventListener('focus', function() {
+            formContainer.style.transform = "translateY(-220px)";
+            formContainer.style.transition = "transform 0.3s ease-out";
+        });
+
+        // Keyboard hatne par wapas apni jagah le aao
+        audioInput.addEventListener('blur', function() {
+            formContainer.style.transform = "translateY(0)";
+        });
+    }
+
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
@@ -709,23 +726,29 @@ if(unlockBtn) {
         if (ytVideoId) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-yt-iframe';
-            // Added origin parameter for strict WebView CORS policies
+            // 🚀 ORIGIN tag is mandatory for Instagram CORS policy
             iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1&origin=${window.location.origin}`;
             
-            // 🚀 FIX: Bypass Insta WebView Spam Filter
-            iframe.style.position = 'fixed'; 
-            iframe.style.top = '-500px'; // Screen ke upar chupa do (1px ki jagah)
+            // Screen ke andar rakhein taaki Instagram isko valid element maane
+            iframe.style.position = 'absolute'; 
+            iframe.style.top = '0'; 
             iframe.style.left = '0';
             iframe.style.width = '10px';
             iframe.style.height = '10px';
-            iframe.style.opacity = '0';
+            iframe.style.opacity = '0.01'; // Transparent, but strictly visible to WebView
             iframe.style.pointerEvents = 'none';
             iframe.style.zIndex = '-9999';
             
-            // Added picture-in-picture to bypass some iOS strict rendering locks
-            iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+            iframe.allow = 'autoplay; encrypted-media';
             document.body.appendChild(iframe);
-            }
+
+            // 🚀 INSTAGRAM BYPASS: Forcefully send Play Command after mounting
+            setTimeout(() => {
+                if (iframe.contentWindow) {
+                     iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
+            }, 1000);
+                    }
         } else if (spotifyData) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
