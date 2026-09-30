@@ -75,6 +75,11 @@ function extractYouTubeId(url) {
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
 }
+function extractSpotifyId(url) {
+    if (!url) return null;
+    const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
+    return match ? { type: match[1], id: match[2] } : null;
+}
 // 🚀 FIX: Instagram Browser Keyboard Scroll Issue
     const audioInput = document.getElementById('audio-link-input');
     if (audioInput) {
