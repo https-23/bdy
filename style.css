@@ -18,30 +18,26 @@ button, .magic-btn, .mini-card, .ig-card, .envelope-wrapper, #envelopeNoBtn {
 input[type="text"], input[type="password"], textarea {
     user-select: auto !important;
 }
-
-/* --- 1. Form Wrapper Styles (Keyboard Safe) --- */
+/* --- 1. Form Wrapper Styles (Keyboard & Scroll Safe) --- */
 html, body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: auto;
+    width: 100%;
+    height: auto !important; /* Purana height lock todne ke liye */
     min-height: 100vh;
     overflow-x: hidden;
-    /* 🚀 FIX: Removes all custom pointer/touch locks */
-    overflow-y: auto; 
+    overflow-y: auto !important; /* Ye scroll ko force chalu karega */
     background: var(--bg-gradient);
 }
 
 #order-form-container {
-    position: relative; 
+    position: relative !important; 
     width: 92%;
     max-width: 400px;
-    /* 🚀 THE REAL FIX: Extra 450px padding at the bottom gives the keyboard 
-       plenty of empty space to open without covering the inputs. */
-    margin: 30px auto 450px auto; 
-    z-index: 10;
+    /* Upar 30px, aur niche 120px ki margin di hai keyboard scroll ke liye */
+    margin: 30px auto 120px auto !important; 
+    z-index: 10000;
 }
-
 /* Form Container */
 .form-card {
     background: #fffcfc;
