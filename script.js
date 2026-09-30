@@ -681,15 +681,23 @@ if(unlockBtn) {
         if (ytVideoId) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-yt-iframe';
-            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1`;
-            iframe.style.position = 'absolute';
-            iframe.style.width = '1px';
-            iframe.style.height = '1px';
-            iframe.style.opacity = '0.01';
+            // Added origin parameter for strict WebView CORS policies
+            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1&origin=${window.location.origin}`;
+            
+            // 🚀 FIX: Bypass Insta WebView Spam Filter
+            iframe.style.position = 'fixed'; 
+            iframe.style.top = '-500px'; // Screen ke upar chupa do (1px ki jagah)
+            iframe.style.left = '0';
+            iframe.style.width = '10px';
+            iframe.style.height = '10px';
+            iframe.style.opacity = '0';
             iframe.style.pointerEvents = 'none';
             iframe.style.zIndex = '-9999';
-            iframe.allow = 'autoplay; encrypted-media';
+            
+            // Added picture-in-picture to bypass some iOS strict rendering locks
+            iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
             document.body.appendChild(iframe);
+            }
         } else if (spotifyData) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
