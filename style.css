@@ -23,14 +23,17 @@ input[type="text"], input[type="password"], textarea {
 html, body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: auto !important; /* Purana height lock todne ke liye */
+    width: 100vw !important;
+    max-width: 100vw !important; 
+    height: auto !important; 
     min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto !important; /* Ye scroll ko force chalu karega */
+    overflow-x: hidden !important; 
+    overflow-y: auto !important; 
     background: var(--bg-gradient);
+    position: relative;
+    /* 🚀 NEW FIX: Ensures body never blocks clicks */
+    pointer-events: auto !important; 
 }
-
 #order-form-container {
     position: relative !important; 
     width: 92%;
@@ -243,8 +246,9 @@ body {
     position: relative;
     background-color: transparent;
     z-index: 1;
-    overflow-x: hidden;
-    margin: 0 auto; /* 🚀 FIX: Automatically centers the app perfectly on Desktop/Tablets */
+    /* 🚀 CHANGE THIS FROM hidden TO auto */
+    overflow-x: auto; 
+    margin: 0 auto; 
 }
 /* --- Screens State Machine --- */
 .screen {
