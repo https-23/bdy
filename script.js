@@ -103,32 +103,6 @@ function extractSpotifyId(url) {
     const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
     return match ? { type: match[1], id: match[2] } : null;
 }
-// 🚀 FIX: Instagram Browser Keyboard Scroll Issue
-    const audioInput = document.getElementById('audio-link-input');
-    if (audioInput) {
-        audioInput.addEventListener('focus', function() {
-            setTimeout(() => {
-                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 400); // 400ms wait taaki keyboard puri tarah open ho jaye
-        });
-    }
-    // 🚀 FIX 1: Instagram Browser Keyboard Overlap Fix
-    const audioInput = document.getElementById('audio-link-input');
-    const formContainer = document.getElementById('order-form-container');
-    
-    if (audioInput && formContainer) {
-        // Keyboard aane par form smoothly upar dhakel do
-        audioInput.addEventListener('focus', function() {
-            formContainer.style.transform = "translateY(-220px)";
-            formContainer.style.transition = "transform 0.3s ease-out";
-        });
-
-        // Keyboard hatne par wapas apni jagah le aao
-        audioInput.addEventListener('blur', function() {
-            formContainer.style.transform = "translateY(0)";
-        });
-    }
-
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
