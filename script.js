@@ -240,16 +240,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
-            
-            // 🚀 FIX: Unified history push for the preview mode
-            history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
-            // order-form hide hone aur preview dikhne se pehle yeh line add karni hai:
-            prepareAudioEngine(window.magicalState.audioLink); // 🚀 GAANA PEHLE HI LOAD KAR LO
+
+            // 🚀 INFLUENCER TRICK: Silently unlock the audio engine on the very first tap
+            const bgMusic = document.getElementById("bg-music");
+            if(bgMusic) {
+                bgMusic.play().then(() => bgMusic.pause()).catch(e => {}); 
+            }
 
             // 🚀 FIX: Unified history push for the preview mode
             history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
-            showScreen("login-screen");
-            window.scrollTo(0, 0);
             showScreen("login-screen");
             window.scrollTo(0, 0);
 
