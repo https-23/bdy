@@ -1890,34 +1890,19 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
-// PASTE THIS AT THE VERY END OF YOUR SCRIPT.JS FILE
 // ==========================================
-// 🛡️ PHASE 8: AGGRESSIVE INSTAGRAM AUDIO RESCUER
+// 🛡️ PHASE 8: THE GLOBAL TOUCH RESCUER
 // ==========================================
-// Agar Instagram ne Unlock Button par YouTube block kar diya hoga, 
-// toh ye code ensure karega ki agle kisi bhi click (Archery) par gaana play ho jaye!
-let ytRescued = false;
-let bgRescued = false;
-
 document.body.addEventListener('touchstart', function() {
-    
-    // 1. Rescue YouTube Audio
-    const ytIframe = document.getElementById('magical-yt-iframe');
-    if (ytIframe && ytIframe.contentWindow && !ytRescued) {
-        // Force YouTube to play and unmute via API command
-        ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-        ytRescued = true;
-    }
-    
-    // 2. Rescue Default Audio (Agar GitHub wala music play nahi hua)
-    const bgm = document.getElementById("bg-music");
-    if (bgm && bgm.paused && !bgRescued) {
-        const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
-        // Check karega ki sach mein koi YT/Spotify link toh nahi hai
-        if (!extractYouTubeId(customAudioLink) && !extractSpotifyId(customAudioLink)) {
-            bgm.play().catch(() => {});
-            bgRescued = true;
+    const customLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+    if (extractYouTubeId(customLink)) {
+        const ytIframe = document.getElementById('magical-yt-iframe');
+        if (ytIframe && ytIframe.contentWindow) {
+            ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+            ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
         }
+    } else {
+        const bgm = document.getElementById("bg-music");
+        if (bgm && bgm.paused) bgm.play().catch(()=>{});
     }
-}, { passive: true });
+}, { passive: true, once: true });
