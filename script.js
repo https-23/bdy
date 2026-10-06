@@ -79,38 +79,6 @@ function extractSpotifyId(url) {
     const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
     return match ? { type: match[1], id: match[2] } : null;
 }
-// 🚀 THE ULTIMATE INSTA HACK: Load muted video in background instantly
-function injectAudioIframeEarly(link) {
-    if (!link) return;
-    const ytId = extractYouTubeId(link);
-    const spotId = extractSpotifyId(link);
-
-    if (ytId && !document.getElementById('magical-yt-iframe')) {
-        const iframe = document.createElement('iframe');
-        iframe.id = 'magical-yt-iframe';
-        // 🚨 HACK: autoplay=1 & mute=1 (Browser muted video ko allow kar dega!)
-        iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&enablejsapi=1`;
-        iframe.style.position = 'absolute';
-        iframe.style.width = '10px';
-        iframe.style.height = '10px';
-        iframe.style.opacity = '0';
-        iframe.style.pointerEvents = 'none';
-        document.body.appendChild(iframe);
-    } else if (spotId && !document.getElementById('magical-spotify-iframe')) {
-        const iframe = document.createElement('iframe');
-        iframe.id = 'magical-spotify-iframe';
-        iframe.src = `https://open.spotify.com/embed/${spotId.type}/${spotId.id}?utm_source=generator&theme=0`;
-        iframe.style.position = 'fixed';
-        iframe.style.top = '15px';
-        iframe.style.left = '50%';
-        iframe.style.transform = 'translateX(-50%)';
-        iframe.style.width = '320px';
-        iframe.style.height = '80px';
-        iframe.style.zIndex = '999999';
-        iframe.style.borderRadius = '12px';
-        document.body.appendChild(iframe);
-    }
-}
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
@@ -270,9 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
             
-            // 🚀 Form banate waqt bhi silent video preload kardo
-            injectAudioIframeEarly(window.magicalState.audioLink);
-
             // 🚀 FIX: Unified history push for the preview mode
             history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
             showScreen("login-screen");
@@ -687,7 +652,7 @@ if (loginScreen && tiltCard) {
         setTimeout(() => { tiltCard.style.transition = "transform 0.1s ease-out"; }, 500);
     });
 }
-if(unlockBtn) {
+    if(unlockBtn) {
     unlockBtn.addEventListener('click', () => {
         const user = document.getElementById('dummy-username').value;
         const pass = document.getElementById('dummy-password').value;
@@ -704,31 +669,62 @@ if(unlockBtn) {
         }
         playPopSound(); 
 
-        // 🚀 FIX: STRICT IF/ELSE TO PREVENT DOUBLE AUDIO
+        // 🚀 THE PURE AUDIO LOGIC (NO HACKS)
         const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
         const ytVideoId = extractYouTubeId(customAudioLink);
-
+        const spotifyData = extractSpotifyId(customAudioLink);
+        
         const bgMusic = document.getElementById("bg-music");
 
+        // 🛑 1. DOUBLE AUDIO FIX: Har haal mein default music ko pehle roko
+        if (bgMusic) { 
+            bgMusic.pause(); 
+            bgMusic.currentTime = 0; 
+        }
+
         if (ytVideoId) {
-            // 🛑 1. Agar YouTube link hai, toh default music 100% pause aur mute kardo!
-            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
+            // 🚀 2. INSTAGRAM FIX: Exact usi millisecond mein iframe banao jab click hua ho
+            let oldIframe = document.getElementById('magical-yt-iframe');
+            if (oldIframe) oldIframe.remove();
             
-            // 🚀 2. THE INSTAGRAM HACK: Jo muted video background mein chal rahi thi, usko Unmute kardo!
-            const ytIframe = document.getElementById('magical-yt-iframe');
-            if (ytIframe && ytIframe.contentWindow) {
-                ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-                ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-            }
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-yt-iframe';
+            // playsinline=1 is the magic word for iOS/Instagram to allow autoplay!
+            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1`;
+            iframe.style.position = 'absolute';
+            iframe.style.width = '10px';
+            iframe.style.height = '10px';
+            iframe.style.opacity = '0.01';
+            iframe.style.pointerEvents = 'none';
+            iframe.style.zIndex = '-9999';
+            iframe.allow = 'autoplay; encrypted-media';
+            document.body.appendChild(iframe);
+        } else if (spotifyData) {
+            let oldIframe = document.getElementById('magical-spotify-iframe');
+            if (oldIframe) oldIframe.remove();
+
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-spotify-iframe';
+            iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
+            iframe.style.position = 'fixed';
+            iframe.style.top = '15px';
+            iframe.style.left = '50%';
+            iframe.style.transform = 'translateX(-50%)';
+            iframe.style.width = '320px';
+            iframe.style.height = '80px';
+            iframe.style.zIndex = '999999';
+            iframe.style.borderRadius = '12px';
+            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            document.body.appendChild(iframe);
         } else {
-            // 🛑 1. Agar YouTube link NAHI hai, SIRF tabhi default music bajega!
+            // 🛑 3. Agar YT link NAHI hai, SIRF TAB default music bajega
             if (bgMusic) { 
                 bgMusic.volume = 0.5; 
-                bgMusic.play().catch(e => console.log("Audio play blocked by browser", e)); 
+                bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
             }
         }
 
-        // 🚀 UI Transitions (1.5s delay)
+        // 🚀 UI Transition apna aaram se 1.5 second baad hoga
         setTimeout(() => {
             showScreen("big-penguin-screen");
             setTimeout(() => {
@@ -738,7 +734,7 @@ if(unlockBtn) {
             }, 1800); 
         }, 1500);
     });
-}
+    }
 // BASIC NAVIGATION
 document.getElementById("yesBtn")?.addEventListener("click", () => { playPopSound(); showScreen("screen2"); });
 document.getElementById("noBtn")?.addEventListener("click", () => { playPopSound(); showScreen("angry"); });
@@ -1375,9 +1371,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 if (data.audio_link) { 
                 window.magicalState = window.magicalState || {}; 
-                window.magicalState.receiverAudio = data.audio_link; 
-                // 🚀 Receiver aate hi background mein silent video load kardo
-                    injectAudioIframeEarly(data.audio_link);
+                window.magicalState.receiverAudio = data.audio_link;
                                 }
                 
                 if (previewContainer) previewContainer.style.display = 'block';
@@ -1889,19 +1883,3 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
-// ==========================================
-// 🛡️ PHASE 8: THE GLOBAL TOUCH RESCUER
-// ==========================================
-document.body.addEventListener('touchstart', function() {
-    const customLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
-    if (extractYouTubeId(customLink)) {
-        const ytIframe = document.getElementById('magical-yt-iframe');
-        if (ytIframe && ytIframe.contentWindow) {
-            ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-            ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        }
-    } else {
-        const bgm = document.getElementById("bg-music");
-        if (bgm && bgm.paused) bgm.play().catch(()=>{});
-    }
-}, { passive: true, once: true });
