@@ -170,12 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
         previewBtn.addEventListener('click', () => {
-            // 🚀 INFLUENCER TRICK: Silently unlock the audio engine on the very first tap
+            
+            // 🚀 INFLUENCER TRICK: Silently unlock HTML5 audio engine on the very first tap
             const bgMusic = document.getElementById("bg-music");
             if(bgMusic) {
-                // Play and instantly pause. The browser now trusts this element.
                 bgMusic.play().then(() => bgMusic.pause()).catch(e => {}); 
             }
+
             const partnerNameInput = document.getElementById('partner-name-input');
             const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
@@ -187,8 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.magicalState.partnerName = partnerName;
             window.magicalState.userName = document.getElementById('user-name-input')?.value.trim() || "";
             
-            // 🚀 NEW: Capture the selected question from the Radio Pills
-            // Capture the selected question from the Radio Pills
             const selectedRadio = document.querySelector('input[name="envelope_question"]:checked');
             if (selectedRadio && selectedRadio.value === 'custom') {
                 window.magicalState.envelopeQuestion = document.getElementById('envelope-msg')?.value.trim() || "Will you be my forever? 💖";
@@ -207,7 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const secretNameEl = document.getElementById('secret-name');
             if (secretNameEl) secretNameEl.innerText = `For ${partnerName} 💖`;
             
-                                    // 🚀 PHASE 4: Video-Aesthetic Envelope Formatting (Preview)
             const envelopeText = document.getElementById('envelope-letter-text');
             const targetText = window.magicalState.envelopeQuestion || "Will you be my forever? 💖";
             
@@ -219,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
-            
             const finalMsg = document.getElementById('final-message');
             if (finalMsg && window.magicalState.mainWish) {
                 finalMsg.innerHTML = window.magicalState.mainWish.replace(/\n/g, '<br>');
@@ -241,12 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
 
-            // 🚀 INFLUENCER TRICK: Silently unlock the audio engine on the very first tap
-            const bgMusic = document.getElementById("bg-music");
-            if(bgMusic) {
-                bgMusic.play().then(() => bgMusic.pause()).catch(e => {}); 
-            }
-
             // 🚀 FIX: Unified history push for the preview mode
             history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
             showScreen("login-screen");
@@ -259,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
+    
     // --- PAY BUTTON & RAZORPAY LOGIC (NO FIREBASE STORAGE NEEDED) ---
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
