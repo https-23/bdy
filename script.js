@@ -269,6 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
+            // 🚀 Form banate waqt bhi silent video preload kardo
+            injectAudioIframeEarly(window.magicalState.audioLink);
 
             // 🚀 FIX: Unified history push for the preview mode
             history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
@@ -703,62 +705,27 @@ if(unlockBtn) {
         }
         playPopSound(); 
 
-        // 🚀 FIX 1: STRICT IF/ELSE TO PREVENT DOUBLE AUDIO
+        // 🚀 FIX: STRICT IF/ELSE TO PREVENT DOUBLE AUDIO
         const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
         const ytVideoId = extractYouTubeId(customAudioLink);
-        const spotifyData = extractSpotifyId(customAudioLink);
 
-        // Sabse pehle default music ko explicitly roko!
         const bgMusic = document.getElementById("bg-music");
-        if (bgMusic) {
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-        }
 
         if (ytVideoId) {
-            // Purana iframe hatao agar ho to
-            let oldIframe = document.getElementById('magical-yt-iframe');
-            if (oldIframe) oldIframe.remove();
+            // 🛑 1. Custom song hai toh default music ko completely rok do!
+            if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
             
-            // Naya iframe exact issi waqt create karo (Instagram ke liye)
-            const iframe = document.createElement('iframe');
-            iframe.id = 'magical-yt-iframe';
-            // enablejsapi=1 is crucial here
-            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&mute=0&enablejsapi=1`;
-            iframe.style.position = 'absolute';
-            iframe.style.width = '10px';
-            iframe.style.height = '10px';
-            iframe.style.opacity = '0.01';
-            iframe.style.pointerEvents = 'none';
-            iframe.style.zIndex = '-9999';
-            iframe.allow = 'autoplay; encrypted-media';
-            document.body.appendChild(iframe);
-        } else if (spotifyData) {
-            let oldIframe = document.getElementById('magical-spotify-iframe');
-            if (oldIframe) oldIframe.remove();
-
-            const iframe = document.createElement('iframe');
-            iframe.id = 'magical-spotify-iframe';
-            iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
-            iframe.style.position = 'fixed';
-            iframe.style.top = '15px';
-            iframe.style.left = '50%';
-            iframe.style.transform = 'translateX(-50%)';
-            iframe.style.width = '320px';
-            iframe.style.height = '80px';
-            iframe.style.zIndex = '999999';
-            iframe.style.borderRadius = '12px';
-            iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            document.body.appendChild(iframe);
+            // 🚀 2. THE INSTAGRAM HACK: Jo video background mein chal rahi thi, usko Unmute kardo!
+            const ytIframe = document.getElementById('magical-yt-iframe');
+            if (ytIframe && ytIframe.contentWindow) {
+                ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            }
         } else {
-            // 🛑 SIRF tabhi default music bajega jab YouTube link NA ho
+            // 🛑 1. Custom song NAHI hai, toh default music ko play karo!
             if (bgMusic) { 
                 bgMusic.volume = 0.5; 
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(e => console.log("Audio play blocked by browser", e));
-                }
+                bgMusic.play().catch(e => console.log("Audio play blocked by browser", e)); 
             }
         }
 
