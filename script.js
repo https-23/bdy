@@ -79,6 +79,38 @@ function extractSpotifyId(url) {
     const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
     return match ? { type: match[1], id: match[2] } : null;
 }
+// 🚀 THE ULTIMATE INSTA HACK: Load muted video in background instantly
+function injectAudioIframeEarly(link) {
+    if (!link) return;
+    const ytId = extractYouTubeId(link);
+    const spotId = extractSpotifyId(link);
+
+    if (ytId && !document.getElementById('magical-yt-iframe')) {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'magical-yt-iframe';
+        // 🚨 HACK: autoplay=1 & mute=1 (Browser muted video ko allow kar dega!)
+        iframe.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&enablejsapi=1`;
+        iframe.style.position = 'absolute';
+        iframe.style.width = '10px';
+        iframe.style.height = '10px';
+        iframe.style.opacity = '0';
+        iframe.style.pointerEvents = 'none';
+        document.body.appendChild(iframe);
+    } else if (spotId && !document.getElementById('magical-spotify-iframe')) {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'magical-spotify-iframe';
+        iframe.src = `https://open.spotify.com/embed/${spotId.type}/${spotId.id}?utm_source=generator&theme=0`;
+        iframe.style.position = 'fixed';
+        iframe.style.top = '15px';
+        iframe.style.left = '50%';
+        iframe.style.transform = 'translateX(-50%)';
+        iframe.style.width = '320px';
+        iframe.style.height = '80px';
+        iframe.style.zIndex = '999999';
+        iframe.style.borderRadius = '12px';
+        document.body.appendChild(iframe);
+    }
+}
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
