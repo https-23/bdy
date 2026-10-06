@@ -170,6 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
         previewBtn.addEventListener('click', () => {
+            // 🚀 INFLUENCER TRICK: Silently unlock the audio engine on the very first tap
+            const bgMusic = document.getElementById("bg-music");
+            if(bgMusic) {
+                // Play and instantly pause. The browser now trusts this element.
+                bgMusic.play().then(() => bgMusic.pause()).catch(e => {}); 
+            }
             const partnerNameInput = document.getElementById('partner-name-input');
             const partnerName = partnerNameInput ? partnerNameInput.value.trim() : '';
 
