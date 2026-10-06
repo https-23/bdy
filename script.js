@@ -650,7 +650,6 @@ if (loginScreen && tiltCard) {
         setTimeout(() => { tiltCard.style.transition = "transform 0.1s ease-out"; }, 500);
     });
 }
-
 if(unlockBtn) {
     unlockBtn.addEventListener('click', () => {
         const user = document.getElementById('dummy-username').value;
@@ -668,8 +667,9 @@ if(unlockBtn) {
         }
         playPopSound(); 
 
-        setTimeout(() => {
-            const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+        // 🚀 MASTER ARCHITECT FIX: Fire Audio IMMEDIATELY to bypass Instagram's WebView Block
+        // DO NOT put this inside the setTimeout!
+        const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
         const ytVideoId = extractYouTubeId(customAudioLink);
         const spotifyData = extractSpotifyId(customAudioLink);
 
@@ -689,7 +689,6 @@ if(unlockBtn) {
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-spotify-iframe';
             iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
-            // 🚀 FIX: Premium Floating Widget (Spotify must be visible to play)
             iframe.style.position = 'fixed';
             iframe.style.top = '15px';
             iframe.style.left = '50%';
@@ -700,7 +699,6 @@ if(unlockBtn) {
             iframe.style.borderRadius = '12px';
             iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
             iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            
             document.body.appendChild(iframe);
         } else {
             const bgMusic = document.getElementById("bg-music");
@@ -709,16 +707,18 @@ if(unlockBtn) {
                 bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
             }
         }
-                        showScreen("big-penguin-screen");
 
-            // 🚀 FIX: Reduced delay from 3800ms to 1800ms (2 seconds faster)
+        // 🚀 Now, handle the UI transitions on a delay separately
+        setTimeout(() => {
+            showScreen("big-penguin-screen");
+
             setTimeout(() => {
                 const giantPeng = document.getElementById('giant-penguin-img');
                 if(giantPeng) giantPeng.classList.add('hide-shadow');
                 
                 setTimeout(() => {
                     showScreen("archery-screen");
-                }, 400); // Speeds up the fade-out slightly
+                }, 400); 
                 
             }, 1800); 
             
