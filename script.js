@@ -662,6 +662,7 @@ if (loginScreen && tiltCard) {
         setTimeout(() => { tiltCard.style.transition = "transform 0.1s ease-out"; }, 500);
     });
 }
+// REPLACE THIS ENTIRE BLOCK (Around Line 418)
 if(unlockBtn) {
     unlockBtn.addEventListener('click', () => {
         const user = document.getElementById('dummy-username').value;
@@ -679,36 +680,73 @@ if(unlockBtn) {
         }
         playPopSound(); 
 
-        // 🚀 MASTER ARCHITECT FIX 3.0: Puraane load huye Iframe ko bolna hai ki gaana chalu karo!
-        const ytIframe = document.getElementById('magical-yt-iframe');
-        if (ytIframe && ytIframe.contentWindow) {
-            ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        // 🚀 FIX 1: STRICT IF/ELSE TO PREVENT DOUBLE AUDIO
+        const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+        const ytVideoId = extractYouTubeId(customAudioLink);
+        const spotifyData = extractSpotifyId(customAudioLink);
+
+        // Sabse pehle default music ko explicitly roko!
+        const bgMusic = document.getElementById("bg-music");
+        if (bgMusic) {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
         }
 
-        // HTML5 Audio ko bhi turant trigger kardo (Fallback)
-        const bgMusic = document.getElementById("bg-music");
-        if (bgMusic) { 
-            bgMusic.volume = 0.5; 
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(e => console.log("Audio play blocked by IG", e));
+        if (ytVideoId) {
+            // Purana iframe hatao agar ho to
+            let oldIframe = document.getElementById('magical-yt-iframe');
+            if (oldIframe) oldIframe.remove();
+            
+            // Naya iframe exact issi waqt create karo (Instagram ke liye)
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-yt-iframe';
+            // enablejsapi=1 is crucial here
+            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&mute=0&enablejsapi=1`;
+            iframe.style.position = 'absolute';
+            iframe.style.width = '10px';
+            iframe.style.height = '10px';
+            iframe.style.opacity = '0.01';
+            iframe.style.pointerEvents = 'none';
+            iframe.style.zIndex = '-9999';
+            iframe.allow = 'autoplay; encrypted-media';
+            document.body.appendChild(iframe);
+        } else if (spotifyData) {
+            let oldIframe = document.getElementById('magical-spotify-iframe');
+            if (oldIframe) oldIframe.remove();
+
+            const iframe = document.createElement('iframe');
+            iframe.id = 'magical-spotify-iframe';
+            iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
+            iframe.style.position = 'fixed';
+            iframe.style.top = '15px';
+            iframe.style.left = '50%';
+            iframe.style.transform = 'translateX(-50%)';
+            iframe.style.width = '320px';
+            iframe.style.height = '80px';
+            iframe.style.zIndex = '999999';
+            iframe.style.borderRadius = '12px';
+            iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
+            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+            document.body.appendChild(iframe);
+        } else {
+            // 🛑 SIRF tabhi default music bajega jab YouTube link NA ho
+            if (bgMusic) { 
+                bgMusic.volume = 0.5; 
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log("Audio play blocked by browser", e));
+                }
             }
         }
 
-        // 🚀 UI Transitions apne original 1.5 second delay ke sath chalenge
+        // 🚀 UI Transitions (1.5s delay)
         setTimeout(() => {
             showScreen("big-penguin-screen");
-
             setTimeout(() => {
                 const giantPeng = document.getElementById('giant-penguin-img');
                 if(giantPeng) giantPeng.classList.add('hide-shadow');
-                
-                setTimeout(() => {
-                    showScreen("archery-screen");
-                }, 400); 
-                
+                setTimeout(() => { showScreen("archery-screen"); }, 400); 
             }, 1800); 
-            
         }, 1500);
     });
 }
@@ -1346,11 +1384,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (data.scratch_msgs) {
                     window.magicalState.scratchMsgs = data.scratch_msgs;
                 }
-                
                 if (data.audio_link) { 
-                    window.magicalState = window.magicalState || {}; 
-                    window.magicalState.receiverAudio = data.audio_link; 
-                    prepareAudioEngine(data.audio_link); // 🚀 RECEIVER KE LIYE BHI PEHLE HI LOAD KAR LO
+                window.magicalState = window.magicalState || {}; 
+                window.magicalState.receiverAudio = data.audio_link; 
                 }
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
@@ -1861,17 +1897,34 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
+// PASTE THIS AT THE VERY END OF YOUR SCRIPT.JS FILE
 // ==========================================
-// 🛡️ PHASE 8: GLOBAL INSTAGRAM AUDIO UNLOCKER
+// 🛡️ PHASE 8: AGGRESSIVE INSTAGRAM AUDIO RESCUER
 // ==========================================
-let globalAudioUnlocked = false;
-document.addEventListener('touchstart', function() {
-    if (!globalAudioUnlocked) {
-        const bgm = document.getElementById("bg-music");
-        if (bgm) {
-            // Play karke instantly pause karna browser ko trick karta hai
-            bgm.play().then(() => { bgm.pause(); }).catch(() => {});
-        }
-        globalAudioUnlocked = true;
+// Agar Instagram ne Unlock Button par YouTube block kar diya hoga, 
+// toh ye code ensure karega ki agle kisi bhi click (Archery) par gaana play ho jaye!
+let ytRescued = false;
+let bgRescued = false;
+
+document.body.addEventListener('touchstart', function() {
+    
+    // 1. Rescue YouTube Audio
+    const ytIframe = document.getElementById('magical-yt-iframe');
+    if (ytIframe && ytIframe.contentWindow && !ytRescued) {
+        // Force YouTube to play and unmute via API command
+        ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+        ytRescued = true;
     }
-}, { once: true, passive: true });
+    
+    // 2. Rescue Default Audio (Agar GitHub wala music play nahi hua)
+    const bgm = document.getElementById("bg-music");
+    if (bgm && bgm.paused && !bgRescued) {
+        const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+        // Check karega ki sach mein koi YT/Spotify link toh nahi hai
+        if (!extractYouTubeId(customAudioLink) && !extractSpotifyId(customAudioLink)) {
+            bgm.play().catch(() => {});
+            bgRescued = true;
+        }
+    }
+}, { passive: true });
