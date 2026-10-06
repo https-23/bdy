@@ -197,16 +197,16 @@ document.addEventListener('DOMContentLoaded', () => {
             wishTextarea.value = "You turn the most ordinary days into something worth remembering — a random Tuesday feels a little more magical just because you're in it. 💖";
         });
     }
-
     // --- PREVIEW BUTTON LOGIC ---
     const previewBtn = document.getElementById('preview-btn');
     if (previewBtn) {
         previewBtn.addEventListener('click', () => {
             
             // 🚀 INFLUENCER TRICK: Silently unlock HTML5 audio engine on the very first tap
-            const bgMusic = document.getElementById("bg-music");
-            if(bgMusic) {
-                bgMusic.play().then(() => bgMusic.pause()).catch(e => {}); 
+            // (Yahan ka duplicate const hata diya gaya hai)
+            const bgm = document.getElementById("bg-music");
+            if(bgm) {
+                bgm.play().then(() => bgm.pause()).catch(e => {}); 
             }
 
             const partnerNameInput = document.getElementById('partner-name-input');
@@ -269,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const previewContainer = document.getElementById('preview-container');
             if (previewContainer) previewContainer.style.display = "block"; 
+            
             // 🚀 Form banate waqt bhi silent video preload kardo
             injectAudioIframeEarly(window.magicalState.audioLink);
 
@@ -284,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
     // --- PAY BUTTON & RAZORPAY LOGIC (NO FIREBASE STORAGE NEEDED) ---
     const payBtn = document.getElementById('pay-now-btn');
     if(payBtn) {
@@ -687,7 +687,6 @@ if (loginScreen && tiltCard) {
         setTimeout(() => { tiltCard.style.transition = "transform 0.1s ease-out"; }, 500);
     });
 }
-// REPLACE THIS ENTIRE BLOCK (Around Line 418)
 if(unlockBtn) {
     unlockBtn.addEventListener('click', () => {
         const user = document.getElementById('dummy-username').value;
@@ -712,17 +711,17 @@ if(unlockBtn) {
         const bgMusic = document.getElementById("bg-music");
 
         if (ytVideoId) {
-            // 🛑 1. Custom song hai toh default music ko completely rok do!
+            // 🛑 1. Agar YouTube link hai, toh default music 100% pause aur mute kardo!
             if (bgMusic) { bgMusic.pause(); bgMusic.currentTime = 0; }
             
-            // 🚀 2. THE INSTAGRAM HACK: Jo video background mein chal rahi thi, usko Unmute kardo!
+            // 🚀 2. THE INSTAGRAM HACK: Jo muted video background mein chal rahi thi, usko Unmute kardo!
             const ytIframe = document.getElementById('magical-yt-iframe');
             if (ytIframe && ytIframe.contentWindow) {
                 ytIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
                 ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
             }
         } else {
-            // 🛑 1. Custom song NAHI hai, toh default music ko play karo!
+            // 🛑 1. Agar YouTube link NAHI hai, SIRF tabhi default music bajega!
             if (bgMusic) { 
                 bgMusic.volume = 0.5; 
                 bgMusic.play().catch(e => console.log("Audio play blocked by browser", e)); 
