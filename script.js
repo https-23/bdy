@@ -79,6 +79,43 @@ function extractSpotifyId(url) {
     const match = url.match(/spotify\.com\/(track|playlist|album)\/([a-zA-Z0-9]+)/);
     return match ? { type: match[1], id: match[2] } : null;
 }
+// 🚀 NEW: PRE-LOAD AUDIO ENGINE TO BEAT INSTAGRAM WEBVIEW
+function prepareAudioEngine(audioLink) {
+    if (!audioLink) return;
+    const ytVideoId = extractYouTubeId(audioLink);
+    const spotifyData = extractSpotifyId(audioLink);
+
+    if (ytVideoId && !document.getElementById('magical-yt-iframe')) {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'magical-yt-iframe';
+        // playsinline=1 aur enablejsapi=1 Instagram WebView ke liye sabse zaroori hai
+        iframe.src = `https://www.youtube.com/embed/${ytVideoId}?enablejsapi=1&playsinline=1&controls=0&loop=1&playlist=${ytVideoId}`;
+        iframe.style.position = 'absolute';
+        iframe.style.width = '10px'; // 10px rakha hai taaki IG isko ad-blocker na samjhe
+        iframe.style.height = '10px';
+        iframe.style.opacity = '0.01';
+        iframe.style.pointerEvents = 'none';
+        iframe.style.zIndex = '-9999';
+        iframe.allow = 'autoplay; encrypted-media';
+        document.body.appendChild(iframe);
+    } else if (spotifyData && !document.getElementById('magical-spotify-iframe')) {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'magical-spotify-iframe';
+        iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
+        iframe.style.position = 'fixed';
+        iframe.style.top = '15px';
+        iframe.style.left = '50%';
+        iframe.style.transform = 'translateX(-50%)';
+        iframe.style.width = '320px';
+        iframe.style.height = '80px';
+        iframe.style.zIndex = '999999';
+        iframe.style.borderRadius = '12px';
+        iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
+        iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+        document.body.appendChild(iframe);
+    }
+}
+
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
@@ -243,6 +280,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 🚀 FIX: Unified history push for the preview mode
             history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
+            // order-form hide hone aur preview dikhne se pehle yeh line add karni hai:
+            prepareAudioEngine(window.magicalState.audioLink); // 🚀 GAANA PEHLE HI LOAD KAR LO
+
+            // 🚀 FIX: Unified history push for the preview mode
+            history.pushState({ screenId: 'login-screen', inPreview: true }, '', '#preview');
+            showScreen("login-screen");
+            window.scrollTo(0, 0);
             showScreen("login-screen");
             window.scrollTo(0, 0);
 
