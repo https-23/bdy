@@ -1410,7 +1410,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (data.audio_link) { 
                 window.magicalState = window.magicalState || {}; 
                 window.magicalState.receiverAudio = data.audio_link; 
-                }
+                // 🚀 Receiver aate hi background mein silent video load kardo
+                    injectAudioIframeEarly(data.audio_link);
+                                }
+                
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
             } else {
