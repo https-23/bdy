@@ -717,48 +717,23 @@ if(unlockBtn) {
         }
         playPopSound(); 
 
-        // 🚀 MASTER ARCHITECT FIX: Fire Audio IMMEDIATELY to bypass Instagram's WebView Block
-        // DO NOT put this inside the setTimeout!
-        const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
-        const ytVideoId = extractYouTubeId(customAudioLink);
-        const spotifyData = extractSpotifyId(customAudioLink);
+        // 🚀 MASTER ARCHITECT FIX 3.0: Puraane load huye Iframe ko bolna hai ki gaana chalu karo!
+        const ytIframe = document.getElementById('magical-yt-iframe');
+        if (ytIframe && ytIframe.contentWindow) {
+            ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        }
 
-        if (ytVideoId) {
-            const iframe = document.createElement('iframe');
-            iframe.id = 'magical-yt-iframe';
-            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1`;
-            iframe.style.position = 'absolute';
-            iframe.style.width = '1px';
-            iframe.style.height = '1px';
-            iframe.style.opacity = '0.01';
-            iframe.style.pointerEvents = 'none';
-            iframe.style.zIndex = '-9999';
-            iframe.allow = 'autoplay; encrypted-media';
-            document.body.appendChild(iframe);
-        } else if (spotifyData) {
-            const iframe = document.createElement('iframe');
-            iframe.id = 'magical-spotify-iframe';
-            iframe.src = `https://open.spotify.com/embed/${spotifyData.type}/${spotifyData.id}?utm_source=generator&theme=0`;
-            iframe.style.position = 'fixed';
-            iframe.style.top = '15px';
-            iframe.style.left = '50%';
-            iframe.style.transform = 'translateX(-50%)';
-            iframe.style.width = '320px';
-            iframe.style.height = '80px';
-            iframe.style.zIndex = '999999';
-            iframe.style.borderRadius = '12px';
-            iframe.style.boxShadow = '0 10px 25px rgba(255, 117, 140, 0.4)';
-            iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
-            document.body.appendChild(iframe);
-        } else {
-            const bgMusic = document.getElementById("bg-music");
-            if (bgMusic) { 
-                bgMusic.volume = 0.5; 
-                bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
+        // HTML5 Audio ko bhi turant trigger kardo (Fallback)
+        const bgMusic = document.getElementById("bg-music");
+        if (bgMusic) { 
+            bgMusic.volume = 0.5; 
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => console.log("Audio play blocked by IG", e));
             }
         }
 
-        // 🚀 Now, handle the UI transitions on a delay separately
+        // 🚀 UI Transitions apne original 1.5 second delay ke sath chalenge
         setTimeout(() => {
             showScreen("big-penguin-screen");
 
@@ -1410,8 +1385,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     window.magicalState.scratchMsgs = data.scratch_msgs;
                 }
                 
-                if (data.audio_link) { window.magicalState = window.magicalState || {}; window.magicalState.receiverAudio = data.audio_link; }
-                
+                if (data.audio_link) { 
+                    window.magicalState = window.magicalState || {}; 
+                    window.magicalState.receiverAudio = data.audio_link; 
+                    prepareAudioEngine(data.audio_link); // 🚀 RECEIVER KE LIYE BHI PEHLE HI LOAD KAR LO
+                }
                 if (previewContainer) previewContainer.style.display = 'block';
                 if (loginScreen) { loginScreen.style.display = 'flex'; loginScreen.classList.add('active'); }
             } else {
@@ -1921,3 +1899,17 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
+// ==========================================
+// 🛡️ PHASE 8: GLOBAL INSTAGRAM AUDIO UNLOCKER
+// ==========================================
+let globalAudioUnlocked = false;
+document.addEventListener('touchstart', function() {
+    if (!globalAudioUnlocked) {
+        const bgm = document.getElementById("bg-music");
+        if (bgm) {
+            // Play karke instantly pause karna browser ko trick karta hai
+            bgm.play().then(() => { bgm.pause(); }).catch(() => {});
+        }
+        globalAudioUnlocked = true;
+    }
+}, { once: true, passive: true });
