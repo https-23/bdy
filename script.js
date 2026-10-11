@@ -1458,25 +1458,31 @@ let isSystemMuted = false;
             isSystemMuted = !isSystemMuted;
             muteBtn.innerText = isSystemMuted ? "🔇" : "🎶";
 
-            // 1. Mute HTML5 Background Music & SFX
             const bgMusic = document.getElementById("bg-music");
-            if (bgMusic) {
-                bgMusic.muted = isSystemMuted;
-                bgMusic.volume = isSystemMuted ? 0 : 0.5;
-            }
-            
-            const popSound = document.getElementById("pop-sound");
-            if (popSound) popSound.muted = isSystemMuted;
-            
-            const scratchSound = document.getElementById("scratch-sound");
-            if (scratchSound) scratchSound.muted = isSystemMuted;
-
-            // 2. Mute YouTube Iframe Safely
             const ytIframe = document.getElementById('magical-yt-iframe');
-            if (ytIframe && ytIframe.contentWindow) {
-                const command = isSystemMuted ? 'mute' : 'unMute';
-                // 🚀 BUG FIX: YouTube API ko strictly array format mein args chahiye hote hain
-                ytIframe.contentWindow.postMessage(`{"event":"command","func":"${command}","args":[]}`, '*');
+
+            if (isSystemMuted) {
+                // 🛑 MUTE KAR RAHE HAIN
+                if (bgMusic) {
+                    bgMusic.muted = true;
+                    bgMusic.volume = 0;
+                }
+                if (ytIframe && ytIframe.contentWindow) {
+                    ytIframe.contentWindow.postMessage(`{"event":"command","func":"mute","args":[]}`, '*');
+                }
+            } else {
+                // 🔊 UNMUTE KAR RAHE HAIN - Force play command bhi bhejenge!
+                if (bgMusic) {
+                    bgMusic.muted = false;
+                    bgMusic.volume = 0.5;
+                    // Agar ruka hua hai, toh force play karo
+                    if (bgMusic.paused) bgMusic.play().catch(e => {}); 
+                }
+                if (ytIframe && ytIframe.contentWindow) {
+                    ytIframe.contentWindow.postMessage(`{"event":"command","func":"unMute","args":[]}`, '*');
+                    // 🚀 MAIN FIX: Unmute karte waqt 'playVideo' bhi bhej do taaki ruka hua gaana chal pade!
+                    ytIframe.contentWindow.postMessage(`{"event":"command","func":"playVideo","args":""}`, '*');
+                }
             }
         }
     }, { passive: false });
