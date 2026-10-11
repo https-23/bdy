@@ -689,8 +689,8 @@ if (loginScreen && tiltCard) {
             
             const iframe = document.createElement('iframe');
             iframe.id = 'magical-yt-iframe';
-            // playsinline=1 is the magic word for iOS/Instagram to allow autoplay!
-            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1`;
+            // 🚀 BUG FIX: 'enablejsapi=1' lagana sabse zaroori hai warna Mute button kaam nahi karega!
+            iframe.src = `https://www.youtube.com/embed/${ytVideoId}?autoplay=1&loop=1&playlist=${ytVideoId}&controls=0&playsinline=1&enablejsapi=1`;
             iframe.style.position = 'absolute';
             iframe.style.width = '10px';
             iframe.style.height = '10px';
@@ -1436,40 +1436,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     
 });
 // ==========================================
-// 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC (BUG-FREE)
+// 🎵 PHASE 2: GLOBAL MUTE / UNMUTE LOGIC (BUG-FREE & MOBILE SAFE)
 // ==========================================
 let isSystemMuted = false;
 
-document.addEventListener('click', (e) => {
-    const muteBtn = e.target.closest('#mute-toggle-btn');
-    if (muteBtn) {
-        e.preventDefault();
-        e.stopPropagation(); 
-        
-        isSystemMuted = !isSystemMuted;
-        muteBtn.innerText = isSystemMuted ? "🔇" : "🎶";
+// 🚀 BUG FIX: Click aur touchstart dono ko listen karega taaki mobile par kabhi fail na ho
+['click', 'touchstart'].forEach(eventType => {
+    document.addEventListener(eventType, (e) => {
+        const muteBtn = e.target.closest('#mute-toggle-btn');
+        if (muteBtn) {
+            e.preventDefault();
+            e.stopPropagation(); 
+            
+            // Mobile par double-click issue ko rokne ke liye
+            if (eventType === 'touchstart') muteBtn.dataset.touched = 'true';
+            if (eventType === 'click' && muteBtn.dataset.touched) {
+                delete muteBtn.dataset.touched;
+                return;
+            }
+            
+            isSystemMuted = !isSystemMuted;
+            muteBtn.innerText = isSystemMuted ? "🔇" : "🎶";
 
-        // 1. Mute HTML5 Background Music & SFX
-        const bgMusic = document.getElementById("bg-music");
-        if (bgMusic) {
-            bgMusic.muted = isSystemMuted;
-            bgMusic.volume = isSystemMuted ? 0 : 0.5; // Double fallback
-        }
-        
-        const popSound = document.getElementById("pop-sound");
-        if (popSound) popSound.muted = isSystemMuted;
-        
-        const scratchSound = document.getElementById("scratch-sound");
-        if (scratchSound) scratchSound.muted = isSystemMuted;
+            // 1. Mute HTML5 Background Music & SFX
+            const bgMusic = document.getElementById("bg-music");
+            if (bgMusic) {
+                bgMusic.muted = isSystemMuted;
+                bgMusic.volume = isSystemMuted ? 0 : 0.5;
+            }
+            
+            const popSound = document.getElementById("pop-sound");
+            if (popSound) popSound.muted = isSystemMuted;
+            
+            const scratchSound = document.getElementById("scratch-sound");
+            if (scratchSound) scratchSound.muted = isSystemMuted;
 
-        // 2. Mute YouTube Iframe Safely (Bypassing Razorpay)
-        const ytIframe = document.getElementById('magical-yt-iframe');
-        if (ytIframe && ytIframe.contentWindow) {
-            const command = isSystemMuted ? 'mute' : 'unMute';
-            // Explicit string format required by YouTube API on mobile
-            ytIframe.contentWindow.postMessage(`{"event":"command","func":"${command}","args":""}`, '*');
+            // 2. Mute YouTube Iframe Safely
+            const ytIframe = document.getElementById('magical-yt-iframe');
+            if (ytIframe && ytIframe.contentWindow) {
+                const command = isSystemMuted ? 'mute' : 'unMute';
+                // 🚀 BUG FIX: YouTube API ko strictly array format mein args chahiye hote hain
+                ytIframe.contentWindow.postMessage(`{"event":"command","func":"${command}","args":[]}`, '*');
+            }
         }
-    }
+    }, { passive: false });
 });
 // 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS
 const originalShowScreen = showScreen;
