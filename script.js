@@ -1893,3 +1893,41 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
+// ==========================================
+// 🛡️ PHASE 9: TAB SWITCH RESCUER (Chrome Background Resume Fix)
+// ==========================================
+// Yeh code detect karega ki user Chrome se bahar gaya hai ya wapas aaya hai
+document.addEventListener("visibilitychange", () => {
+    const ytIframe = document.getElementById('magical-yt-iframe');
+    const bgMusic = document.getElementById("bg-music");
+
+    // Agar user app se bahar chala gaya (Background)
+    if (document.hidden) {
+        if (ytIframe && ytIframe.contentWindow) {
+            ytIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        }
+        if (bgMusic) {
+            bgMusic.pause();
+        }
+    } 
+    // Agar user wapas Chrome mein aa gaya
+    else {
+        // Sirf tabhi resume karo jab user ne khud Mute button na dabaya ho
+        if (!isSystemMuted) {
+            
+            // 1. YouTube Audio Resume
+            if (ytIframe && ytIframe.contentWindow) {
+                ytIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            } 
+            // 2. Default Audio Resume
+            else if (bgMusic) {
+                const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+                // Sirf tabhi play karega jab YT link na ho
+                if (!extractYouTubeId(customAudioLink) && !extractSpotifyId(customAudioLink)) {
+                    bgMusic.play().catch(e => console.log("Auto-resume blocked", e));
+                }
+            }
+            
+        }
+    }
+});
