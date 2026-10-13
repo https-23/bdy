@@ -1440,7 +1440,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ==========================================
 let isSystemMuted = false;
 
-// 🚀 BUG FIX: Click aur touchstart dono ko listen karega taaki mobile par kabhi fail na ho
 ['click', 'touchstart'].forEach(eventType => {
     document.addEventListener(eventType, (e) => {
         const muteBtn = e.target.closest('#mute-toggle-btn');
@@ -1448,7 +1447,6 @@ let isSystemMuted = false;
             e.preventDefault();
             e.stopPropagation(); 
             
-            // Mobile par double-click issue ko rokne ke liye
             if (eventType === 'touchstart') muteBtn.dataset.touched = 'true';
             if (eventType === 'click' && muteBtn.dataset.touched) {
                 delete muteBtn.dataset.touched;
@@ -1460,6 +1458,10 @@ let isSystemMuted = false;
 
             const bgMusic = document.getElementById("bg-music");
             const ytIframe = document.getElementById('magical-yt-iframe');
+            
+            // 🚀 CHECK KARENGE KI CUSTOM YOUTUBE LINK HAI YA NAHI
+            const customAudioLink = window.magicalState?.receiverAudio || window.magicalState?.audioLink;
+            const hasCustomAudio = extractYouTubeId(customAudioLink) || extractSpotifyId(customAudioLink);
 
             if (isSystemMuted) {
                 // 🛑 MUTE KAR RAHE HAIN
@@ -1471,16 +1473,17 @@ let isSystemMuted = false;
                     ytIframe.contentWindow.postMessage(`{"event":"command","func":"mute","args":[]}`, '*');
                 }
             } else {
-                // 🔊 UNMUTE KAR RAHE HAIN - Force play command bhi bhejenge!
+                // 🔊 UNMUTE KAR RAHE HAIN
                 if (bgMusic) {
                     bgMusic.muted = false;
                     bgMusic.volume = 0.5;
-                    // Agar ruka hua hai, toh force play karo
-                    if (bgMusic.paused) bgMusic.play().catch(e => {}); 
+                    // 🛑 MAIN FIX: Sirf tabhi default music play karo jab YouTube link NA ho!
+                    if (!hasCustomAudio && bgMusic.paused) {
+                        bgMusic.play().catch(e => {}); 
+                    }
                 }
                 if (ytIframe && ytIframe.contentWindow) {
                     ytIframe.contentWindow.postMessage(`{"event":"command","func":"unMute","args":[]}`, '*');
-                    // 🚀 MAIN FIX: Unmute karte waqt 'playVideo' bhi bhej do taaki ruka hua gaana chal pade!
                     ytIframe.contentWindow.postMessage(`{"event":"command","func":"playVideo","args":""}`, '*');
                 }
             }
