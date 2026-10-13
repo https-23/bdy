@@ -1487,13 +1487,22 @@ let isSystemMuted = false;
         }
     }, { passive: false });
 });
-// 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS
+// 🚀 SHOW BUTTON WHEN MAGIC UNLOCKS AND ATTACH TO CURRENT SCREEN
 const originalShowScreen = showScreen;
 window.showScreen = function(screenId, isBack = false) {
     originalShowScreen(screenId, isBack);
     const muteToggleBtn = document.getElementById('mute-toggle-btn');
-    if (screenId === "big-penguin-screen" && muteToggleBtn) {
-        muteToggleBtn.style.display = "flex";
+    const targetScreen = document.getElementById(screenId);
+    
+    if (muteToggleBtn) {
+        if (screenId === "big-penguin-screen") {
+            muteToggleBtn.style.display = "flex";
+        }
+        // 🚀 THE MAGIC SCROLL FIX: Mute button ko current screen ke andar attach kar do
+        // Taaki wo Back Button ki tarah screen ke content ke sath natural scroll ho!
+        if (targetScreen) {
+            targetScreen.appendChild(muteToggleBtn);
+        }
     }
 };
 // ==========================================
