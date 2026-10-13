@@ -1053,9 +1053,9 @@ h1, h2 {
    PHASE 2: GLOBAL MUTE TOGGLE (SCROLL FIX)
    ========================================= */
 #mute-toggle-btn {
-    position: fixed !important; /* 🚀 FIX: Yeh line isko screen par chipka ke rakhegi */
-    top: 20px !important;       /* 🚀 FIX: Screen ke top se 20px door */
-    right: 20px !important;     /* 🚀 FIX: Screen ke right se 20px door */
+    position: absolute !important; /* 🚀 FIX: Ab ye fixed nahi rahega */
+    top: 15px !important;       /* 🚀 FIX: Back button ke exactly level par */
+    right: 15px !important;     
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -1068,11 +1068,11 @@ h1, h2 {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    z-index: 999999 !important; /* 🚀 FIX: Sabse aage rakhne ke liye important lagaya */
+    z-index: 100 !important; /* 🚀 FIX: Z-index back button ke barabar kar diya */
     box-shadow: 0 4px 15px rgba(255, 117, 140, 0.3);
     transition: transform 0.2s, background 0.3s;
     padding: 0;
-    margin: 0;                  /* 🚀 FIX: Kisi aur margin ko cancel karne ke liye */
+    margin: 0;                  
 }
 
 #mute-toggle-btn:active {
