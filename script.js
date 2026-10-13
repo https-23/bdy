@@ -680,9 +680,12 @@ if (loginScreen && tiltCard) {
         if (bgMusic) { 
             bgMusic.pause(); 
             bgMusic.currentTime = 0; 
+            bgMusic.removeAttribute('autoplay'); // 🚀 ARCHITECT FIX: Browser ka default autoplay block karega
         }
 
         if (ytVideoId) {
+            if (bgMusic) bgMusic.muted = true; // 🚀 HARD FIX: Guarantee bgMusic stays silent!
+            
             // 🚀 2. INSTAGRAM FIX: Exact usi millisecond mein iframe banao jab click hua ho
             let oldIframe = document.getElementById('magical-yt-iframe');
             if (oldIframe) oldIframe.remove();
@@ -700,6 +703,8 @@ if (loginScreen && tiltCard) {
             iframe.allow = 'autoplay; encrypted-media';
             document.body.appendChild(iframe);
         } else if (spotifyData) {
+            if (bgMusic) bgMusic.muted = true; // 🚀 HARD FIX
+
             let oldIframe = document.getElementById('magical-spotify-iframe');
             if (oldIframe) oldIframe.remove();
 
@@ -719,6 +724,7 @@ if (loginScreen && tiltCard) {
         } else {
             // 🛑 3. Agar YT link NAHI hai, SIRF TAB default music bajega
             if (bgMusic) { 
+                bgMusic.muted = false; // Ensure it's unmuted if we actually need it
                 bgMusic.volume = 0.5; 
                 bgMusic.play().catch(e => console.log("Audio play blocked", e)); 
             }
@@ -1475,11 +1481,16 @@ let isSystemMuted = false;
             } else {
                 // 🔊 UNMUTE KAR RAHE HAIN
                 if (bgMusic) {
-                    bgMusic.muted = false;
-                    bgMusic.volume = 0.5;
-                    // 🛑 MAIN FIX: Sirf tabhi default music play karo jab YouTube link NA ho!
-                    if (!hasCustomAudio && bgMusic.paused) {
-                        bgMusic.play().catch(e => {}); 
+                    // 🚀 ARCHITECT FIX: Sirf tabhi default music ko unmute/play karo jab YouTube link NA ho!
+                    if (!hasCustomAudio) {
+                        bgMusic.muted = false;
+                        bgMusic.volume = 0.5;
+                        if (bgMusic.paused) {
+                            bgMusic.play().catch(e => {}); 
+                        }
+                    } else {
+                        // Agar YT/Spotify link active hai, toh default music ko strictly muted hi rakho!
+                        bgMusic.muted = true;
                     }
                 }
                 if (ytIframe && ytIframe.contentWindow) {
