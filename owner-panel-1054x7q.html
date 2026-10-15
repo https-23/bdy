@@ -5,59 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard - 10 Petal X</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        blob: "blob 7s infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+          .animation-delay-2000 { animation-delay: 2s; }
+          .animation-delay-4000 { animation-delay: 4s; }
+          .glass-card { @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl; }
+          .glass-panel { @apply bg-black/40 backdrop-blur-md border border-white/10 rounded-xl; }
+        }
+        
+        /* 3D Button Press Effect */
+        .btn-3d {
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 0 0 rgba(0,0,0,0.2), 0 15px 20px rgba(0,0,0,0.4);
+        }
+        .btn-3d:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 0 rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4);
+        }
+        
+        /* Custom Scrollbar for tables */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-6 font-sans">
+<body class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-black text-white antialiased relative overflow-x-hidden font-sans">
+    
+    <!-- Animated Background Blobs -->
+    <div class="fixed top-0 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none z-0"></div>
+    <div class="fixed top-20 right-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none z-0"></div>
+    <div class="fixed bottom-10 left-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000 pointer-events-none z-0"></div>
 
     <!-- Login Section -->
-    <div id="login-section" class="max-w-sm mx-auto mt-20 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-        <h2 class="text-2xl font-bold mb-4 text-purple-400">Admin Login</h2>
-        <input type="password" id="admin-secret" placeholder="Enter Admin Secret" class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white mb-4 outline-none focus:border-purple-500">
-        <button onclick="loadDashboard()" class="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded font-bold transition">Login</button>
+    <div id="login-section" class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+        <div class="glass-card p-10 w-full max-w-md transform transition-all hover:scale-[1.02]">
+            <div class="text-center mb-8">
+                <div class="inline-block p-3 rounded-full bg-white/5 border border-white/10 mb-4 shadow-lg">
+                    <span class="text-4xl">👑</span>
+                </div>
+                <h2 class="text-3xl font-bold tracking-tight">System <span class="text-purple-400">Admin</span></h2>
+                <p class="text-sm text-gray-400 mt-2">Enter your secret key to access the control panel</p>
+            </div>
+            
+            <input type="password" id="admin-secret" placeholder="Enter Admin Secret" 
+                class="w-full bg-black/30 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all mb-6 shadow-inner text-center tracking-widest text-lg">
+            
+            <button onclick="loadDashboard()" class="btn-3d w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-2">
+                Unlock System
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </button>
+        </div>
     </div>
 
     <!-- Dashboard Section (Hidden default) -->
-    <div id="dashboard-section" class="hidden max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
-            <h1 class="text-3xl font-bold text-purple-400">Owner Dashboard</h1>
-            <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded font-bold">Logout</button>
+    <div id="dashboard-section" class="hidden relative z-10 max-w-7xl mx-auto px-4 py-8">
+        
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 glass-card p-6 px-8">
+            <div class="flex items-center gap-4 mb-4 md:mb-0">
+                <div class="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30">
+                    <span class="text-2xl">⚡</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">10 Petal X <span class="text-purple-400">Command Center</span></h1>
+                    <p class="text-sm text-emerald-400 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> System Online & Secure
+                    </p>
+                </div>
+            </div>
+            <button onclick="logout()" class="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm font-bold transition-colors shadow-lg">
+                Lock & Exit
+            </button>
         </header>
 
-        <!-- Influencers Table -->
-        <div class="mb-8 bg-gray-800 rounded-lg p-6 shadow-lg">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Influencers & Payouts</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-gray-400 border-b border-gray-700">
-                            <th class="p-2">Name</th>
-                            <th class="p-2">Code</th>
-                            <th class="p-2">Unpaid (₹)</th>
-                            <th class="p-2">Total Earned (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="influencers-list">
-                        <!-- Data will load here -->
-                    </tbody>
-                </table>
+        <!-- Top Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card p-6 border-t-4 border-t-blue-400">
+                <p class="text-sm text-gray-400 mb-1">Total Influencers</p>
+                <h3 id="metric-influencers" class="text-4xl font-bold text-white">0</h3>
             </div>
-            <button onclick="settlePayments()" class="mt-4 bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold">Mark All as Paid</button>
+            <div class="glass-card p-6 border-t-4 border-t-pink-400 relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 text-pink-500/10 text-8xl">₹</div>
+                <p class="text-sm text-gray-400 mb-1">Total Unpaid Dues</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-2xl font-bold text-pink-400">₹</span>
+                    <h3 id="metric-unpaid" class="text-4xl font-bold text-white">0</h3>
+                </div>
+            </div>
+            <div class="glass-card p-6 border-t-4 border-t-emerald-400 relative overflow-hidden">
+                <div class="absolute -right-4 -bottom-4 text-emerald-500/10 text-8xl">₹</div>
+                <p class="text-sm text-gray-400 mb-1">Lifetime Payouts</p>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-2xl font-bold text-emerald-400">₹</span>
+                    <h3 id="metric-lifetime" class="text-4xl font-bold text-white">0</h3>
+                </div>
+            </div>
         </div>
 
-        <!-- System Errors Table -->
-        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border-l-4 border-red-500">
-            <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2 text-red-400">System Errors / Hacks</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="text-gray-400 border-b border-gray-700">
-                            <th class="p-2">Date & Time</th>
-                            <th class="p-2">Error Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="errors-list">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Influencers Table -->
+            <div class="lg:col-span-2 glass-card p-6 flex flex-col h-[600px]">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span class="text-xl">👥</span> Influencers Ledger
+                    </h2>
+                    <button onclick="settlePayments()" class="btn-3d bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-lg shadow-emerald-600/30">
+                        Mark All as Paid
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-auto glass-panel rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-black/80 backdrop-blur-xl border-b border-white/10 z-10">
+                            <tr class="text-xs uppercase tracking-wider text-gray-400">
+                                <th class="p-4 font-semibold">Partner Details</th>
+                                <th class="p-4 font-semibold">Promo Code</th>
+                                <th class="p-4 font-semibold text-right">Unpaid</th>
+                                <th class="p-4 font-semibold text-right">Earned</th>
+                            </tr>
+                        </thead>
+                        <tbody id="influencers-list" class="divide-y divide-white/5">
+                            <!-- Data will load here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- System Errors Log -->
+            <div class="glass-card p-6 flex flex-col h-[600px] border-t-4 border-t-red-500/50">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-red-400">
+                    <span class="text-xl">🚨</span> System Logs & Errors
+                </h2>
+                
+                <div class="flex-1 overflow-auto glass-panel rounded-xl p-2">
+                    <div id="errors-list" class="space-y-3">
                         <!-- Errors will load here -->
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -67,8 +170,13 @@
         let secret = "";
 
         async function loadDashboard() {
+            const btn = document.querySelector('#login-section button');
+            const originalText = btn.innerHTML;
+            
             secret = document.getElementById('admin-secret').value;
-            if(!secret) return alert("Secret required!");
+            if(!secret) return;
+
+            btn.innerHTML = 'Connecting... <span class="animate-pulse">⚡</span>';
 
             try {
                 const res = await fetch(`${API_BASE}/api/admin/dashboard`, {
@@ -77,57 +185,124 @@
                 const data = await res.json();
 
                 if(res.ok) {
-                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('login-section').style.display = 'none';
                     document.getElementById('dashboard-section').classList.remove('hidden');
+                    document.getElementById('dashboard-section').classList.add('animate-[fadeIn_0.5s_ease-out]');
                     
+                    let totalUnpaid = 0;
+                    let totalLifetime = 0;
+
                     // Render Influencers
-                    document.getElementById('influencers-list').innerHTML = data.influencers.map(inf => `
-                        <tr class="border-b border-gray-700 hover:bg-gray-750">
-                            <td class="p-2">${inf.name}</td>
-                            <td class="p-2 font-mono text-purple-400">${inf.promo_code}</td>
-                            <td class="p-2 text-red-400 font-bold">₹${inf.pending_balance}</td>
-                            <td class="p-2 text-green-400">₹${inf.lifetime_earnings}</td>
+                    document.getElementById('influencers-list').innerHTML = data.influencers.map(inf => {
+                        totalUnpaid += inf.pending_balance;
+                        totalLifetime += inf.lifetime_earnings;
+                        
+                        const unpaidColor = inf.pending_balance > 0 ? 'text-pink-400' : 'text-gray-500';
+                        const badgeColor = inf.pending_balance > 0 ? 'bg-pink-500/10 border-pink-500/20' : 'bg-gray-500/10 border-gray-500/20';
+                        
+                        return `
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="p-4">
+                                <p class="font-bold text-white group-hover:text-purple-300 transition-colors">${inf.name}</p>
+                                <p class="text-xs text-gray-400">${inf.email || 'N/A'}</p>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-md text-xs font-mono font-bold border border-purple-500/30 bg-purple-500/10 text-purple-300">
+                                    ${inf.promo_code}
+                                </span>
+                            </td>
+                            <td class="p-4 text-right">
+                                <span class="px-3 py-1 rounded-md text-sm font-bold border ${badgeColor} ${unpaidColor}">
+                                    ₹${inf.pending_balance.toLocaleString('en-IN')}
+                                </span>
+                            </td>
+                            <td class="p-4 text-right text-emerald-400 font-bold">
+                                ₹${inf.lifetime_earnings.toLocaleString('en-IN')}
+                            </td>
                         </tr>
-                    `).join('');
+                    `}).join('');
+
+                    // Update Top Metrics
+                    document.getElementById('metric-influencers').innerText = data.influencers.length;
+                    document.getElementById('metric-unpaid').innerText = totalUnpaid.toLocaleString('en-IN');
+                    document.getElementById('metric-lifetime').innerText = totalLifetime.toLocaleString('en-IN');
 
                     // Render Errors
-                    document.getElementById('errors-list').innerHTML = data.errors.map(err => `
-                        <tr class="border-b border-gray-700">
-                            <td class="p-2 text-sm text-gray-400">${new Date(err.created_at).toLocaleString()}</td>
-                            <td class="p-2 text-red-300">${err.error_message}</td>
-                        </tr>
-                    `).join('');
+                    if (data.errors.length === 0) {
+                        document.getElementById('errors-list').innerHTML = `
+                            <div class="text-center p-8 text-gray-500 flex flex-col items-center">
+                                <span class="text-4xl mb-2 opacity-50">🛡️</span>
+                                <p>System is clean. No errors found.</p>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById('errors-list').innerHTML = data.errors.map(err => `
+                            <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-lg hover:bg-red-500/10 transition-colors">
+                                <p class="text-xs font-mono text-red-300/60 mb-1">${new Date(err.created_at).toLocaleString('en-IN')}</p>
+                                <p class="text-sm text-red-200">${err.error_message}</p>
+                            </div>
+                        `).join('');
+                    }
                 } else {
-                    alert("Login Failed: " + data.error);
+                    alert("Login Failed: " + (data.error || "Wrong secret key"));
+                    btn.innerHTML = originalText;
                 }
             } catch (err) {
-                alert("Connection error!");
+                alert("Connection error! Make sure the backend API is deployed.");
+                btn.innerHTML = originalText;
             }
         }
 
         async function settlePayments() {
-            if(!confirm("Are you sure you want to clear all unpaid balances?")) return;
+            const unpaidElement = document.getElementById('metric-unpaid');
+            if (unpaidElement.innerText === '0') {
+                return alert("No unpaid balances to settle!");
+            }
+
+            if(!confirm("Are you sure you want to clear all unpaid balances and mark them as paid?")) return;
             
             try {
                 const res = await fetch(`${API_BASE}/api/admin/settle`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${secret}` }
                 });
+                
                 if(res.ok) {
-                    alert("All payments settled successfully!");
-                    loadDashboard(); // Refresh table
+                    // Quick success animation
+                    document.body.insertAdjacentHTML('beforeend', `
+                        <div id="success-flash" class="fixed inset-0 bg-emerald-500/20 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-500">
+                            <div class="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-2xl font-bold shadow-2xl flex items-center gap-3 transform scale-0 animate-[popIn_0.3s_forwards]">
+                                <span>💸</span> Payments Settled!
+                            </div>
+                        </div>
+                        <style>@keyframes popIn { to { transform: scale(1); } }</style>
+                    `);
+                    
+                    setTimeout(() => {
+                        const flash = document.getElementById('success-flash');
+                        flash.style.opacity = '0';
+                        setTimeout(() => flash.remove(), 500);
+                        loadDashboard(); // Refresh data quietly
+                    }, 1500);
+                } else {
+                    alert("Failed to settle payments. Check backend logs.");
                 }
             } catch (err) {
-                alert("Failed to settle payments");
+                alert("Network error while settling payments.");
             }
         }
 
         function logout() {
             secret = "";
             document.getElementById('admin-secret').value = "";
-            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('login-section').style.display = 'flex';
             document.getElementById('dashboard-section').classList.add('hidden');
         }
+
+        // Allow Enter key to login
+        document.getElementById('admin-secret').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') loadDashboard();
+        });
     </script>
 </body>
 </html>
