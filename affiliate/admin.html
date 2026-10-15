@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - 10 Petal X</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6 font-sans">
+
+    <!-- Login Section -->
+    <div id="login-section" class="max-w-sm mx-auto mt-20 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+        <h2 class="text-2xl font-bold mb-4 text-purple-400">Admin Login</h2>
+        <input type="password" id="admin-secret" placeholder="Enter Admin Secret" class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white mb-4 outline-none focus:border-purple-500">
+        <button onclick="loadDashboard()" class="w-full bg-purple-600 hover:bg-purple-500 py-3 rounded font-bold transition">Login</button>
+    </div>
+
+    <!-- Dashboard Section (Hidden default) -->
+    <div id="dashboard-section" class="hidden max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
+            <h1 class="text-3xl font-bold text-purple-400">Owner Dashboard</h1>
+            <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded font-bold">Logout</button>
+        </header>
+
+        <!-- Influencers Table -->
+        <div class="mb-8 bg-gray-800 rounded-lg p-6 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Influencers & Payouts</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-700">
+                            <th class="p-2">Name</th>
+                            <th class="p-2">Code</th>
+                            <th class="p-2">Unpaid (₹)</th>
+                            <th class="p-2">Total Earned (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="influencers-list">
+                        <!-- Data will load here -->
+                    </tbody>
+                </table>
+            </div>
+            <button onclick="settlePayments()" class="mt-4 bg-green-600 hover:bg-green-500 px-6 py-2 rounded font-bold">Mark All as Paid</button>
+        </div>
+
+        <!-- System Errors Table -->
+        <div class="bg-gray-800 rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+            <h2 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2 text-red-400">System Errors / Hacks</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-700">
+                            <th class="p-2">Date & Time</th>
+                            <th class="p-2">Error Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="errors-list">
+                        <!-- Errors will load here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://magical-api.10petalxmagic.workers.dev";
+        let secret = "";
+
+        async function loadDashboard() {
+            secret = document.getElementById('admin-secret').value;
+            if(!secret) return alert("Secret required!");
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${secret}` }
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('dashboard-section').classList.remove('hidden');
+                    
+                    // Render Influencers
+                    document.getElementById('influencers-list').innerHTML = data.influencers.map(inf => `
+                        <tr class="border-b border-gray-700 hover:bg-gray-750">
+                            <td class="p-2">${inf.name}</td>
+                            <td class="p-2 font-mono text-purple-400">${inf.promo_code}</td>
+                            <td class="p-2 text-red-400 font-bold">₹${inf.pending_balance}</td>
+                            <td class="p-2 text-green-400">₹${inf.lifetime_earnings}</td>
+                        </tr>
+                    `).join('');
+
+                    // Render Errors
+                    document.getElementById('errors-list').innerHTML = data.errors.map(err => `
+                        <tr class="border-b border-gray-700">
+                            <td class="p-2 text-sm text-gray-400">${new Date(err.created_at).toLocaleString()}</td>
+                            <td class="p-2 text-red-300">${err.error_message}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    alert("Login Failed: " + data.error);
+                }
+            } catch (err) {
+                alert("Connection error!");
+            }
+        }
+
+        async function settlePayments() {
+            if(!confirm("Are you sure you want to clear all unpaid balances?")) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/settle`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${secret}` }
+                });
+                if(res.ok) {
+                    alert("All payments settled successfully!");
+                    loadDashboard(); // Refresh table
+                }
+            } catch (err) {
+                alert("Failed to settle payments");
+            }
+        }
+
+        function logout() {
+            secret = "";
+            document.getElementById('admin-secret').value = "";
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
