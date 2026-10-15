@@ -82,11 +82,29 @@ function extractSpotifyId(url) {
 // ==========================================
 // 🚀 PHASE 1: SECURE CLOUD STORAGE (CLOUDFLARE R2)
 // ==========================================
-
 async function prepareImageForCloudflare(base64Data) {
-    // ImgBB is completely removed.
-    // We pass the compressed base64 data directly to your Cloudflare Worker & R2 Bucket.
-    return base64Data;
+    try {
+        // Base64 text ko wapas choti binary file (Blob) mein convert karein
+        const res = await fetch(base64Data);
+        const blob = await res.blob();
+        
+        // Hamare naye Worker route par upload karein
+        const uploadRes = await fetch('https://magical-api.10petalxmagic.workers.dev/api/upload-image', {
+            method: 'POST',
+            body: blob
+        });
+        
+        const data = await uploadRes.json();
+        if (data.success) {
+            // URL return hoga, ab Base64 database mein nahi jayega!
+            return data.url; 
+        } else {
+            throw new Error("Cloud upload failed");
+        }
+    } catch (error) {
+        console.error("Upload error:", error);
+        throw error;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
