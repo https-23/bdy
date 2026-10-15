@@ -29,6 +29,44 @@ window.magicalState = {
     scratchMsgs: { 1: "", 2: "", 3: "", 4: "" }
 };
 // ==========================================
+// PHASE 3: RESTORE DATA FROM SESSION STORAGE
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    const savedState = sessionStorage.getItem('magical_draft');
+    if (savedState && !window.location.search.includes('gift=')) {
+        try {
+            const parsedState = JSON.parse(savedState);
+            window.magicalState = { ...window.magicalState, ...parsedState };
+            
+            // Text fields restore karein
+            if (document.getElementById('partner-name-input')) document.getElementById('partner-name-input').value = window.magicalState.partnerName || "";
+            if (document.getElementById('user-name-input')) document.getElementById('user-name-input').value = window.magicalState.userName || "";
+            if (document.getElementById('main-wish-msg')) document.getElementById('main-wish-msg').value = window.magicalState.mainWish || "";
+            if (document.getElementById('audio-link-input')) document.getElementById('audio-link-input').value = window.magicalState.audioLink || "";
+            
+            if (document.getElementById('scratch-1')) document.getElementById('scratch-1').value = window.magicalState.scratchMsgs[1] || "";
+            if (document.getElementById('scratch-2')) document.getElementById('scratch-2').value = window.magicalState.scratchMsgs[2] || "";
+            if (document.getElementById('scratch-3')) document.getElementById('scratch-3').value = window.magicalState.scratchMsgs[3] || "";
+            if (document.getElementById('scratch-4')) document.getElementById('scratch-4').value = window.magicalState.scratchMsgs[4] || "";
+
+            // Uploaded Photos restore karein
+            for (let i = 0; i < 4; i++) {
+                if (window.magicalState.images[i]) {
+                    const photoInputs = document.querySelectorAll('.photo-upload-box');
+                    if (photoInputs[i]) {
+                        photoInputs[i].style.background = `url(${window.magicalState.images[i]}) center/cover no-repeat`;
+                        photoInputs[i].style.border = '2px solid #28a745';
+                        const plusIcon = photoInputs[i].querySelector('.upload-icon') || photoInputs[i].querySelector('span');
+                        if (plusIcon) plusIcon.style.display = 'none';
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Failed to restore session data", e);
+        }
+    }
+});
+// ==========================================
 // 📸 1. PHOTO COMPRESSION & UPLOAD LOGIC
 // ==========================================
 async function compressImage(file) {
@@ -247,6 +285,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // PHASE 3: SAVE DATA TO SESSION STORAGE
+            sessionStorage.setItem('magical_draft', JSON.stringify(window.magicalState));
+            
             const dummyUser = document.getElementById('dummy-username');
             if (dummyUser) dummyUser.value = partnerName; 
 
@@ -370,8 +411,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
+                    console.error("Payment Failed:", response.error);
                     payBtn.innerText = "Pay Now (₹99)";
                     payBtn.disabled = false;
+                    
+                    // PHASE 3: SAFE ERROR MESSAGE
+                    let errorMsg = "Payment fail ho gayi hai. ";
+                    if (response.error.reason === 'payment_cancelled') {
+                        errorMsg = "Aapne payment cancel kar di hai. Koi paisa nahi kata gaya. Kripya wapas try karein.";
+                    } else {
+                        errorMsg += response.error.description || "Internet connection ya bank server issue ho sakta hai. Plzz🥺 dubara try karein.";
+                    }
+                    alert("Oops! 🥀\n\n" + errorMsg);
+                    
+                    // Slider ko reset karna
+                    const swipeText = document.getElementById('swipe-text');
+                    const swipeThumb = document.getElementById('swipe-thumb');
+                    const swipeTrack = document.getElementById('swipe-track');
+                    if (swipeText && swipeThumb && swipeTrack) {
+                        swipeThumb.style.transition = 'left 0.4s ease';
+                        swipeTrack.style.transition = 'width 0.4s ease';
+                        swipeThumb.style.left = '4px';
+                        swipeTrack.style.width = '0%';
+                        swipeText.innerText = "✨PAY ₹99 & GET LINK 🔗";
+                        swipeText.style.color = '#666';
+                    }
                 });
                 rzp.open();
                 
