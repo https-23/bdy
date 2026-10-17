@@ -52,6 +52,7 @@
 
         <section class="mb-10 glass-card p-6">
             <h2 class="text-lg font-semibold mb-4">Your Unique Referral Link</h2>
+            <p class="text-gray-300 mt-4 text-center">Your Promo Code: <span id="display-promo-code" class="text-purple-400 font-bold text-xl ml-2">Loading...</span></p>
             <div class="flex flex-col sm:flex-row gap-3">
                 <input type="text" id="referral-link" readonly value="Loading..." 
                     class="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-emerald-400 font-mono text-sm focus:outline-none" />
@@ -116,6 +117,7 @@
                 if (!response.ok) throw new Error("Failed to load dashboard data");
                 
                 const data = await response.json();
+                document.getElementById('display-promo-code').innerText = data.promoCode;
 
                 document.getElementById('user-name').innerText = data.profile.name;
                 const primaryCode = data.profile.activeCodes[0];
