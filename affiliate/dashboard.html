@@ -117,7 +117,8 @@
                 if (!response.ok) throw new Error("Failed to load dashboard data");
                 
                 const data = await response.json();
-                document.getElementById('display-promo-code').innerText = data.promoCode;
+                
+                document.getElementById('display-promo-code').innerText = data.profile.promo_code;
 
                 document.getElementById('user-name').innerText = data.profile.name;
                 const primaryCode = data.profile.activeCodes[0];
