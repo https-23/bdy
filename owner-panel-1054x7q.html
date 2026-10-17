@@ -184,10 +184,18 @@
             </div>
         </div>
     </div>
-
     <script>
         const API_BASE = "https://magical-api.10petalxmagic.workers.dev";
         let secret = "";
+
+        // 1. AUTO-LOGIN ON REFRESH
+        window.onload = () => {
+            const savedSecret = sessionStorage.getItem('admin_secret');
+            if(savedSecret) {
+                document.getElementById('admin-secret').value = savedSecret;
+                loadDashboard();
+            }
+        };
 
         async function loadDashboard() {
             const btn = document.querySelector('#login-section button');
@@ -205,6 +213,9 @@
                 const data = await res.json();
 
                 if(res.ok) {
+                    // 2. SAVE SECRET IN SESSION AFTER SUCCESSFUL LOGIN
+                    sessionStorage.setItem('admin_secret', secret);
+                    
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('dashboard-section').classList.remove('hidden');
                     document.getElementById('dashboard-section').classList.add('animate-[fadeIn_0.5s_ease-out]');
@@ -294,7 +305,6 @@
                 });
                 
                 if(res.ok) {
-                    // Quick success animation
                     document.body.insertAdjacentHTML('beforeend', `
                         <div id="success-flash" class="fixed inset-0 bg-emerald-500/20 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-500">
                             <div class="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-2xl font-bold shadow-2xl flex items-center gap-3 transform scale-0 animate-[popIn_0.3s_forwards]">
@@ -320,6 +330,8 @@
 
         function logout() {
             secret = "";
+            // 3. CLEAR SESSION ON LOGOUT
+            sessionStorage.removeItem('admin_secret');
             document.getElementById('admin-secret').value = "";
             document.getElementById('login-section').style.display = 'flex';
             document.getElementById('dashboard-section').classList.add('hidden');
