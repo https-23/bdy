@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (data.valid) {
-                    window.magicalState.appliedPromo = data.promoCode;
+                    window.magicalState.appliedPromo = data.promo = code;
                     promoMessage.innerText = `${data.message} (₹${data.discountAmount} Off!)`;
                     promoMessage.style.color = "#28a745"; // Green success text
                     if (swipeTextEl) swipeTextEl.innerText = `✨PAY ₹${data.finalPrice} & GET LINK🔗`;
