@@ -276,7 +276,7 @@
                             <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-lg hover:bg-red-500/10 transition-colors">
                                 <p class="text-sm text-red-400 font-bold">${err.error_message}</p>
                                 ${err.error_stack ? `<p class="text-xs text-gray-400 mt-1 font-mono break-all">${err.error_stack}</p>` : ''}
-                                <p class="text-xs font-mono text-red-300/60 mt-2">${new Date(err.created_at).toLocaleString('en-IN')}</p>
+                                <p class="text-xs font-mono text-red-300/60 mt-2">${new Date(err.created_at + 'Z').toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})}</p>
                             </div>
                         `).join('');
                     }
