@@ -400,12 +400,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     },
                     "theme": { "color": "#c0392b" },
-                    // 🚀 FIX 1: Cancel karne par Promo Code check karke price set karega
+                   // 🚀 1. Window close (Cancel) karne par सीधा ₹69 ya ₹99 set karega
                     "modal": {
                         "ondismiss": function() {
-                            const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
+                            const isPromoActive = window.magicalState.appliedPromo || document.getElementById('promo-input')?.disabled;
+                            const price = isPromoActive ? 69 : 99;
+                            payBtn.innerText = `Pay Now (₹${price})`;
                             payBtn.disabled = false;
-                            payBtn.innerText = `Pay Now (₹${currentPrice})`;
+
+                            const swipeText = document.getElementById('swipe-text');
+                            if (swipeText) swipeText.innerText = `✨PAY ₹${price} & GET LINK 🔗`;
                         }
                     }
                 };
@@ -413,11 +417,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
                     console.error("Payment Failed:", response.error);
-                    const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
+                    const isPromoActive = window.magicalState.appliedPromo || document.getElementById('promo-input')?.disabled;
+                    const price = isPromoActive ? 69 : 99;
+
+                    payBtn.innerText = `Pay Now (₹${price})`;
                     payBtn.disabled = false;
-                    payBtn.innerText = `Pay Now (₹${currentPrice})`;
                     
-                    // PHASE 3: SAFE ERROR MESSAGE
                     let errorMsg = "Payment fail ho gayi hai. ";
                     if (response.error.reason === 'payment_cancelled') {
                         errorMsg = "Aapne payment cancel kar di hai. Koi paisa nahi kata gaya. Kripya wapas try karein.";
@@ -426,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     alert("Oops! 🥀\n\n" + errorMsg);
                     
-                    // 🚀 FIX 2: Payment fail hone par bhi ₹69 hi rahega agar promo applied hai
                     const swipeText = document.getElementById('swipe-text');
                     const swipeThumb = document.getElementById('swipe-thumb');
                     const swipeTrack = document.getElementById('swipe-track');
@@ -435,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = `✨PAY ₹${currentPrice} & GET LINK 🔗`;
+                        swipeText.innerText = `✨PAY ₹${price} & GET LINK 🔗`;
                         swipeText.style.color = '#666';
                     }
                 });
@@ -444,9 +448,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Error: " + error.message); 
-                const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
+                const isPromoActive = window.magicalState.appliedPromo || document.getElementById('promo-input')?.disabled;
+                const price = isPromoActive ? 69 : 99;
+                payBtn.innerText = `Pay Now (₹${price})`;
                 payBtn.disabled = false;
-                payBtn.innerText = `Pay Now (₹${currentPrice})`;
             }
         });
     }
@@ -600,7 +605,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     
-        // Sync loading text only while button is disabled (processing)
+                    // Sirf tab loading text dikhao jab button disabled ho
                     if (successTriggered && hiddenPayBtn.disabled && hiddenPayBtn.textContent) {
                         const loadingText = hiddenPayBtn.textContent.trim();
                         if (loadingText !== "PAY" && !loadingText.startsWith("Pay Now")) {
@@ -608,15 +613,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // 🚀 FIX 3: Wapas aane par Promo Code ke hisaab se ₹69 ya ₹99 dikhayega
+                    // 🚀 Wapas aane par check karega ki promo input disabled (applied) hai ya nahi
                     if (mutation.attributeName === "disabled" && !hiddenPayBtn.disabled && successTriggered) {
                         successTriggered = false;
-                        const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
+                        const isPromoActive = window.magicalState.appliedPromo || document.getElementById('promo-input')?.disabled;
+                        const price = isPromoActive ? 69 : 99;
+
                         swipeThumb.style.transition = 'left 0.4s ease';
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = `✨PAY ₹${currentPrice} & GET LINK 🔗`;
+                        swipeText.innerText = `✨PAY ₹${price} & GET LINK 🔗`;
                         swipeText.style.color = '#666';
                         thumbIcon.innerText = "Swipe ➔";
                     }
