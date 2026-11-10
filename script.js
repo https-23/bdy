@@ -400,20 +400,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     },
                     "theme": { "color": "#c0392b" },
-                    // 🚀 NAYA FIX YAHAN HAI: Window close karne par reset hoga
+                    // 🚀 FIX 1: Cancel karne par Promo Code check karke price set karega
                     "modal": {
                         "ondismiss": function() {
-                            payBtn.innerText = "Pay Now (₹99)";
-                            payBtn.disabled = false; // Yeh slider ko wapas bhej dega!
+                            const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
+                            payBtn.disabled = false;
+                            payBtn.innerText = `Pay Now (₹${currentPrice})`;
                         }
-                }
+                    }
                 };
                 
                 var rzp = new Razorpay(options);
                 rzp.on('payment.failed', function (response){
                     console.error("Payment Failed:", response.error);
-                    payBtn.innerText = "Pay Now (₹99)";
+                    const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
                     payBtn.disabled = false;
+                    payBtn.innerText = `Pay Now (₹${currentPrice})`;
                     
                     // PHASE 3: SAFE ERROR MESSAGE
                     let errorMsg = "Payment fail ho gayi hai. ";
@@ -424,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     alert("Oops! 🥀\n\n" + errorMsg);
                     
-                    // Slider ko reset karna
+                    // 🚀 FIX 2: Payment fail hone par bhi ₹69 hi rahega agar promo applied hai
                     const swipeText = document.getElementById('swipe-text');
                     const swipeThumb = document.getElementById('swipe-thumb');
                     const swipeTrack = document.getElementById('swipe-track');
@@ -433,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = "✨PAY ₹99 & GET LINK 🔗";
+                        swipeText.innerText = `✨PAY ₹${currentPrice} & GET LINK 🔗`;
                         swipeText.style.color = '#666';
                     }
                 });
@@ -442,8 +444,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Payment System Error:", error);
                 alert("Error: " + error.message); 
-                payBtn.innerText = "Pay Now (₹99)";
+                const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
                 payBtn.disabled = false;
+                payBtn.innerText = `Pay Now (₹${currentPrice})`;
             }
         });
     }
@@ -494,6 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.valid) {
                     window.magicalState.appliedPromo = data.promo = code;
+                    window.magicalState.finalPrice = data.finalPrice || 69; // 👈 Yeh line add karein
                     promoMessage.innerText = `${data.message} (₹${data.discountAmount} Off!)`;
                     promoMessage.style.color = "#28a745"; // Green success text
                     if (swipeTextEl) swipeTextEl.innerText = `✨PAY ₹${data.finalPrice} & GET LINK🔗`;
@@ -592,33 +596,32 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', endSwipe);
 
         // Security Observer: If Razorpay gets closed or fails, reset the slider automatically
-        // Security Observer: If Razorpay gets closed or fails, reset the slider automatically
         if (hiddenPayBtn) {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     
-                    // 🚀 NAYA FIX: Sync loading text so user knows it's actively processing API calls!
-                    if (successTriggered && hiddenPayBtn.textContent) {
+        // Sync loading text only while button is disabled (processing)
+                    if (successTriggered && hiddenPayBtn.disabled && hiddenPayBtn.textContent) {
                         const loadingText = hiddenPayBtn.textContent.trim();
-                        if(loadingText !== "PAY") {
+                        if (loadingText !== "PAY" && !loadingText.startsWith("Pay Now")) {
                             swipeText.innerText = loadingText + " ⏳";
                         }
                     }
 
-                    // Wapas aane par Reset Logic
+                    // 🚀 FIX 3: Wapas aane par Promo Code ke hisaab se ₹69 ya ₹99 dikhayega
                     if (mutation.attributeName === "disabled" && !hiddenPayBtn.disabled && successTriggered) {
                         successTriggered = false;
+                        const currentPrice = window.magicalState.appliedPromo ? (window.magicalState.finalPrice || 69) : 99;
                         swipeThumb.style.transition = 'left 0.4s ease';
                         swipeTrack.style.transition = 'width 0.4s ease';
                         swipeThumb.style.left = '4px';
                         swipeTrack.style.width = '0%';
-                        swipeText.innerText = "✨PAY ₹99 & GET LINK 🔗";
+                        swipeText.innerText = `✨PAY ₹${currentPrice} & GET LINK 🔗`;
                         swipeText.style.color = '#666';
                         thumbIcon.innerText = "Swipe ➔";
                     }
                 });
             });
-            // Watch for both text changes and disable state
             observer.observe(hiddenPayBtn, { attributes: true, childList: true, subtree: true, characterData: true });
         }
     }
