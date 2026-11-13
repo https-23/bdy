@@ -1612,33 +1612,54 @@ window.showScreen = function(screenId, isBack = false) {
     }
 };
 // ==========================================
-// 📋 PHASE 3: CLIPBOARD COPY LOGIC
+// 📥 GLOBAL DOWNLOAD LINK HELPER
+// ==========================================
+function downloadMagicalLink(link) {
+    const partnerName = window.magicalState?.partnerName || 'Surprise';
+    const textContent = `✨ Your Magical Surprise is Ready! ✨\n\nHere is your unique link:\n${link}\n\nPlease keep it safe and send it to your special someone. 💖\n\nWith Love,\n10 Petal X`;
+    
+    const blob = new Blob([textContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Magical_Link_For_${partnerName}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+// ==========================================
+// 📋 PHASE 3: CLIPBOARD COPY & DOWNLOAD LOGIC
 // ==========================================
 const copyLinkBtn = document.getElementById('copy-link-btn');
 if (copyLinkBtn) {
     copyLinkBtn.addEventListener('click', () => {
         const linkInput = document.getElementById('generated-link-input');
+        const link = linkInput.value;
         
-        // Select text safely for mobile browsers
+        // Mobile browsers ke liye safely select karna
         linkInput.select();
         linkInput.setSelectionRange(0, 99999);
         
-        navigator.clipboard.writeText(linkInput.value).then(() => {
-            copyLinkBtn.innerText = "COPIED! ✔";
-            copyLinkBtn.style.background = "#218838";
+        // 1. Trigger Download Instantly
+        downloadMagicalLink(link);
+        
+        // 2. Trigger Copy logic
+        navigator.clipboard.writeText(link).then(() => {
+            copyLinkBtn.innerText = "SAVED! ✔";
+            copyLinkBtn.style.background = "#28a745";
             
-            // Reset button text after 2 seconds
+            // 2 seconds baad normal text wapas lana
             setTimeout(() => {
-                copyLinkBtn.innerText = "COPY 📋";
+                copyLinkBtn.innerText = "COPY & DOWNLOAD 📥";
                 copyLinkBtn.style.background = "#28a745";
             }, 2000);
         }).catch(err => {
             console.error('Failed to copy text: ', err);
-            alert("Could not copy automatically. Please copy the link manually.");
+            alert("File downloaded! But could not copy automatically. Please copy the link manually.");
         });
     });
 }
-
 const closeSuccessBtn = document.getElementById('close-success-btn');
 if (closeSuccessBtn) {
     closeSuccessBtn.addEventListener('click', () => {
@@ -1657,11 +1678,16 @@ function activatePostPayState(link) {
         payBtn.style.display = 'none'; 
         postPayBtn.style.display = 'block'; 
         
-        // 2. Secure Copy Logic
+        // 2. Secure Copy & Download Logic in ONE Click
         postPayBtn.onclick = () => {
+            
+            // 1st Action: Force Download
+            downloadMagicalLink(link);
+
+            // 2nd Action: Force Copy to Clipboard
             navigator.clipboard.writeText(link).then(() => {
                 const originalText = postPayBtn.innerHTML;
-                postPayBtn.innerHTML = '<span class="btn-text">COPIED! ✔</span>';
+                postPayBtn.innerHTML = '<span class="btn-text">SAVED! ✔</span>';
                 postPayBtn.style.background = "#28a745"; // Flash green
                 
                 setTimeout(() => { 
@@ -1682,9 +1708,9 @@ function activatePostPayState(link) {
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             
-            // Only update text if it doesn't currently say "COPIED! ✔"
-            if (!postPayBtn.innerText.includes("COPIED")) {
-                postPayBtn.innerHTML = `<span class="btn-text">COPY LINK 📋 (${minutes}:${seconds < 10 ? '0' : ''}${seconds})</span>`;
+            // Only update text if it doesn't currently say "SAVED! ✔"
+            if (!postPayBtn.innerText.includes("SAVED")) {
+                postPayBtn.innerHTML = `<span class="btn-text">COPY & DOWNLOAD 📥 (${minutes}:${seconds < 10 ? '0' : ''}${seconds})</span>`;
             }
             
             // 4. Session Expiration
