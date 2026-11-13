@@ -1612,17 +1612,79 @@ window.showScreen = function(screenId, isBack = false) {
     }
 };
 // ==========================================
-// 📥 GLOBAL DOWNLOAD LINK HELPER
+// 📥 GLOBAL DOWNLOAD LINK HELPER (UPDATED TO HTML)
 // ==========================================
 function downloadMagicalLink(link) {
     const partnerName = window.magicalState?.partnerName || 'Surprise';
-    const textContent = `✨ Your Magical Surprise is Ready! ✨\n\nHere is your unique link:\n${link}\n\nPlease keep it safe and send it to your special someone. 💖\n\nWith Love,\n10 Petal X`;
     
-    const blob = new Blob([textContent], { type: 'text/plain' });
+    // HTML format me design kiya hua content taaki link blue or clickable rahe aur font bada ho
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Magical Link for ${partnerName}</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background-color: #ffe6ea;
+                color: #5a1829;
+                text-align: center;
+                padding: 40px 20px;
+                margin: 0;
+            }
+            .card {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                max-width: 500px;
+                margin: 0 auto;
+                border: 2px dashed #ffb6c1;
+            }
+            h1 { color: #e94057; font-size: 26px; margin-bottom: 20px; }
+            p { font-size: 18px; line-height: 1.5; margin: 10px 0; }
+            .link-box {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 25px 0;
+                border: 1px solid #e0e0e0;
+                word-wrap: break-word;
+            }
+            a {
+                color: #007bff;
+                font-size: 20px;
+                font-weight: bold;
+                text-decoration: underline;
+                display: inline-block;
+            }
+            a:active { color: #0056b3; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>✨ Your Magical Surprise is Ready! ✨</h1>
+            <p>Here is your unique link for <b>${partnerName}</b>:</p>
+            
+            <div class="link-box">
+                <a href="${link}" target="_blank">${link}</a>
+            </div>
+            
+            <p>Please keep it safe and send it to your special someone. 💖</p>
+            <p style="margin-top: 30px; font-weight: bold; color: #e94057;">With Love,<br>10 Petal X</p>
+        </div>
+    </body>
+    </html>
+    `;
+
+    // Blob type ko 'text/html' kar diya
+    const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Magical_Link_For_${partnerName}.txt`;
+    a.download = `Magical_Link_For_${partnerName}.html`; // File extension changed to .html
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
