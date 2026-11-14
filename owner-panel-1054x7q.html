@@ -75,6 +75,10 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span>System Online & Syncing</span>
                     </div>
+                    <!-- 🇮🇳 LIVE KOLKATA IST CLOCK -->
+                    <div class="text-[11px] font-mono text-purple-200 mt-1">
+                        🇮🇳 Kolkata (IST): <span id="live-ist-clock" class="font-bold text-white">--:--:--</span>
+                    </div>
                 </div>
             </div>
 
@@ -88,86 +92,103 @@
             </div>
         </div>
 
-        <!-- 🗓️ MONDAY PAYOUT CYCLE BANNER -->
+        <!-- 🗓️ MONDAY PAYOUT CYCLE BANNER (IST ANCHORED) -->
         <div class="glass-card p-4 px-6 border-l-4 border-l-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-500/10 to-transparent">
             <div class="flex items-center gap-3">
                 <span class="text-2xl">🗓️</span>
                 <div>
-                    <h3 class="text-sm font-bold text-amber-300">Monday Payout Cycle Active</h3>
+                    <h3 class="text-sm font-bold text-amber-300">Monday Payout Cycle Active (IST)</h3>
                     <p class="text-xs text-gray-300">Settle individual influencers anytime or use "Mark All as Paid" on Monday.</p>
                 </div>
             </div>
             <div class="bg-black/40 border border-amber-500/30 px-4 py-2 rounded-xl text-xs font-mono text-amber-300 shrink-0">
-                Next Monday Payout: <span id="monday-countdown" class="font-bold text-white">Calculating...</span>
+                Next Monday (IST): <span id="monday-countdown" class="font-bold text-white">Calculating...</span>
             </div>
         </div>
 
-        <!-- 📊 KPI SUMMARY CARDS (6 CARDS) -->
-        <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
-            <div class="glass-card p-5">
-                <p class="text-xs text-gray-400">Total Revenue</p>
-                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-blue-400 text-lg mr-1">₹</span><span id="kpi-revenue">0</span></h2>
+        <!-- 📊 KPI SUMMARY CARDS (7 CARDS INCLUDING GATEWAY FEES) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3.5">
+            <div class="glass-card p-4">
+                <p class="text-[11px] text-gray-400">Gross Revenue</p>
+                <h2 class="text-2xl font-extrabold mt-1"><span class="text-blue-400 text-base mr-0.5">₹</span><span id="kpi-revenue">0</span></h2>
+                <p class="text-[10px] text-gray-400 mt-1">₹69 / order</p>
             </div>
 
-            <div class="glass-card p-5">
-                <p class="text-xs text-gray-400">Net Profit</p>
-                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-emerald-400 text-lg mr-1">₹</span><span id="kpi-profit">0</span></h2>
+            <div class="glass-card p-4 border border-amber-500/30">
+                <p class="text-[11px] text-amber-300">Gateway Cut (PG)</p>
+                <h2 class="text-2xl font-extrabold mt-1 text-amber-400"><span class="text-base mr-0.5">-₹</span><span id="kpi-gateway">0</span></h2>
+                <p class="text-[10px] text-amber-300/80 mt-1">₹2 / order</p>
             </div>
 
-            <div class="glass-card p-5">
-                <p class="text-xs text-gray-400">Promo Orders</p>
-                <h2 id="kpi-orders" class="text-2xl sm:text-3xl font-extrabold mt-1 text-purple-300">0</h2>
+            <div class="glass-card p-4">
+                <p class="text-[11px] text-gray-400">Creator Payouts</p>
+                <h2 class="text-2xl font-extrabold mt-1 text-indigo-300"><span class="text-base mr-0.5">-₹</span><span id="kpi-lifetime">0</span></h2>
+                <p class="text-[10px] text-gray-400 mt-1">₹25 / order</p>
             </div>
 
-            <div class="glass-card p-5">
-                <p class="text-xs text-gray-400">Influencers</p>
-                <h2 id="kpi-influencers" class="text-2xl sm:text-3xl font-extrabold mt-1">0</h2>
+            <div class="glass-card p-4 border border-emerald-500/40 bg-emerald-500/10">
+                <p class="text-[11px] text-emerald-300 font-semibold">Your Net Profit</p>
+                <h2 class="text-2xl font-extrabold mt-1 text-emerald-400"><span class="text-base mr-0.5">₹</span><span id="kpi-profit">0</span></h2>
+                <p class="text-[10px] text-emerald-300/90 mt-1">₹42 / order (Pure)</p>
             </div>
 
-            <div class="glass-card p-5 border border-pink-500/30">
-                <p class="text-xs text-pink-300">Total Unpaid Dues</p>
-                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-pink-400 text-lg mr-1">₹</span><span id="kpi-unpaid">0</span></h2>
+            <div class="glass-card p-4">
+                <p class="text-[11px] text-gray-400">Promo Orders</p>
+                <h2 id="kpi-orders" class="text-2xl font-extrabold mt-1 text-purple-300">0</h2>
+                <p class="text-[10px] text-gray-400 mt-1">Completed</p>
             </div>
 
-            <div class="glass-card p-5">
-                <p class="text-xs text-gray-400">Lifetime Payouts</p>
-                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-indigo-400 text-lg mr-1">₹</span><span id="kpi-lifetime">0</span></h2>
+            <div class="glass-card p-4">
+                <p class="text-[11px] text-gray-400">Influencers</p>
+                <h2 id="kpi-influencers" class="text-2xl font-extrabold mt-1">0</h2>
+                <p class="text-[10px] text-gray-400 mt-1">Registered</p>
+            </div>
+
+            <div class="glass-card p-4 border border-pink-500/30 col-span-2 sm:col-span-1">
+                <p class="text-[11px] text-pink-300">Unpaid Dues</p>
+                <h2 class="text-2xl font-extrabold mt-1"><span class="text-pink-400 text-base mr-0.5">₹</span><span id="kpi-unpaid">0</span></h2>
+                <p class="text-[10px] text-pink-300/80 mt-1">Pending settle</p>
             </div>
         </div>
 
-        <!-- 📈 PHASE 3: VISUAL ANALYTICS, GRAPHS & LEADERBOARD -->
+        <!-- 📈 VISUAL ANALYTICS, 3-WAY SPLIT & LEADERBOARD -->
         <div class="space-y-6">
 
-            <!-- Profit Split Meter & Top 3 Performers Podium -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Net Profit vs Commission Split Bar -->
+                <!-- 3-Way Revenue Split Card (₹42 Profit + ₹25 Creator + ₹2 Gateway = ₹69) -->
                 <div class="glass-card p-6 flex flex-col justify-between">
                     <div>
                         <h3 class="text-base font-bold flex items-center gap-2">
-                            <span>💎</span> Profit vs. Payout Split
+                            <span>💎</span> Exact ₹69 Order Split
                         </h3>
-                        <p class="text-xs text-gray-400 mt-1">How much revenue stays with 10 Petal X vs. creators</p>
+                        <p class="text-xs text-gray-400 mt-1">Pure Net Profit after ₹25 Creator & ₹2 Gateway cuts</p>
                     </div>
 
                     <div class="my-5">
-                        <div class="flex justify-between text-xs font-bold mb-2">
-                            <span class="text-emerald-400">Your Net Profit (<span id="split-profit-pct">64%</span>)</span>
-                            <span class="text-pink-400">Creator Cut (<span id="split-comm-pct">36%</span>)</span>
+                        <div class="flex justify-between text-[11px] font-bold mb-2">
+                            <span class="text-emerald-400">Profit (<span id="split-profit-pct">61%</span>)</span>
+                            <span class="text-pink-400">Creator (<span id="split-comm-pct">36%</span>)</span>
+                            <span class="text-amber-400">PG (<span id="split-pg-pct">3%</span>)</span>
                         </div>
                         <div class="w-full h-4 bg-black/40 rounded-full overflow-hidden flex border border-white/10">
-                            <div id="split-profit-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-700" style="width: 64%;"></div>
-                            <div id="split-comm-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full transition-all duration-700" style="width: 36%;"></div>
+                            <div id="split-profit-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-700" style="width: 60.9%;"></div>
+                            <div id="split-comm-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full transition-all duration-700" style="width: 36.2%;"></div>
+                            <div id="split-pg-bar" class="bg-amber-400 h-full transition-all duration-700" style="width: 2.9%;"></div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 text-center bg-black/30 p-3 rounded-xl border border-white/5">
+                    <div class="grid grid-cols-3 gap-2 text-center bg-black/30 p-3 rounded-xl border border-white/5">
                         <div>
-                            <p class="text-[11px] text-gray-400">Profit Per Promo Order</p>
-                            <p class="text-lg font-extrabold text-emerald-400">₹44</p>
+                            <p class="text-[10px] text-gray-400">Your Net Profit</p>
+                            <p class="text-base font-extrabold text-emerald-400">₹42</p>
+                        </div>
+                        <div class="border-x border-white/10">
+                            <p class="text-[10px] text-gray-400">Creator Cut</p>
+                            <p class="text-base font-extrabold text-pink-400">-₹25</p>
                         </div>
                         <div>
-                            <p class="text-[11px] text-gray-400">Creator Commission</p>
-                            <p class="text-lg font-extrabold text-pink-400">₹25</p>
+                            <p class="text-[10px] text-gray-400">Gateway Fee</p>
+                            <p class="text-base font-extrabold text-amber-400">-₹2</p>
                         </div>
                     </div>
                 </div>
@@ -179,7 +200,7 @@
                             <h3 class="text-base font-bold flex items-center gap-2">
                                 <span>🏆</span> Top Revenue Generating Creators
                             </h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Ranked automatically by total orders & net profit generated</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Ranked automatically by orders & pure net profit (after ₹2/order gateway fee)</p>
                         </div>
                     </div>
                     <div id="top-performers-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -190,17 +211,17 @@
                 </div>
             </div>
 
-            <!-- Dual Interactive Charts: 1. Weekly/Monthly Trend & 2. Influencer Breakdown -->
+            <!-- Dual Interactive Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                <!-- CHART 1: Weekly / Monthly Revenue & Profit Trend -->
+                <!-- CHART 1: Weekly / Monthly Revenue & Pure Profit Timeline -->
                 <div class="glass-card p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div>
                             <h3 class="text-base font-bold flex items-center gap-2">
-                                <span>📈</span> Revenue & Profit Timeline
+                                <span>📈</span> Revenue & Net Profit Timeline (IST)
                             </h3>
-                            <p class="text-xs text-gray-400">Track daily sales & net profit growth</p>
+                            <p class="text-xs text-gray-400">Daily Gross Revenue vs. Pure ₹42/order Net Profit</p>
                         </div>
                         <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 self-start">
                             <button id="btn-chart-7d" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white transition-all">
@@ -216,14 +237,14 @@
                     </div>
                 </div>
 
-                <!-- CHART 2: Influencer-Wise Revenue vs Net Profit Bar Chart -->
+                <!-- CHART 2: Influencer-Wise Revenue, Profit, Creator Cut & PG Fee -->
                 <div class="glass-card p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                         <div>
                             <h3 class="text-base font-bold flex items-center gap-2">
                                 <span>📊</span> Influencer Revenue vs. Profit
                             </h3>
-                            <p class="text-xs text-gray-400">Compare revenue & profit generated by each promo code</p>
+                            <p class="text-xs text-gray-400">Per creator breakdown including ₹2/order Gateway Fee</p>
                         </div>
                         <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold self-start">
                             Per Creator Breakdown
@@ -237,14 +258,14 @@
             </div>
         </div>
 
-        <!-- 👥 INFLUENCERS LEDGER WITH PER-ROW MANUAL PAYOUT BUTTON -->
+        <!-- 👥 INFLUENCERS LEDGER WITH GATEWAY FEE COLUMN & MANUAL PAYOUT -->
         <div class="glass-card p-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div>
                     <h2 class="text-xl font-bold flex items-center gap-2">
                         <span>👥</span> Influencers Ledger & Payouts
                     </h2>
-                    <p class="text-xs text-gray-400 mt-0.5">Click any order badge to filter orders, or click "✅ Pay" to settle a single creator.</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Shows Gross Revenue, Gateway Fee (-₹2/ord), Creator Earned (-₹25/ord), and Your Pure Net Profit (₹42/ord).</p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
@@ -267,35 +288,37 @@
             </div>
 
             <div class="overflow-x-auto custom-scroll rounded-xl border border-white/10">
-                <table class="w-full text-left border-collapse min-w-[820px]">
+                <table class="w-full text-left border-collapse min-w-[940px]">
                     <thead>
                         <tr class="bg-black/50 text-[11px] uppercase tracking-wider text-gray-300 border-b border-white/10">
                             <th class="p-3.5">Influencer</th>
                             <th class="p-3.5">Promo Code</th>
                             <th class="p-3.5 text-center">Orders / Clicks</th>
-                            <th class="p-3.5">Rev / Your Profit</th>
+                            <th class="p-3.5">Gross Rev</th>
+                            <th class="p-3.5">Gateway Fee (₹2)</th>
+                            <th class="p-3.5">Creator Cut (₹25)</th>
+                            <th class="p-3.5">Your Profit (₹42)</th>
                             <th class="p-3.5">Unpaid Due</th>
-                            <th class="p-3.5">Total Earned</th>
                             <th class="p-3.5 text-right">Manual Payout Action</th>
                         </tr>
                     </thead>
                     <tbody id="influencers-tbody" class="divide-y divide-white/10 text-sm">
                         <tr>
-                            <td colspan="7" class="p-6 text-center text-gray-400">Loading influencers ledger...</td>
+                            <td colspan="9" class="p-6 text-center text-gray-400">Loading influencers ledger...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 🛒 LIVE ORDERS BREAKDOWN BY INFLUENCER -->
+        <!-- 🛒 LIVE ORDERS BREAKDOWN WITH GATEWAY FEE & KOLKATA IST TIME -->
         <div class="glass-card p-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <h2 class="text-xl font-bold flex items-center gap-2">
-                        <span>🛒</span> Promo Orders History
+                        <span>🛒</span> Promo Orders History (IST Timezone)
                     </h2>
-                    <p id="orders-filter-label" class="text-xs text-gray-400 mt-0.5">Showing latest 100 promo orders across all influencers</p>
+                    <p id="orders-filter-label" class="text-xs text-gray-400 mt-0.5">Showing latest promo orders with ₹2 Gateway Fee & ₹42 Pure Profit breakdown</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button id="reset-order-filter-btn" class="hidden px-3 py-1.5 bg-purple-500/20 border border-purple-400/40 text-purple-200 rounded-lg text-xs font-semibold">
@@ -308,20 +331,21 @@
             </div>
 
             <div class="overflow-x-auto custom-scroll rounded-xl border border-white/10 max-h-96">
-                <table class="w-full text-left border-collapse min-w-[650px]">
+                <table class="w-full text-left border-collapse min-w-[760px]">
                     <thead class="sticky top-0 bg-indigo-950/95 backdrop-blur-md">
                         <tr class="text-[11px] uppercase tracking-wider text-gray-300 border-b border-white/10">
                             <th class="p-3.5">Order ID</th>
                             <th class="p-3.5">Influencer & Code</th>
-                            <th class="p-3.5">Customer Paid</th>
+                            <th class="p-3.5">Customer Paid (Rev)</th>
+                            <th class="p-3.5">Gateway Fee (PG)</th>
                             <th class="p-3.5">Creator Cut</th>
                             <th class="p-3.5">Your Net Profit</th>
-                            <th class="p-3.5">Date & Time</th>
+                            <th class="p-3.5">Date & Time (Kolkata IST)</th>
                         </tr>
                     </thead>
                     <tbody id="orders-tbody" class="divide-y divide-white/10 text-sm">
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-gray-400">Loading orders...</td>
+                            <td colspan="7" class="p-6 text-center text-gray-400">Loading orders...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -332,7 +356,7 @@
         <div class="glass-card p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2">
-                    <span>🚨</span> System Logs & Hacks
+                    <span>🚨</span> System Logs & Hacks (IST)
                 </h2>
                 <button id="clear-logs-btn" class="px-3.5 py-1.5 bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-300 rounded-lg text-xs font-semibold transition-all">
                     🧹 Clear Logs
@@ -347,6 +371,11 @@
 
     <script>
         const WORKER_URL = 'https://magical-api.10petalxmagic.workers.dev';
+        const ORDER_PRICE = 69;
+        const CREATOR_COMMISSION = 25;
+        const GATEWAY_FEE_PER_ORDER = 2; // ₹2 Payment Gateway Cut per order
+        const PURE_PROFIT_PER_ORDER = ORDER_PRICE - CREATOR_COMMISSION - GATEWAY_FEE_PER_ORDER; // ₹42 Pure Profit
+
         let adminSecret = sessionStorage.getItem('10petalx_admin_secret') || '';
         let globalDashboardData = null;
         let showUnpaidOnly = false;
@@ -361,26 +390,89 @@
         const secretInput = document.getElementById('admin-secret-input');
         const authError = document.getElementById('auth-error');
 
-        // 1. Monday Payout Countdown Timer
-        function updateMondayCountdown() {
-            const now = new Date();
-            const nextMonday = new Date();
-            const daysUntilMonday = (8 - now.getDay()) % 7 || 7;
-            nextMonday.setDate(now.getDate() + daysUntilMonday);
-            nextMonday.setHours(0, 0, 0, 0);
+        // ==========================================================
+        // 🇮🇳 ASIA/KOLKATA (IST GMT+5:30) TIMEZONE ENGINE
+        // ==========================================================
+        function parseD1TimestampToUTCDate(rawStr) {
+            if (!rawStr) return null;
+            if (rawStr instanceof Date) return rawStr;
+            let s = String(rawStr).trim();
+            // Cloudflare D1 / SQLite stores UTC as "YYYY-MM-DD HH:MM:SS" without 'Z'
+            if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(s)) {
+                s = s.replace(' ', 'T') + 'Z';
+            } else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(s)) {
+                s = s + 'Z';
+            }
+            const parsed = new Date(s);
+            return isNaN(parsed.getTime()) ? null : parsed;
+        }
 
-            const diff = nextMonday - now;
+        function formatToKolkataIST(rawStr) {
+            const dateObj = parseD1TimestampToUTCDate(rawStr);
+            if (!dateObj) return rawStr || '-';
+            return new Intl.DateTimeFormat('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }).format(dateObj) + ' IST';
+        }
+
+        function getISTDateKey(dateOrRawStr) {
+            const dateObj = parseD1TimestampToUTCDate(dateOrRawStr);
+            if (!dateObj) return '';
+            // en-CA outputs YYYY-MM-DD in Asia/Kolkata timezone
+            return new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).format(dateObj);
+        }
+
+        function updateLiveISTClockAndCountdown() {
+            const now = new Date();
+            // 1. Live IST Clock in Header
+            const clockEl = document.getElementById('live-ist-clock');
+            if (clockEl) {
+                clockEl.innerText = new Intl.DateTimeFormat('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                }).format(now);
+            }
+
+            // 2. Accurate Next Monday 12:00 AM IST Countdown
+            const istNowStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+            const istNow = new Date(istNowStr);
+            const nextMondayIST = new Date(istNow);
+            const daysUntilMonday = (8 - istNow.getDay()) % 7 || 7;
+            nextMondayIST.setDate(istNow.getDate() + daysUntilMonday);
+            nextMondayIST.setHours(0, 0, 0, 0);
+
+            const diff = nextMondayIST - istNow;
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
             const m = Math.floor((diff / (1000 * 60)) % 60);
 
-            const el = document.getElementById('monday-countdown');
-            if (el) el.innerText = `${d}d ${h}h ${m}m`;
+            const countdownEl = document.getElementById('monday-countdown');
+            if (countdownEl) countdownEl.innerText = `${d}d ${h}h ${m}m`;
         }
-        setInterval(updateMondayCountdown, 60000);
-        updateMondayCountdown();
+        setInterval(updateLiveISTClockAndCountdown, 1000);
+        updateLiveISTClockAndCountdown();
 
-        // 2. Load Dashboard Data from Worker
+        // ==========================================================
+        // 📊 LOAD & NORMALIZE DASHBOARD DATA (WITH ₹2 GATEWAY CUT)
+        // ==========================================================
         async function loadDashboard(secretKey) {
             try {
                 const res = await fetch(`${WORKER_URL}/api/admin/dashboard`, {
@@ -401,6 +493,24 @@
 
                 sessionStorage.setItem('10petalx_admin_secret', secretKey);
                 adminSecret = secretKey;
+
+                // Normalize Influencer financial math: ₹69 Rev - ₹25 Creator - ₹2 Gateway = ₹42 Net Profit
+                data.influencers = (data.influencers || []).map(inf => {
+                    const earned = inf.lifetime_earnings || 0;
+                    const ordersCount = Math.max(inf.total_orders || 0, Math.round(earned / CREATOR_COMMISSION));
+                    const grossRev = ordersCount * ORDER_PRICE;
+                    const gatewayFee = ordersCount * GATEWAY_FEE_PER_ORDER;
+                    const pureNetProfit = grossRev - earned - gatewayFee; // ₹42 per order
+
+                    return {
+                        ...inf,
+                        total_orders: ordersCount,
+                        total_revenue: grossRev,
+                        gateway_fee: gatewayFee,
+                        net_profit: pureNetProfit
+                    };
+                });
+
                 globalDashboardData = data;
 
                 authModal.classList.add('hidden');
@@ -422,29 +532,35 @@
         // 3. Render KPI Summary Cards
         function renderKPIs(data) {
             const infs = data.influencers || [];
-            const analytics = data.analytics || {};
 
+            const totalOrders = infs.reduce((sum, i) => sum + (i.total_orders || 0), 0);
+            const totalRev = totalOrders * ORDER_PRICE;
+            const totalGatewayFee = totalOrders * GATEWAY_FEE_PER_ORDER;
+            const totalLifetimeComm = infs.reduce((sum, i) => sum + (i.lifetime_earnings || 0), 0);
+            const totalPureProfit = totalRev - totalLifetimeComm - totalGatewayFee;
             const totalUnpaid = infs.reduce((sum, i) => sum + (i.pending_balance || 0), 0);
-            const totalLifetime = infs.reduce((sum, i) => sum + (i.lifetime_earnings || 0), 0);
-            const totalOrders = analytics.totalOrdersCount ?? infs.reduce((sum, i) => sum + (i.total_orders || Math.round((i.lifetime_earnings || 0) / 25)), 0);
-            const totalRev = analytics.totalRevenue || (totalOrders * 69);
-            const totalProf = analytics.totalProfit || (totalRev - totalLifetime);
 
             document.getElementById('kpi-revenue').innerText = totalRev.toLocaleString('en-IN');
-            document.getElementById('kpi-profit').innerText = totalProf.toLocaleString('en-IN');
+            document.getElementById('kpi-gateway').innerText = totalGatewayFee.toLocaleString('en-IN');
+            document.getElementById('kpi-lifetime').innerText = totalLifetimeComm.toLocaleString('en-IN');
+            document.getElementById('kpi-profit').innerText = totalPureProfit.toLocaleString('en-IN');
             document.getElementById('kpi-orders').innerText = totalOrders.toLocaleString('en-IN');
             document.getElementById('kpi-influencers').innerText = infs.length;
             document.getElementById('kpi-unpaid').innerText = totalUnpaid.toLocaleString('en-IN');
-            document.getElementById('kpi-lifetime').innerText = totalLifetime.toLocaleString('en-IN');
 
-            // Update Profit vs Payout Split Bar
+            // Update 3-Way Split Bar
             if (totalRev > 0) {
-                const profPct = Math.round((totalProf / totalRev) * 100);
-                const commPct = 100 - profPct;
+                const profPct = ((totalPureProfit / totalRev) * 100).toFixed(1);
+                const commPct = ((totalLifetimeComm / totalRev) * 100).toFixed(1);
+                const pgPct = ((totalGatewayFee / totalRev) * 100).toFixed(1);
+
                 document.getElementById('split-profit-pct').innerText = `${profPct}%`;
                 document.getElementById('split-comm-pct').innerText = `${commPct}%`;
+                document.getElementById('split-pg-pct').innerText = `${pgPct}%`;
+
                 document.getElementById('split-profit-bar').style.width = `${profPct}%`;
                 document.getElementById('split-comm-bar').style.width = `${commPct}%`;
+                document.getElementById('split-pg-bar').style.width = `${pgPct}%`;
             }
 
             const statusBadge = document.getElementById('system-status-badge');
@@ -457,17 +573,10 @@
             }
         }
 
-        // 4. PHASE 3: Render Top 3 Podium + Weekly/Monthly & Influencer Charts
+        // 4. Render Top 3 Podium & Both Graphs (with ₹2 Gateway Fee & ₹42 Profit)
         function renderPhase3Analytics(data) {
-            const infs = (data.influencers || []).map(inf => {
-                const earned = inf.lifetime_earnings || 0;
-                const orders = inf.total_orders ?? Math.round(earned / 25);
-                const rev = inf.total_revenue ?? (orders * 69);
-                const profit = inf.net_profit ?? (rev - earned);
-                return { ...inf, orders, rev, profit, earned };
-            }).sort((a, b) => b.rev - a.rev);
+            const infs = (data.influencers || []).slice().sort((a, b) => b.total_revenue - a.total_revenue);
 
-            // Render Top 3 Podium
             const podiumGrid = document.getElementById('top-performers-grid');
             const medals = ['🥇 #1 Top Creator', '🥈 #2 Runner Up', '🥉 #3 Rising Star'];
             const borderColors = ['border-amber-400/50 bg-amber-500/10', 'border-gray-300/40 bg-white/5', 'border-amber-700/50 bg-amber-900/10'];
@@ -483,18 +592,22 @@
                             <span class="px-2 py-0.5 rounded bg-purple-500/30 text-purple-200 font-mono text-xs font-bold">${inf.promo_code}</span>
                         </div>
                         <div class="font-bold text-base text-white truncate">${inf.name || 'Creator'}</div>
-                        <div class="grid grid-cols-3 gap-1 mt-3 pt-2 border-t border-white/10 text-center">
+                        <div class="grid grid-cols-4 gap-1 mt-3 pt-2 border-t border-white/10 text-center">
                             <div>
                                 <p class="text-[10px] text-gray-400">Orders</p>
-                                <p class="text-xs font-bold text-white">${inf.orders}</p>
+                                <p class="text-xs font-bold text-white">${inf.total_orders}</p>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400">Revenue</p>
-                                <p class="text-xs font-bold text-blue-300">₹${inf.rev}</p>
+                                <p class="text-xs font-bold text-blue-300">₹${inf.total_revenue}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400">PG Cut</p>
+                                <p class="text-xs font-bold text-amber-400">-₹${inf.gateway_fee}</p>
                             </div>
                             <div>
                                 <p class="text-[10px] text-gray-400">Your Profit</p>
-                                <p class="text-xs font-bold text-emerald-400">₹${inf.profit}</p>
+                                <p class="text-xs font-bold text-emerald-400">₹${inf.net_profit}</p>
                             </div>
                         </div>
                     </div>
@@ -505,52 +618,66 @@
             renderInfluencerBarChart(infs);
         }
 
-        // Render Weekly (7D) / Monthly (30D) Timeline Chart
+        // Render Weekly (7D) / Monthly (30D) Timeline Chart (Grouped by IST Date)
         function renderTimelineChart(daysCount) {
             const ctx = document.getElementById('timelineChart').getContext('2d');
             if (timelineChartInstance) timelineChartInstance.destroy();
 
+            // Group raw orders strictly by Asia/Kolkata (IST) Date!
             const dailyMap = {};
-            (globalDashboardData?.dailyChartData || []).forEach(row => {
-                if (row.date) dailyMap[row.date] = row;
-            });
+            const ordersList = globalDashboardData?.orders || [];
 
-            // Also map from raw orders if dailyChartData wasn't returned
-            if (Object.keys(dailyMap).length === 0 && (globalDashboardData?.orders || []).length > 0) {
-                globalDashboardData.orders.forEach(o => {
-                    const d = (o.created_at || '').slice(0, 10);
-                    if (!d) return;
-                    if (!dailyMap[d]) dailyMap[d] = { revenue: 0, profit: 0, commission: 0 };
-                    const rev = o.order_total || 69;
-                    const comm = o.commission_earned || 25;
-                    dailyMap[d].revenue += rev;
-                    dailyMap[d].commission += comm;
-                    dailyMap[d].profit += (rev - comm);
+            if (ordersList.length > 0) {
+                ordersList.forEach(o => {
+                    const istDateKey = getISTDateKey(o.created_at);
+                    if (!istDateKey) return;
+                    if (!dailyMap[istDateKey]) {
+                        dailyMap[istDateKey] = { revenue: 0, profit: 0, gateway: 0 };
+                    }
+                    const rev = o.order_total || ORDER_PRICE;
+                    const comm = o.commission_earned || CREATOR_COMMISSION;
+                    const pg = GATEWAY_FEE_PER_ORDER;
+                    dailyMap[istDateKey].revenue += rev;
+                    dailyMap[istDateKey].gateway += pg;
+                    dailyMap[istDateKey].profit += (rev - comm - pg); // ₹42 per order
+                });
+            } else {
+                // Fallback to dailyChartData if orders array is empty
+                (globalDashboardData?.dailyChartData || []).forEach(row => {
+                    if (row.date) {
+                        const count = row.orders_count || Math.round((row.revenue || 0) / ORDER_PRICE);
+                        const rev = count * ORDER_PRICE;
+                        const pg = count * GATEWAY_FEE_PER_ORDER;
+                        const comm = count * CREATOR_COMMISSION;
+                        dailyMap[row.date] = {
+                            revenue: rev,
+                            gateway: pg,
+                            profit: rev - comm - pg
+                        };
+                    }
                 });
             }
 
             const labels = [];
             const revSeries = [];
             const profitSeries = [];
+            const pgSeries = [];
 
-            const today = new Date();
+            const now = new Date();
             for (let i = daysCount - 1; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const iso = d.toISOString().slice(0, 10);
-                const label = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                const istKey = getISTDateKey(d);
+                const label = new Intl.DateTimeFormat('en-IN', {
+                    timeZone: 'Asia/Kolkata',
+                    day: 'numeric',
+                    month: 'short'
+                }).format(d);
+
                 labels.push(label);
-
-                const match = dailyMap[iso];
-                revSeries.push(match ? (match.revenue || 0) : 0);
-                profitSeries.push(match ? (match.profit || 0) : 0);
-            }
-
-            // Fallback: If all days are 0 but KPIs have historical revenue, show aggregate on today's point
-            const hasAnyPoint = revSeries.some(v => v > 0);
-            if (!hasAnyPoint && globalDashboardData?.analytics?.totalRevenue > 0) {
-                revSeries[revSeries.length - 1] = globalDashboardData.analytics.totalRevenue;
-                profitSeries[profitSeries.length - 1] = globalDashboardData.analytics.totalProfit;
+                const match = dailyMap[istKey];
+                revSeries.push(match ? match.revenue : 0);
+                profitSeries.push(match ? match.profit : 0);
+                pgSeries.push(match ? match.gateway : 0);
             }
 
             timelineChartInstance = new Chart(ctx, {
@@ -559,17 +686,17 @@
                     labels,
                     datasets: [
                         {
-                            label: 'Total Revenue (₹)',
+                            label: 'Gross Revenue (₹69/ord)',
                             data: revSeries,
                             borderColor: '#60a5fa',
-                            backgroundColor: 'rgba(96, 165, 250, 0.15)',
+                            backgroundColor: 'rgba(96, 165, 250, 0.14)',
                             borderWidth: 2.5,
                             tension: 0.35,
                             fill: true,
                             pointRadius: 3
                         },
                         {
-                            label: 'Your Net Profit (₹)',
+                            label: 'Your Net Profit (₹42/ord)',
                             data: profitSeries,
                             borderColor: '#34d399',
                             backgroundColor: 'rgba(52, 211, 153, 0.18)',
@@ -577,6 +704,17 @@
                             tension: 0.35,
                             fill: true,
                             pointRadius: 3
+                        },
+                        {
+                            label: 'Gateway Fee (₹2/ord)',
+                            data: pgSeries,
+                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [4, 4],
+                            tension: 0.35,
+                            fill: false,
+                            pointRadius: 2.5
                         }
                     ]
                 },
@@ -594,16 +732,17 @@
             });
         }
 
-        // Render Influencer-Wise Revenue vs Profit Bar Chart
+        // Render Influencer Bar Chart
         function renderInfluencerBarChart(infs) {
             const ctx = document.getElementById('influencerChart').getContext('2d');
             if (influencerChartInstance) influencerChartInstance.destroy();
 
             const topInfs = infs.slice(0, 8);
             const labels = topInfs.map(i => i.promo_code);
-            const revData = topInfs.map(i => i.rev);
-            const profitData = topInfs.map(i => i.profit);
-            const commData = topInfs.map(i => i.earned);
+            const revData = topInfs.map(i => i.total_revenue);
+            const profitData = topInfs.map(i => i.net_profit);
+            const commData = topInfs.map(i => i.lifetime_earnings || 0);
+            const pgData = topInfs.map(i => i.gateway_fee);
 
             influencerChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -614,19 +753,25 @@
                             label: 'Revenue (₹)',
                             data: revData,
                             backgroundColor: 'rgba(96, 165, 250, 0.85)',
-                            borderRadius: 6
+                            borderRadius: 5
                         },
                         {
-                            label: 'Your Net Profit (₹)',
+                            label: 'Your Profit (₹42/ord)',
                             data: profitData,
                             backgroundColor: 'rgba(52, 211, 153, 0.85)',
-                            borderRadius: 6
+                            borderRadius: 5
                         },
                         {
-                            label: 'Creator Cut (₹)',
+                            label: 'Creator Cut (₹25/ord)',
                             data: commData,
                             backgroundColor: 'rgba(244, 114, 182, 0.85)',
-                            borderRadius: 6
+                            borderRadius: 5
+                        },
+                        {
+                            label: 'Gateway Fee (₹2/ord)',
+                            data: pgData,
+                            backgroundColor: 'rgba(251, 191, 36, 0.9)',
+                            borderRadius: 5
                         }
                     ]
                 },
@@ -634,7 +779,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#e5e7eb', font: { size: 11 } } }
+                        legend: { labels: { color: '#e5e7eb', font: { size: 10 } } }
                     },
                     scales: {
                         x: { ticks: { color: '#d1d5db', font: { size: 10, weight: 'bold' } }, grid: { display: false } },
@@ -644,7 +789,7 @@
             });
         }
 
-        // 5. Render Influencers Ledger Table
+        // 5. Render Influencers Ledger Table (With Separate Gateway Fee & ₹42 Profit Columns)
         function renderInfluencersTable() {
             const tbody = document.getElementById('influencers-tbody');
             const searchVal = (document.getElementById('influencer-search')?.value || '').trim().toLowerCase();
@@ -662,18 +807,19 @@
             }
 
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">No matching influencers found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-gray-400">No matching influencers found.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = list.map(inf => {
                 const unpaid = inf.pending_balance || 0;
                 const earned = inf.lifetime_earnings || 0;
-                const ordersCount = inf.total_orders ?? Math.round(earned / 25);
+                const ordersCount = inf.total_orders || 0;
                 const clicks = inf.total_clicks || 0;
                 const convRate = clicks > 0 ? ((ordersCount / clicks) * 100).toFixed(1) : '0.0';
-                const rev = inf.total_revenue ?? (ordersCount * 69);
-                const profit = inf.net_profit ?? (rev - earned);
+                const rev = inf.total_revenue || 0;
+                const pgFee = inf.gateway_fee || 0;
+                const profit = inf.net_profit || 0;
 
                 const unpaidBadge = unpaid > 0
                     ? `<span class="px-3 py-1 rounded-full text-xs font-bold bg-pink-500/25 text-pink-300 border border-pink-500/40">₹${unpaid}</span>`
@@ -719,12 +865,11 @@
                         </button>
                         <div class="text-[11px] text-gray-400 mt-1">🖱️ ${clicks} clicks (${convRate}%)</div>
                     </td>
-                    <td class="p-3.5">
-                        <div class="text-xs text-gray-300">Rev: <span class="font-bold text-white">₹${rev}</span></div>
-                        <div class="text-xs text-emerald-400 font-semibold">Profit: ₹${profit}</div>
-                    </td>
+                    <td class="p-3.5 font-bold text-blue-300">₹${rev}</td>
+                    <td class="p-3.5 font-semibold text-amber-400">-₹${pgFee}</td>
+                    <td class="p-3.5 font-semibold text-pink-300">-₹${earned}</td>
+                    <td class="p-3.5 font-extrabold text-emerald-400">+₹${profit}</td>
                     <td class="p-3.5">${unpaidBadge}</td>
-                    <td class="p-3.5 font-extrabold text-emerald-400">₹${earned}</td>
                     <td class="p-3.5 text-right">${actionButtons}</td>
                 </tr>`;
             }).join('');
@@ -749,16 +894,17 @@
                 const data = await res.json();
                 if (!res.ok || !data.success) throw new Error(data.error || 'Failed to settle');
 
-                copyPayoutReceipt(name, promoCode, amount, Math.round(amount / 25), true);
+                copyPayoutReceipt(name, promoCode, amount, Math.round(amount / CREATOR_COMMISSION), true);
                 await loadDashboard(adminSecret);
             } catch (err) {
                 alert("Payout update failed: " + err.message);
             }
         }
 
-        // 7. Copy WhatsApp Payout Receipt
+        // 7. Copy WhatsApp Payout Receipt (With IST Date)
         function copyPayoutReceipt(name, promoCode, amount, ordersCount, autoTriggered = false) {
-            const msg = `🎉 *10 Petal X - Affiliate Payout Successful!* 🎉\n\nHi *${name}*,\nYour weekly payout has been processed!\n\n🏷️ *Promo Code:* ${promoCode}\n📦 *Orders Settled:* ${ordersCount}\n💸 *Amount Paid:* ₹${amount}\n📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\nKeep sharing your link and earning ₹25 per order! 🚀✨`;
+            const istDate = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
+            const msg = `🎉 *10 Petal X - Affiliate Payout Successful!* 🎉\n\nHi *${name}*,\nYour weekly payout has been processed!\n\n🏷️ *Promo Code:* ${promoCode}\n📦 *Orders Settled:* ${ordersCount}\n💸 *Amount Paid:* ₹${amount}\n📅 *Date (IST):* ${istDate}\n\nKeep sharing your link and earning ₹25 per order! 🚀✨`;
             navigator.clipboard.writeText(msg).then(() => {
                 if (autoTriggered) {
                     alert(`✅ ₹${amount} marked as Paid for ${name}!\n\n📋 WhatsApp Payout Receipt has been copied to your clipboard.`);
@@ -768,7 +914,7 @@
             });
         }
 
-        // 8. Render Orders History Table
+        // 8. Render Orders History Table (With Gateway Fee -₹2, Net Profit +₹42, and Kolkata IST Time)
         function renderOrdersTable() {
             const tbody = document.getElementById('orders-tbody');
             const filterLabel = document.getElementById('orders-filter-label');
@@ -786,15 +932,16 @@
             }
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400">No recorded orders found in table yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">No recorded orders found in table yet.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = orders.map(o => {
-                const total = o.order_total || 69;
-                const comm = o.commission_earned || 25;
-                const profit = o.net_profit ?? (total - comm);
-                const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const total = o.order_total || ORDER_PRICE;
+                const comm = o.commission_earned || CREATOR_COMMISSION;
+                const pgFee = GATEWAY_FEE_PER_ORDER; // ₹2 Gateway Cut
+                const pureProfit = total - comm - pgFee; // ₹42 Net Profit
+                const istDateStr = formatToKolkataIST(o.created_at);
 
                 return `
                 <tr class="hover:bg-white/5 transition-colors">
@@ -803,10 +950,11 @@
                         <span class="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-xs font-bold">${o.promo_code_used}</span>
                         <span class="text-xs text-gray-400 ml-1">${o.influencer_name ? `(${o.influencer_name})` : ''}</span>
                     </td>
-                    <td class="p-3.5 font-bold text-white">₹${total}</td>
+                    <td class="p-3.5 font-bold text-blue-300">₹${total}</td>
+                    <td class="p-3.5 text-amber-400 font-semibold">-₹${pgFee}</td>
                     <td class="p-3.5 text-pink-300 font-semibold">-₹${comm}</td>
-                    <td class="p-3.5 text-emerald-400 font-bold">+₹${profit}</td>
-                    <td class="p-3.5 text-xs text-gray-400">${dateStr}</td>
+                    <td class="p-3.5 text-emerald-400 font-extrabold">+₹${pureProfit}</td>
+                    <td class="p-3.5 text-xs font-mono text-gray-300">${istDateStr}</td>
                 </tr>`;
             }).join('');
         }
@@ -817,7 +965,7 @@
             document.getElementById('orders-tbody').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 9. Render System Logs
+        // 9. Render System Logs (With Kolkata IST Timestamp)
         function renderErrors(errors) {
             const container = document.getElementById('errors-container');
             if (!errors.length) {
@@ -831,12 +979,12 @@
                         <p class="text-xs font-bold text-red-300">${err.error_message}</p>
                         <p class="text-[11px] font-mono text-gray-300 mt-0.5">${err.error_stack || ''}</p>
                     </div>
-                    <span class="text-[10px] text-gray-400 shrink-0">${err.created_at || ''}</span>
+                    <span class="text-[10px] font-mono text-gray-300 shrink-0">${formatToKolkataIST(err.created_at)}</span>
                 </div>
             `).join('');
         }
 
-        // 10. CSV Export Helpers
+        // 10. CSV Export Helpers (Includes Gateway Fee & IST Timestamps)
         function downloadCSV(filename, rows) {
             const csvContent = rows.map(r => r.map(field => `"${String(field ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -852,30 +1000,47 @@
             const infs = globalDashboardData?.influencers || [];
             if (!infs.length) return alert("No influencer data to export!");
             const rows = [
-                ['Name', 'Email', 'Promo Code', 'Total Orders', 'Total Clicks', 'Revenue (INR)', 'Your Net Profit (INR)', 'Unpaid Balance (INR)', 'Lifetime Earned (INR)']
+                ['Name', 'Email', 'Promo Code', 'Total Orders', 'Total Clicks', 'Gross Revenue (INR)', 'Gateway Fee (₹2/ord)', 'Creator Commission (₹25/ord)', 'Your Pure Net Profit (₹42/ord)', 'Unpaid Balance (INR)']
             ];
             infs.forEach(i => {
-                const earned = i.lifetime_earnings || 0;
-                const orders = i.total_orders ?? Math.round(earned / 25);
-                const rev = i.total_revenue ?? (orders * 69);
-                const profit = i.net_profit ?? (rev - earned);
-                rows.push([i.name, i.email, i.promo_code, orders, i.total_clicks || 0, rev, profit, i.pending_balance || 0, earned]);
+                rows.push([
+                    i.name,
+                    i.email,
+                    i.promo_code,
+                    i.total_orders,
+                    i.total_clicks || 0,
+                    i.total_revenue,
+                    i.gateway_fee,
+                    i.lifetime_earnings || 0,
+                    i.net_profit,
+                    i.pending_balance || 0
+                ]);
             });
-            downloadCSV(`10PetalX_Influencer_Payouts_${new Date().toISOString().slice(0,10)}.csv`, rows);
+            downloadCSV(`10PetalX_Influencer_Payouts_${getISTDateKey(new Date())}.csv`, rows);
         });
 
         document.getElementById('export-orders-csv').addEventListener('click', () => {
             const orders = globalDashboardData?.orders || [];
             if (!orders.length) return alert("No orders data to export!");
             const rows = [
-                ['Order ID', 'Promo Code', 'Influencer Name', 'Order Total (INR)', 'Commission (INR)', 'Net Profit (INR)', 'Created At']
+                ['Order ID', 'Promo Code', 'Influencer Name', 'Customer Paid (INR)', 'Gateway Fee (INR)', 'Creator Cut (INR)', 'Your Net Profit (INR)', 'Created At (Kolkata IST)']
             ];
             orders.forEach(o => {
-                const total = o.order_total || 69;
-                const comm = o.commission_earned || 25;
-                rows.push([o.order_id, o.promo_code_used, o.influencer_name || '', total, comm, total - comm, o.created_at || '']);
+                const total = o.order_total || ORDER_PRICE;
+                const comm = o.commission_earned || CREATOR_COMMISSION;
+                const pg = GATEWAY_FEE_PER_ORDER;
+                rows.push([
+                    o.order_id,
+                    o.promo_code_used,
+                    o.influencer_name || '',
+                    total,
+                    pg,
+                    comm,
+                    total - comm - pg,
+                    formatToKolkataIST(o.created_at)
+                ]);
             });
-            downloadCSV(`10PetalX_Promo_Orders_${new Date().toISOString().slice(0,10)}.csv`, rows);
+            downloadCSV(`10PetalX_Promo_Orders_${getISTDateKey(new Date())}.csv`, rows);
         });
 
         // Chart Timeframe Toggle Buttons
