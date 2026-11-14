@@ -3,344 +3,962 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owner Dashboard - 10 Petal X</title>
+    <title>10 Petal X - Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        blob: "blob 7s infinite",
-                    },
-                    keyframes: {
-                        blob: {
-                            "0%": { transform: "translate(0px, 0px) scale(1)" },
-                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-                            "100%": { transform: "translate(0px, 0px) scale(1)" },
-                        }
-                    }
-                }
-            }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: radial-gradient(circle at top, #2e1065 0%, #1e1b4b 45%, #090514 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-          .animation-delay-2000 { animation-delay: 2s; }
-          .animation-delay-4000 { animation-delay: 4s; }
-          .glass-card { @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl; }
-          .glass-panel { @apply bg-black/40 backdrop-blur-md border border-white/10 rounded-xl; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 1.25rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
-        
-        /* 3D Button Press Effect */
-        .btn-3d {
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 0 0 rgba(0,0,0,0.2), 0 15px 20px rgba(0,0,0,0.4);
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
         }
-        .btn-3d:active {
-            transform: translateY(8px);
-            box-shadow: 0 0 0 0 rgba(0,0,0,0.2), 0 5px 10px rgba(0,0,0,0.4);
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
-        
-        /* Custom Scrollbar for tables */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.5);
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-black text-white antialiased relative overflow-x-hidden font-sans">
-    
-    <!-- Animated Background Blobs -->
-    <div class="fixed top-0 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob pointer-events-none z-0"></div>
-    <div class="fixed top-20 right-10 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000 pointer-events-none z-0"></div>
-    <div class="fixed bottom-10 left-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000 pointer-events-none z-0"></div>
+<body class="p-4 md:p-8 antialiased">
 
-    <!-- Login Section -->
-    <div id="login-section" class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
-        <div class="glass-card p-10 w-full max-w-md transform transition-all hover:scale-[1.02]">
-            <div class="text-center mb-8">
-                <div class="inline-block p-3 rounded-full bg-white/5 border border-white/10 mb-4 shadow-lg">
-                    <span class="text-4xl">👑</span>
-                </div>
-                <h2 class="text-3xl font-bold tracking-tight">System <span class="text-purple-400">Admin</span></h2>
-                <p class="text-sm text-gray-400 mt-2">Enter your secret key to access the control panel</p>
+    <!-- 🔒 ADMIN LOCK SCREEN MODAL -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 w-full max-w-md text-center border border-purple-500/30">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-3xl shadow-lg shadow-purple-500/30">
+                ⚡
             </div>
+            <h2 class="text-2xl font-bold mb-1">10 Petal X Command</h2>
+            <p class="text-xs text-gray-400 mb-6">Enter your Admin Secret Key to unlock ledger, graphs & payouts</p>
             
-            <input type="password" id="admin-secret" placeholder="Enter Admin Secret" 
-                class="w-full bg-black/30 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all mb-6 shadow-inner text-center tracking-widest text-lg">
-            
-            <button onclick="loadDashboard()" class="btn-3d w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-4 rounded-xl text-lg flex items-center justify-center gap-2">
-                Unlock System
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-            </button>
+            <form id="auth-form" class="space-y-4">
+                <input type="password" id="admin-secret-input" placeholder="Enter ADMIN_SECRET..." required
+                    class="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-3 text-white text-center focus:outline-none focus:border-purple-500 transition-all" />
+                <p id="auth-error" class="text-xs text-red-400 hidden">Invalid Admin Secret! Access Denied.</p>
+                <button type="submit" id="unlock-admin-btn"
+                    class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all">
+                    Unlock Command Center 🔓
+                </button>
+            </form>
         </div>
     </div>
 
-    <!-- Dashboard Section (Hidden default) -->
-    <div id="dashboard-section" class="hidden relative z-10 max-w-7xl mx-auto px-4 py-8">
-        
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 glass-card p-6 px-8">
-            <div class="flex items-center gap-4 mb-4 md:mb-0">
-                <div class="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30">
-                    <span class="text-2xl">⚡</span>
+    <!-- 🚀 MAIN COMMAND CENTER -->
+    <div id="dashboard-content" class="max-w-6xl mx-auto space-y-6 hidden">
+
+        <!-- TOP HEADER CARD -->
+        <div class="glass-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/30 shrink-0">
+                    ⚡
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">10 Petal X <span class="text-purple-400">Command Center</span></h1>
-                    <p id="system-health" class="text-sm text-emerald-400 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> System Online & Secure
-                    </p>
-                </div>
-            </div>
-            <button onclick="logout()" class="px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg text-sm font-bold transition-colors shadow-lg">
-                Lock & Exit
-            </button>
-        </header>
-
-        <!-- Top Metrics Cards (Updated for Phase 5) -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div class="glass-card p-5 border-t-4 border-t-blue-400 relative overflow-hidden">
-                <div class="absolute -right-4 -bottom-4 text-blue-500/10 text-6xl">₹</div>
-                <p class="text-xs text-gray-400 mb-1">Total Revenue</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-xl font-bold text-blue-400">₹</span>
-                    <h3 id="metric-revenue" class="text-3xl font-bold text-white">0</h3>
-                </div>
-            </div>
-            
-            <div class="glass-card p-5 border-t-4 border-t-emerald-400 relative overflow-hidden">
-                <div class="absolute -right-4 -bottom-4 text-emerald-500/10 text-6xl">₹</div>
-                <p class="text-xs text-gray-400 mb-1">Net Profit</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-xl font-bold text-emerald-400">₹</span>
-                    <h3 id="metric-profit" class="text-3xl font-bold text-white">0</h3>
-                </div>
-            </div>
-
-            <div class="glass-card p-5 border-t-4 border-t-purple-400">
-                <p class="text-xs text-gray-400 mb-1">Influencers</p>
-                <h3 id="metric-influencers" class="text-3xl font-bold text-white">0</h3>
-            </div>
-
-            <div class="glass-card p-5 border-t-4 border-t-pink-400 relative overflow-hidden">
-                <div class="absolute -right-4 -bottom-4 text-pink-500/10 text-6xl">₹</div>
-                <p class="text-xs text-gray-400 mb-1">Total Unpaid Dues</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-xl font-bold text-pink-400">₹</span>
-                    <h3 id="metric-unpaid" class="text-3xl font-bold text-white">0</h3>
-                </div>
-            </div>
-
-            <div class="glass-card p-5 border-t-4 border-t-gray-400 relative overflow-hidden">
-                <div class="absolute -right-4 -bottom-4 text-gray-500/10 text-6xl">₹</div>
-                <p class="text-xs text-gray-400 mb-1">Lifetime Payouts</p>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-xl font-bold text-gray-400">₹</span>
-                    <h3 id="metric-lifetime" class="text-3xl font-bold text-white">0</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Influencers Table -->
-            <div class="lg:col-span-2 glass-card p-6 flex flex-col h-[600px]">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold flex items-center gap-2">
-                        <span class="text-xl">👥</span> Influencers Ledger
-                    </h2>
-                    <button onclick="settlePayments()" class="btn-3d bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg font-bold text-sm shadow-lg shadow-emerald-600/30">
-                        Mark All as Paid
-                    </button>
-                </div>
-                
-                <div class="flex-1 overflow-auto glass-panel rounded-xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="sticky top-0 bg-black/80 backdrop-blur-xl border-b border-white/10 z-10">
-                            <tr class="text-xs uppercase tracking-wider text-gray-400">
-                                <th class="p-4 font-semibold">Partner Details</th>
-                                <th class="p-4 font-semibold">Promo Code</th>
-                                <th class="p-4 font-semibold text-right">Unpaid</th>
-                                <th class="p-4 font-semibold text-right">Earned</th>
-                            </tr>
-                        </thead>
-                        <tbody id="influencers-list" class="divide-y divide-white/5">
-                            <!-- Data will load here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- System Errors Log (Updated for Phase 5 IP Tracking) -->
-            <div class="glass-card p-6 flex flex-col h-[600px] border-t-4 border-t-red-500/50">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-red-400">
-                    <span class="text-xl">🚨</span> System Logs & Hacks
-                </h2>
-                
-                <div class="flex-1 overflow-auto glass-panel rounded-xl p-2">
-                    <div id="errors-list" class="space-y-3">
-                        <!-- Errors will load here -->
+                    <h1 class="text-2xl font-extrabold tracking-tight">
+                        10 Petal X <span class="text-purple-300">Command Center</span>
+                    </h1>
+                    <div id="system-status-badge" class="flex items-center gap-2 text-xs text-emerald-400 mt-1 font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>System Online & Syncing</span>
                     </div>
                 </div>
             </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button id="refresh-btn" class="px-4 py-2.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-xl text-xs font-semibold transition-all">
+                    🔄 Refresh
+                </button>
+                <button id="lock-btn" class="px-5 py-2.5 bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/30 text-pink-300 rounded-xl text-xs font-semibold transition-all">
+                    Lock & Exit
+                </button>
+            </div>
         </div>
-    </div>
-    <script>
-        const API_BASE = "https://magical-api.10petalxmagic.workers.dev";
-        let secret = "";
 
-        // 1. AUTO-LOGIN ON REFRESH
-        window.onload = () => {
-            const savedSecret = sessionStorage.getItem('admin_secret');
-            if(savedSecret) {
-                document.getElementById('admin-secret').value = savedSecret;
-                loadDashboard();
-            }
-        };
+        <!-- 🗓️ MONDAY PAYOUT CYCLE BANNER -->
+        <div class="glass-card p-4 px-6 border-l-4 border-l-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gradient-to-r from-amber-500/10 to-transparent">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🗓️</span>
+                <div>
+                    <h3 class="text-sm font-bold text-amber-300">Monday Payout Cycle Active</h3>
+                    <p class="text-xs text-gray-300">Settle individual influencers anytime or use "Mark All as Paid" on Monday.</p>
+                </div>
+            </div>
+            <div class="bg-black/40 border border-amber-500/30 px-4 py-2 rounded-xl text-xs font-mono text-amber-300 shrink-0">
+                Next Monday Payout: <span id="monday-countdown" class="font-bold text-white">Calculating...</span>
+            </div>
+        </div>
 
-        async function loadDashboard() {
-            const btn = document.querySelector('#login-section button');
-            const originalText = btn.innerHTML;
-            
-            secret = document.getElementById('admin-secret').value;
-            if(!secret) return;
+        <!-- 📊 KPI SUMMARY CARDS (6 CARDS) -->
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
+            <div class="glass-card p-5">
+                <p class="text-xs text-gray-400">Total Revenue</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-blue-400 text-lg mr-1">₹</span><span id="kpi-revenue">0</span></h2>
+            </div>
 
-            btn.innerHTML = 'Connecting... <span class="animate-pulse">⚡</span>';
+            <div class="glass-card p-5">
+                <p class="text-xs text-gray-400">Net Profit</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-emerald-400 text-lg mr-1">₹</span><span id="kpi-profit">0</span></h2>
+            </div>
 
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/dashboard`, {
-                    headers: { 'Authorization': `Bearer ${secret}` }
-                });
-                const data = await res.json();
+            <div class="glass-card p-5">
+                <p class="text-xs text-gray-400">Promo Orders</p>
+                <h2 id="kpi-orders" class="text-2xl sm:text-3xl font-extrabold mt-1 text-purple-300">0</h2>
+            </div>
 
-                if(res.ok) {
-                    // 2. SAVE SECRET IN SESSION AFTER SUCCESSFUL LOGIN
-                    sessionStorage.setItem('admin_secret', secret);
-                    
-                    document.getElementById('login-section').style.display = 'none';
-                    document.getElementById('dashboard-section').classList.remove('hidden');
-                    document.getElementById('dashboard-section').classList.add('animate-[fadeIn_0.5s_ease-out]');
-                    
-                    let totalUnpaid = 0;
-                    let totalLifetime = 0;
+            <div class="glass-card p-5">
+                <p class="text-xs text-gray-400">Influencers</p>
+                <h2 id="kpi-influencers" class="text-2xl sm:text-3xl font-extrabold mt-1">0</h2>
+            </div>
 
-                    // Render Influencers
-                    document.getElementById('influencers-list').innerHTML = data.influencers.map(inf => {
-                        totalUnpaid += inf.pending_balance;
-                        totalLifetime += inf.lifetime_earnings;
-                        
-                        const unpaidColor = inf.pending_balance > 0 ? 'text-pink-400' : 'text-gray-500';
-                        const badgeColor = inf.pending_balance > 0 ? 'bg-pink-500/10 border-pink-500/20' : 'bg-gray-500/10 border-gray-500/20';
-                        
-                        return `
-                        <tr class="hover:bg-white/5 transition-colors group">
-                            <td class="p-4">
-                                <p class="font-bold text-white group-hover:text-purple-300 transition-colors">${inf.name}</p>
-                                <p class="text-xs text-gray-400">${inf.email || 'N/A'}</p>
-                            </td>
-                            <td class="p-4">
-                                <span class="px-3 py-1 rounded-md text-xs font-mono font-bold border border-purple-500/30 bg-purple-500/10 text-purple-300">
-                                    ${inf.promo_code}
-                                </span>
-                            </td>
-                            <td class="p-4 text-right">
-                                <span class="px-3 py-1 rounded-md text-sm font-bold border ${badgeColor} ${unpaidColor}">
-                                    ₹${inf.pending_balance.toLocaleString('en-IN')}
-                                </span>
-                            </td>
-                            <td class="p-4 text-right text-emerald-400 font-bold">
-                                ₹${inf.lifetime_earnings.toLocaleString('en-IN')}
-                            </td>
+            <div class="glass-card p-5 border border-pink-500/30">
+                <p class="text-xs text-pink-300">Total Unpaid Dues</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-pink-400 text-lg mr-1">₹</span><span id="kpi-unpaid">0</span></h2>
+            </div>
+
+            <div class="glass-card p-5">
+                <p class="text-xs text-gray-400">Lifetime Payouts</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-1"><span class="text-indigo-400 text-lg mr-1">₹</span><span id="kpi-lifetime">0</span></h2>
+            </div>
+        </div>
+
+        <!-- 📈 PHASE 3: VISUAL ANALYTICS, GRAPHS & LEADERBOARD -->
+        <div class="space-y-6">
+
+            <!-- Profit Split Meter & Top 3 Performers Podium -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Net Profit vs Commission Split Bar -->
+                <div class="glass-card p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold flex items-center gap-2">
+                            <span>💎</span> Profit vs. Payout Split
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1">How much revenue stays with 10 Petal X vs. creators</p>
+                    </div>
+
+                    <div class="my-5">
+                        <div class="flex justify-between text-xs font-bold mb-2">
+                            <span class="text-emerald-400">Your Net Profit (<span id="split-profit-pct">64%</span>)</span>
+                            <span class="text-pink-400">Creator Cut (<span id="split-comm-pct">36%</span>)</span>
+                        </div>
+                        <div class="w-full h-4 bg-black/40 rounded-full overflow-hidden flex border border-white/10">
+                            <div id="split-profit-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-700" style="width: 64%;"></div>
+                            <div id="split-comm-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full transition-all duration-700" style="width: 36%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-center bg-black/30 p-3 rounded-xl border border-white/5">
+                        <div>
+                            <p class="text-[11px] text-gray-400">Profit Per Promo Order</p>
+                            <p class="text-lg font-extrabold text-emerald-400">₹44</p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-gray-400">Creator Commission</p>
+                            <p class="text-lg font-extrabold text-pink-400">₹25</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 3 Performing Influencers Podium -->
+                <div class="glass-card p-6 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base font-bold flex items-center gap-2">
+                                <span>🏆</span> Top Revenue Generating Creators
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Ranked automatically by total orders & net profit generated</p>
+                        </div>
+                    </div>
+                    <div id="top-performers-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-black/30 border border-white/10 text-center text-xs text-gray-400 col-span-3">
+                            Loading top creators...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dual Interactive Charts: 1. Weekly/Monthly Trend & 2. Influencer Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- CHART 1: Weekly / Monthly Revenue & Profit Trend -->
+                <div class="glass-card p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold flex items-center gap-2">
+                                <span>📈</span> Revenue & Profit Timeline
+                            </h3>
+                            <p class="text-xs text-gray-400">Track daily sales & net profit growth</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 self-start">
+                            <button id="btn-chart-7d" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white transition-all">
+                                Weekly (7D)
+                            </button>
+                            <button id="btn-chart-30d" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 hover:text-white transition-all">
+                                Monthly (30D)
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- CHART 2: Influencer-Wise Revenue vs Net Profit Bar Chart -->
+                <div class="glass-card p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold flex items-center gap-2">
+                                <span>📊</span> Influencer Revenue vs. Profit
+                            </h3>
+                            <p class="text-xs text-gray-400">Compare revenue & profit generated by each promo code</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold self-start">
+                            Per Creator Breakdown
+                        </span>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="influencerChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 👥 INFLUENCERS LEDGER WITH PER-ROW MANUAL PAYOUT BUTTON -->
+        <div class="glass-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span>👥</span> Influencers Ledger & Payouts
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Click any order badge to filter orders, or click "✅ Pay" to settle a single creator.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="export-influencers-csv" class="px-3.5 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 rounded-xl text-xs font-semibold transition-all">
+                        📥 Export Payouts CSV
+                    </button>
+                    <button id="filter-unpaid-btn" class="px-3.5 py-2 bg-white/5 hover:bg-white/15 border border-white/15 rounded-xl text-xs font-semibold transition-all">
+                        🔥 Show Unpaid Only
+                    </button>
+                    <button id="settle-all-btn" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all">
+                        Mark All as Paid (Monday)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <input type="text" id="influencer-search" placeholder="🔍 Search by Influencer Name, Email, or Promo Code..."
+                    class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-purple-400" />
+            </div>
+
+            <div class="overflow-x-auto custom-scroll rounded-xl border border-white/10">
+                <table class="w-full text-left border-collapse min-w-[820px]">
+                    <thead>
+                        <tr class="bg-black/50 text-[11px] uppercase tracking-wider text-gray-300 border-b border-white/10">
+                            <th class="p-3.5">Influencer</th>
+                            <th class="p-3.5">Promo Code</th>
+                            <th class="p-3.5 text-center">Orders / Clicks</th>
+                            <th class="p-3.5">Rev / Your Profit</th>
+                            <th class="p-3.5">Unpaid Due</th>
+                            <th class="p-3.5">Total Earned</th>
+                            <th class="p-3.5 text-right">Manual Payout Action</th>
                         </tr>
-                    `}).join('');
+                    </thead>
+                    <tbody id="influencers-tbody" class="divide-y divide-white/10 text-sm">
+                        <tr>
+                            <td colspan="7" class="p-6 text-center text-gray-400">Loading influencers ledger...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-                    // Update Phase 5 Top Metrics
-                    document.getElementById('metric-revenue').innerText = (data.analytics && data.analytics.totalRevenue) ? data.analytics.totalRevenue.toLocaleString('en-IN') : '0';
-                    document.getElementById('metric-profit').innerText = (data.analytics && data.analytics.totalProfit) ? data.analytics.totalProfit.toLocaleString('en-IN') : '0';
-                    document.getElementById('metric-influencers').innerText = data.influencers.length;
-                    document.getElementById('metric-unpaid').innerText = totalUnpaid.toLocaleString('en-IN');
-                    document.getElementById('metric-lifetime').innerText = totalLifetime.toLocaleString('en-IN');
+        <!-- 🛒 LIVE ORDERS BREAKDOWN BY INFLUENCER -->
+        <div class="glass-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span>🛒</span> Promo Orders History
+                    </h2>
+                    <p id="orders-filter-label" class="text-xs text-gray-400 mt-0.5">Showing latest 100 promo orders across all influencers</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="reset-order-filter-btn" class="hidden px-3 py-1.5 bg-purple-500/20 border border-purple-400/40 text-purple-200 rounded-lg text-xs font-semibold">
+                        ✖ Clear Filter (Show All)
+                    </button>
+                    <button id="export-orders-csv" class="px-3.5 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 rounded-xl text-xs font-semibold transition-all">
+                        📥 Export Orders CSV
+                    </button>
+                </div>
+            </div>
 
-                    // Update System Health Indicator
-                    const healthIndicator = document.getElementById('system-health');
-                    if (data.errors.length === 0) {
-                        healthIndicator.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> System Online & Secure`;
-                        document.getElementById('errors-list').innerHTML = `
-                            <div class="text-center p-8 text-gray-500 flex flex-col items-center">
-                                <span class="text-4xl mb-2 opacity-50">🛡️</span>
-                                <p>System is clean. No errors found.</p>
-                            </div>
-                        `;
-                    } else {
-                        healthIndicator.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Warning: Review Logs`;
-                        document.getElementById('errors-list').innerHTML = data.errors.map(err => `
-                            <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-lg hover:bg-red-500/10 transition-colors">
-                                <p class="text-sm text-red-400 font-bold">${err.error_message}</p>
-                                ${err.error_stack ? `<p class="text-xs text-gray-400 mt-1 font-mono break-all">${err.error_stack}</p>` : ''}
-                                <p class="text-xs font-mono text-red-300/60 mt-2">${new Date(err.created_at + 'Z').toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})}</p>
-                            </div>
-                        `).join('');
-                    }
-                } else {
-                    alert("Login Failed: " + (data.error || "Wrong secret key"));
-                    btn.innerHTML = originalText;
+            <div class="overflow-x-auto custom-scroll rounded-xl border border-white/10 max-h-96">
+                <table class="w-full text-left border-collapse min-w-[650px]">
+                    <thead class="sticky top-0 bg-indigo-950/95 backdrop-blur-md">
+                        <tr class="text-[11px] uppercase tracking-wider text-gray-300 border-b border-white/10">
+                            <th class="p-3.5">Order ID</th>
+                            <th class="p-3.5">Influencer & Code</th>
+                            <th class="p-3.5">Customer Paid</th>
+                            <th class="p-3.5">Creator Cut</th>
+                            <th class="p-3.5">Your Net Profit</th>
+                            <th class="p-3.5">Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody" class="divide-y divide-white/10 text-sm">
+                        <tr>
+                            <td colspan="6" class="p-6 text-center text-gray-400">Loading orders...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 🚨 SYSTEM LOGS & HACK ATTEMPTS -->
+        <div class="glass-card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                    <span>🚨</span> System Logs & Hacks
+                </h2>
+                <button id="clear-logs-btn" class="px-3.5 py-1.5 bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-300 rounded-lg text-xs font-semibold transition-all">
+                    🧹 Clear Logs
+                </button>
+            </div>
+            <div id="errors-container" class="space-y-2.5 max-h-72 overflow-y-auto custom-scroll pr-1">
+                <p class="text-xs text-gray-400">No security alerts recorded.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const WORKER_URL = 'https://magical-api.10petalxmagic.workers.dev';
+        let adminSecret = sessionStorage.getItem('10petalx_admin_secret') || '';
+        let globalDashboardData = null;
+        let showUnpaidOnly = false;
+        let selectedPromoFilter = null;
+        let currentTimelineDays = 7;
+        let timelineChartInstance = null;
+        let influencerChartInstance = null;
+
+        const authModal = document.getElementById('auth-modal');
+        const dashboardContent = document.getElementById('dashboard-content');
+        const authForm = document.getElementById('auth-form');
+        const secretInput = document.getElementById('admin-secret-input');
+        const authError = document.getElementById('auth-error');
+
+        // 1. Monday Payout Countdown Timer
+        function updateMondayCountdown() {
+            const now = new Date();
+            const nextMonday = new Date();
+            const daysUntilMonday = (8 - now.getDay()) % 7 || 7;
+            nextMonday.setDate(now.getDate() + daysUntilMonday);
+            nextMonday.setHours(0, 0, 0, 0);
+
+            const diff = nextMonday - now;
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+
+            const el = document.getElementById('monday-countdown');
+            if (el) el.innerText = `${d}d ${h}h ${m}m`;
+        }
+        setInterval(updateMondayCountdown, 60000);
+        updateMondayCountdown();
+
+        // 2. Load Dashboard Data from Worker
+        async function loadDashboard(secretKey) {
+            try {
+                const res = await fetch(`${WORKER_URL}/api/admin/dashboard`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${secretKey}` }
+                });
+
+                if (res.status === 401) {
+                    sessionStorage.removeItem('10petalx_admin_secret');
+                    authError.classList.remove('hidden');
+                    authModal.classList.remove('hidden');
+                    dashboardContent.classList.add('hidden');
+                    return false;
                 }
+
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Failed to load');
+
+                sessionStorage.setItem('10petalx_admin_secret', secretKey);
+                adminSecret = secretKey;
+                globalDashboardData = data;
+
+                authModal.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+
+                renderKPIs(data);
+                renderPhase3Analytics(data);
+                renderInfluencersTable();
+                renderOrdersTable();
+                renderErrors(data.errors || []);
+                return true;
             } catch (err) {
-                alert("Connection error! Make sure the backend API is deployed.");
-                btn.innerHTML = originalText;
+                console.error("Admin Load Error:", err);
+                alert("Error loading admin panel: " + err.message);
+                return false;
             }
         }
 
-        async function settlePayments() {
-            const unpaidElement = document.getElementById('metric-unpaid');
-            if (unpaidElement.innerText === '0') {
-                return alert("No unpaid balances to settle!");
+        // 3. Render KPI Summary Cards
+        function renderKPIs(data) {
+            const infs = data.influencers || [];
+            const analytics = data.analytics || {};
+
+            const totalUnpaid = infs.reduce((sum, i) => sum + (i.pending_balance || 0), 0);
+            const totalLifetime = infs.reduce((sum, i) => sum + (i.lifetime_earnings || 0), 0);
+            const totalOrders = analytics.totalOrdersCount ?? infs.reduce((sum, i) => sum + (i.total_orders || Math.round((i.lifetime_earnings || 0) / 25)), 0);
+            const totalRev = analytics.totalRevenue || (totalOrders * 69);
+            const totalProf = analytics.totalProfit || (totalRev - totalLifetime);
+
+            document.getElementById('kpi-revenue').innerText = totalRev.toLocaleString('en-IN');
+            document.getElementById('kpi-profit').innerText = totalProf.toLocaleString('en-IN');
+            document.getElementById('kpi-orders').innerText = totalOrders.toLocaleString('en-IN');
+            document.getElementById('kpi-influencers').innerText = infs.length;
+            document.getElementById('kpi-unpaid').innerText = totalUnpaid.toLocaleString('en-IN');
+            document.getElementById('kpi-lifetime').innerText = totalLifetime.toLocaleString('en-IN');
+
+            // Update Profit vs Payout Split Bar
+            if (totalRev > 0) {
+                const profPct = Math.round((totalProf / totalRev) * 100);
+                const commPct = 100 - profPct;
+                document.getElementById('split-profit-pct').innerText = `${profPct}%`;
+                document.getElementById('split-comm-pct').innerText = `${commPct}%`;
+                document.getElementById('split-profit-bar').style.width = `${profPct}%`;
+                document.getElementById('split-comm-bar').style.width = `${commPct}%`;
             }
 
-            if(!confirm("Are you sure you want to clear all unpaid balances and mark them as paid?")) return;
-            
-            try {
-                const res = await fetch(`${API_BASE}/api/admin/settle`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${secret}` }
-                });
-                
-                if(res.ok) {
-                    document.body.insertAdjacentHTML('beforeend', `
-                        <div id="success-flash" class="fixed inset-0 bg-emerald-500/20 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-500">
-                            <div class="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-2xl font-bold shadow-2xl flex items-center gap-3 transform scale-0 animate-[popIn_0.3s_forwards]">
-                                <span>💸</span> Payments Settled!
+            const statusBadge = document.getElementById('system-status-badge');
+            if ((data.errors || []).length > 0) {
+                statusBadge.className = "flex items-center gap-2 text-xs text-amber-400 mt-1 font-medium";
+                statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span><span>Warning: Review Logs (${data.errors.length})</span>`;
+            } else {
+                statusBadge.className = "flex items-center gap-2 text-xs text-emerald-400 mt-1 font-medium";
+                statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span><span>System Healthy & Secure</span>`;
+            }
+        }
+
+        // 4. PHASE 3: Render Top 3 Podium + Weekly/Monthly & Influencer Charts
+        function renderPhase3Analytics(data) {
+            const infs = (data.influencers || []).map(inf => {
+                const earned = inf.lifetime_earnings || 0;
+                const orders = inf.total_orders ?? Math.round(earned / 25);
+                const rev = inf.total_revenue ?? (orders * 69);
+                const profit = inf.net_profit ?? (rev - earned);
+                return { ...inf, orders, rev, profit, earned };
+            }).sort((a, b) => b.rev - a.rev);
+
+            // Render Top 3 Podium
+            const podiumGrid = document.getElementById('top-performers-grid');
+            const medals = ['🥇 #1 Top Creator', '🥈 #2 Runner Up', '🥉 #3 Rising Star'];
+            const borderColors = ['border-amber-400/50 bg-amber-500/10', 'border-gray-300/40 bg-white/5', 'border-amber-700/50 bg-amber-900/10'];
+
+            const top3 = infs.slice(0, 3);
+            if (top3.length === 0) {
+                podiumGrid.innerHTML = `<div class="p-4 rounded-xl bg-black/30 text-center text-xs text-gray-400 col-span-3">No influencer data yet.</div>`;
+            } else {
+                podiumGrid.innerHTML = top3.map((inf, idx) => `
+                    <div class="p-4 rounded-xl border ${borderColors[idx]} flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">${medals[idx]}</span>
+                            <span class="px-2 py-0.5 rounded bg-purple-500/30 text-purple-200 font-mono text-xs font-bold">${inf.promo_code}</span>
+                        </div>
+                        <div class="font-bold text-base text-white truncate">${inf.name || 'Creator'}</div>
+                        <div class="grid grid-cols-3 gap-1 mt-3 pt-2 border-t border-white/10 text-center">
+                            <div>
+                                <p class="text-[10px] text-gray-400">Orders</p>
+                                <p class="text-xs font-bold text-white">${inf.orders}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400">Revenue</p>
+                                <p class="text-xs font-bold text-blue-300">₹${inf.rev}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-400">Your Profit</p>
+                                <p class="text-xs font-bold text-emerald-400">₹${inf.profit}</p>
                             </div>
                         </div>
-                        <style>@keyframes popIn { to { transform: scale(1); } }</style>
-                    `);
-                    
-                    setTimeout(() => {
-                        const flash = document.getElementById('success-flash');
-                        flash.style.opacity = '0';
-                        setTimeout(() => flash.remove(), 500);
-                        loadDashboard(); // Refresh data quietly
-                    }, 1500);
-                } else {
-                    alert("Failed to settle payments. Check backend logs.");
+                    </div>
+                `).join('');
+            }
+
+            renderTimelineChart(currentTimelineDays);
+            renderInfluencerBarChart(infs);
+        }
+
+        // Render Weekly (7D) / Monthly (30D) Timeline Chart
+        function renderTimelineChart(daysCount) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            if (timelineChartInstance) timelineChartInstance.destroy();
+
+            const dailyMap = {};
+            (globalDashboardData?.dailyChartData || []).forEach(row => {
+                if (row.date) dailyMap[row.date] = row;
+            });
+
+            // Also map from raw orders if dailyChartData wasn't returned
+            if (Object.keys(dailyMap).length === 0 && (globalDashboardData?.orders || []).length > 0) {
+                globalDashboardData.orders.forEach(o => {
+                    const d = (o.created_at || '').slice(0, 10);
+                    if (!d) return;
+                    if (!dailyMap[d]) dailyMap[d] = { revenue: 0, profit: 0, commission: 0 };
+                    const rev = o.order_total || 69;
+                    const comm = o.commission_earned || 25;
+                    dailyMap[d].revenue += rev;
+                    dailyMap[d].commission += comm;
+                    dailyMap[d].profit += (rev - comm);
+                });
+            }
+
+            const labels = [];
+            const revSeries = [];
+            const profitSeries = [];
+
+            const today = new Date();
+            for (let i = daysCount - 1; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const iso = d.toISOString().slice(0, 10);
+                const label = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                labels.push(label);
+
+                const match = dailyMap[iso];
+                revSeries.push(match ? (match.revenue || 0) : 0);
+                profitSeries.push(match ? (match.profit || 0) : 0);
+            }
+
+            // Fallback: If all days are 0 but KPIs have historical revenue, show aggregate on today's point
+            const hasAnyPoint = revSeries.some(v => v > 0);
+            if (!hasAnyPoint && globalDashboardData?.analytics?.totalRevenue > 0) {
+                revSeries[revSeries.length - 1] = globalDashboardData.analytics.totalRevenue;
+                profitSeries[profitSeries.length - 1] = globalDashboardData.analytics.totalProfit;
+            }
+
+            timelineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Total Revenue (₹)',
+                            data: revSeries,
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96, 165, 250, 0.15)',
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Your Net Profit (₹)',
+                            data: profitSeries,
+                            borderColor: '#34d399',
+                            backgroundColor: 'rgba(52, 211, 153, 0.18)',
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#e5e7eb', font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { beginAtZero: true, ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } }
+                    }
                 }
+            });
+        }
+
+        // Render Influencer-Wise Revenue vs Profit Bar Chart
+        function renderInfluencerBarChart(infs) {
+            const ctx = document.getElementById('influencerChart').getContext('2d');
+            if (influencerChartInstance) influencerChartInstance.destroy();
+
+            const topInfs = infs.slice(0, 8);
+            const labels = topInfs.map(i => i.promo_code);
+            const revData = topInfs.map(i => i.rev);
+            const profitData = topInfs.map(i => i.profit);
+            const commData = topInfs.map(i => i.earned);
+
+            influencerChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Revenue (₹)',
+                            data: revData,
+                            backgroundColor: 'rgba(96, 165, 250, 0.85)',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Your Net Profit (₹)',
+                            data: profitData,
+                            backgroundColor: 'rgba(52, 211, 153, 0.85)',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Creator Cut (₹)',
+                            data: commData,
+                            backgroundColor: 'rgba(244, 114, 182, 0.85)',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#e5e7eb', font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#d1d5db', font: { size: 10, weight: 'bold' } }, grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } }
+                    }
+                }
+            });
+        }
+
+        // 5. Render Influencers Ledger Table
+        function renderInfluencersTable() {
+            const tbody = document.getElementById('influencers-tbody');
+            const searchVal = (document.getElementById('influencer-search')?.value || '').trim().toLowerCase();
+            let list = (globalDashboardData?.influencers || []).slice();
+
+            if (showUnpaidOnly) {
+                list = list.filter(i => (i.pending_balance || 0) > 0);
+            }
+            if (searchVal) {
+                list = list.filter(i =>
+                    (i.name || '').toLowerCase().includes(searchVal) ||
+                    (i.email || '').toLowerCase().includes(searchVal) ||
+                    (i.promo_code || '').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-400">No matching influencers found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(inf => {
+                const unpaid = inf.pending_balance || 0;
+                const earned = inf.lifetime_earnings || 0;
+                const ordersCount = inf.total_orders ?? Math.round(earned / 25);
+                const clicks = inf.total_clicks || 0;
+                const convRate = clicks > 0 ? ((ordersCount / clicks) * 100).toFixed(1) : '0.0';
+                const rev = inf.total_revenue ?? (ordersCount * 69);
+                const profit = inf.net_profit ?? (rev - earned);
+
+                const unpaidBadge = unpaid > 0
+                    ? `<span class="px-3 py-1 rounded-full text-xs font-bold bg-pink-500/25 text-pink-300 border border-pink-500/40">₹${unpaid}</span>`
+                    : `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-gray-400">₹0</span>`;
+
+                const actionButtons = unpaid > 0
+                    ? `<div class="flex items-center justify-end gap-2">
+                        <button onclick="settleSingleInfluencer('${inf.promo_code}', '${(inf.name || '').replace(/'/g, "\\'")}', ${unpaid})"
+                            class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all">
+                            ✅ Pay ₹${unpaid}
+                        </button>
+                        <button onclick="copyPayoutReceipt('${(inf.name || '').replace(/'/g, "\\'")}', '${inf.promo_code}', ${unpaid}, ${ordersCount})"
+                            title="Copy WhatsApp Payout Message"
+                            class="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs">
+                            📋
+                        </button>
+                       </div>`
+                    : `<div class="flex items-center justify-end gap-2">
+                        <span class="px-3 py-1 rounded-lg bg-white/5 text-gray-500 text-xs font-semibold">Paid ✔</span>
+                        <button onclick="copyPayoutReceipt('${(inf.name || '').replace(/'/g, "\\'")}', '${inf.promo_code}', ${earned}, ${ordersCount})"
+                            title="Copy Lifetime Summary"
+                            class="p-1.5 bg-white/5 hover:bg-white/15 text-gray-400 rounded-lg text-xs">
+                            📋
+                        </button>
+                       </div>`;
+
+                return `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3.5">
+                        <div class="font-bold text-white">${inf.name || 'Unknown'}</div>
+                        <div class="text-xs text-gray-400">${inf.email || ''}</div>
+                    </td>
+                    <td class="p-3.5">
+                        <span class="px-3 py-1 rounded-lg bg-purple-500/20 border border-purple-400/30 text-purple-200 font-mono text-xs font-bold">
+                            ${inf.promo_code}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-center">
+                        <button onclick="filterOrdersByPromo('${inf.promo_code}')" 
+                            class="px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 text-blue-300 font-bold text-xs transition-all"
+                            title="Click to view orders from ${inf.promo_code}">
+                            📦 ${ordersCount} Orders
+                        </button>
+                        <div class="text-[11px] text-gray-400 mt-1">🖱️ ${clicks} clicks (${convRate}%)</div>
+                    </td>
+                    <td class="p-3.5">
+                        <div class="text-xs text-gray-300">Rev: <span class="font-bold text-white">₹${rev}</span></div>
+                        <div class="text-xs text-emerald-400 font-semibold">Profit: ₹${profit}</div>
+                    </td>
+                    <td class="p-3.5">${unpaidBadge}</td>
+                    <td class="p-3.5 font-extrabold text-emerald-400">₹${earned}</td>
+                    <td class="p-3.5 text-right">${actionButtons}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // 6. Settle Single Influencer
+        async function settleSingleInfluencer(promoCode, name, amount) {
+            if (!confirm(`Mark ₹${amount} payout as SUCCESSFUL for ${name} (${promoCode})?\n\nThis will reset their Unpaid Balance to ₹0.`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${WORKER_URL}/api/admin/settle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${adminSecret}`
+                    },
+                    body: JSON.stringify({ promoCode })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Failed to settle');
+
+                copyPayoutReceipt(name, promoCode, amount, Math.round(amount / 25), true);
+                await loadDashboard(adminSecret);
             } catch (err) {
-                alert("Network error while settling payments.");
+                alert("Payout update failed: " + err.message);
             }
         }
 
-        function logout() {
-            secret = "";
-            // 3. CLEAR SESSION ON LOGOUT
-            sessionStorage.removeItem('admin_secret');
-            document.getElementById('admin-secret').value = "";
-            document.getElementById('login-section').style.display = 'flex';
-            document.getElementById('dashboard-section').classList.add('hidden');
+        // 7. Copy WhatsApp Payout Receipt
+        function copyPayoutReceipt(name, promoCode, amount, ordersCount, autoTriggered = false) {
+            const msg = `🎉 *10 Petal X - Affiliate Payout Successful!* 🎉\n\nHi *${name}*,\nYour weekly payout has been processed!\n\n🏷️ *Promo Code:* ${promoCode}\n📦 *Orders Settled:* ${ordersCount}\n💸 *Amount Paid:* ₹${amount}\n📅 *Date:* ${new Date().toLocaleDateString('en-IN')}\n\nKeep sharing your link and earning ₹25 per order! 🚀✨`;
+            navigator.clipboard.writeText(msg).then(() => {
+                if (autoTriggered) {
+                    alert(`✅ ₹${amount} marked as Paid for ${name}!\n\n📋 WhatsApp Payout Receipt has been copied to your clipboard.`);
+                } else {
+                    alert(`📋 Payout receipt for ${name} copied to clipboard!`);
+                }
+            });
         }
 
-        // Allow Enter key to login
-        document.getElementById('admin-secret').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') loadDashboard();
+        // 8. Render Orders History Table
+        function renderOrdersTable() {
+            const tbody = document.getElementById('orders-tbody');
+            const filterLabel = document.getElementById('orders-filter-label');
+            const resetBtn = document.getElementById('reset-order-filter-btn');
+
+            let orders = (globalDashboardData?.orders || []).slice();
+
+            if (selectedPromoFilter) {
+                orders = orders.filter(o => (o.promo_code_used || '').toUpperCase() === selectedPromoFilter);
+                filterLabel.innerHTML = `Filtered by Promo Code: <span class="text-purple-300 font-bold">${selectedPromoFilter}</span> (${orders.length} orders)`;
+                resetBtn.classList.remove('hidden');
+            } else {
+                filterLabel.innerText = `Showing latest ${orders.length} promo orders across all influencers`;
+                resetBtn.classList.add('hidden');
+            }
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-400">No recorded orders found in table yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => {
+                const total = o.order_total || 69;
+                const comm = o.commission_earned || 25;
+                const profit = o.net_profit ?? (total - comm);
+                const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+                return `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3.5 font-mono text-xs text-gray-300">${o.order_id}</td>
+                    <td class="p-3.5">
+                        <span class="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-xs font-bold">${o.promo_code_used}</span>
+                        <span class="text-xs text-gray-400 ml-1">${o.influencer_name ? `(${o.influencer_name})` : ''}</span>
+                    </td>
+                    <td class="p-3.5 font-bold text-white">₹${total}</td>
+                    <td class="p-3.5 text-pink-300 font-semibold">-₹${comm}</td>
+                    <td class="p-3.5 text-emerald-400 font-bold">+₹${profit}</td>
+                    <td class="p-3.5 text-xs text-gray-400">${dateStr}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterOrdersByPromo(code) {
+            selectedPromoFilter = code;
+            renderOrdersTable();
+            document.getElementById('orders-tbody').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 9. Render System Logs
+        function renderErrors(errors) {
+            const container = document.getElementById('errors-container');
+            if (!errors.length) {
+                container.innerHTML = `<p class="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl">✔ Zero security incidents or crashes logged.</p>`;
+                return;
+            }
+
+            container.innerHTML = errors.map(err => `
+                <div class="p-3.5 rounded-xl bg-red-500/10 border border-red-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <p class="text-xs font-bold text-red-300">${err.error_message}</p>
+                        <p class="text-[11px] font-mono text-gray-300 mt-0.5">${err.error_stack || ''}</p>
+                    </div>
+                    <span class="text-[10px] text-gray-400 shrink-0">${err.created_at || ''}</span>
+                </div>
+            `).join('');
+        }
+
+        // 10. CSV Export Helpers
+        function downloadCSV(filename, rows) {
+            const csvContent = rows.map(r => r.map(field => `"${String(field ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('export-influencers-csv').addEventListener('click', () => {
+            const infs = globalDashboardData?.influencers || [];
+            if (!infs.length) return alert("No influencer data to export!");
+            const rows = [
+                ['Name', 'Email', 'Promo Code', 'Total Orders', 'Total Clicks', 'Revenue (INR)', 'Your Net Profit (INR)', 'Unpaid Balance (INR)', 'Lifetime Earned (INR)']
+            ];
+            infs.forEach(i => {
+                const earned = i.lifetime_earnings || 0;
+                const orders = i.total_orders ?? Math.round(earned / 25);
+                const rev = i.total_revenue ?? (orders * 69);
+                const profit = i.net_profit ?? (rev - earned);
+                rows.push([i.name, i.email, i.promo_code, orders, i.total_clicks || 0, rev, profit, i.pending_balance || 0, earned]);
+            });
+            downloadCSV(`10PetalX_Influencer_Payouts_${new Date().toISOString().slice(0,10)}.csv`, rows);
         });
+
+        document.getElementById('export-orders-csv').addEventListener('click', () => {
+            const orders = globalDashboardData?.orders || [];
+            if (!orders.length) return alert("No orders data to export!");
+            const rows = [
+                ['Order ID', 'Promo Code', 'Influencer Name', 'Order Total (INR)', 'Commission (INR)', 'Net Profit (INR)', 'Created At']
+            ];
+            orders.forEach(o => {
+                const total = o.order_total || 69;
+                const comm = o.commission_earned || 25;
+                rows.push([o.order_id, o.promo_code_used, o.influencer_name || '', total, comm, total - comm, o.created_at || '']);
+            });
+            downloadCSV(`10PetalX_Promo_Orders_${new Date().toISOString().slice(0,10)}.csv`, rows);
+        });
+
+        // Chart Timeframe Toggle Buttons
+        document.getElementById('btn-chart-7d').addEventListener('click', (e) => {
+            currentTimelineDays = 7;
+            e.target.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white transition-all";
+            document.getElementById('btn-chart-30d').className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 hover:text-white transition-all";
+            renderTimelineChart(7);
+        });
+
+        document.getElementById('btn-chart-30d').addEventListener('click', (e) => {
+            currentTimelineDays = 30;
+            e.target.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white transition-all";
+            document.getElementById('btn-chart-7d').className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 hover:text-white transition-all";
+            renderTimelineChart(30);
+        });
+
+        // Auth & Action Listeners
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('unlock-admin-btn');
+            btn.innerText = "Verifying...";
+            authError.classList.add('hidden');
+            await loadDashboard(secretInput.value.trim());
+            btn.innerText = "Unlock Command Center 🔓";
+        });
+
+        document.getElementById('refresh-btn').addEventListener('click', () => loadDashboard(adminSecret));
+
+        document.getElementById('lock-btn').addEventListener('click', () => {
+            sessionStorage.removeItem('10petalx_admin_secret');
+            adminSecret = '';
+            secretInput.value = '';
+            dashboardContent.classList.add('hidden');
+            authModal.classList.remove('hidden');
+        });
+
+        document.getElementById('influencer-search').addEventListener('input', renderInfluencersTable);
+
+        document.getElementById('filter-unpaid-btn').addEventListener('click', (e) => {
+            showUnpaidOnly = !showUnpaidOnly;
+            e.target.className = showUnpaidOnly
+                ? "px-3.5 py-2 bg-pink-600 text-white rounded-xl text-xs font-bold transition-all"
+                : "px-3.5 py-2 bg-white/5 hover:bg-white/15 border border-white/15 rounded-xl text-xs font-semibold transition-all";
+            renderInfluencersTable();
+        });
+
+        document.getElementById('reset-order-filter-btn').addEventListener('click', () => {
+            selectedPromoFilter = null;
+            renderOrdersTable();
+        });
+
+        document.getElementById('settle-all-btn').addEventListener('click', async () => {
+            const unpaidTotal = document.getElementById('kpi-unpaid').innerText;
+            if (unpaidTotal === '0') {
+                alert("All influencers are already settled (₹0 unpaid dues)!");
+                return;
+            }
+            if (!confirm(`Confirm Monday Bulk Payout of ₹${unpaidTotal} across all unpaid influencers?`)) return;
+
+            const res = await fetch(`${WORKER_URL}/api/admin/settle`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${adminSecret}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`✅ Settled ₹${data.summary.totalAmountPaid} across ${data.summary.influencersSettled} influencers!`);
+                loadDashboard(adminSecret);
+            }
+        });
+
+        document.getElementById('clear-logs-btn').addEventListener('click', async () => {
+            if (!confirm("Clear all system & security logs?")) return;
+            const res = await fetch(`${WORKER_URL}/api/admin/clear-errors`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${adminSecret}` }
+            });
+            if (res.ok) loadDashboard(adminSecret);
+        });
+
+        if (adminSecret) {
+            loadDashboard(adminSecret);
+        }
     </script>
 </body>
 </html>
